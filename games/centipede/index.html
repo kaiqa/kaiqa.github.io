@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centipede Game with Phaser</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+</head>
+<body>
+    <script>
+        const gameConfig = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        let game = new Phaser.Game(gameConfig);;
+
+        let player;
+        let centipede;
+        let bullets;
+        let mushrooms;
+        let shootSound;
+        let destroySound;
+        let canShoot = true;
+        let lastShotTime = 0; 
+        let spider;
+        const fireRate = 100; // 2000 milliseconds = 2 seconds
+        let textScore;
+        let score = 0;
+
+        function preload() {
+            this.load.image('player', 'assets/player.png');
+            this.load.image('centipede', 'assets/centipede.png');
+            this.load.image('bullet', 'assets/bullet.png');
+            this.load.image('mushroom', 'assets/mushroom.png');
+            this.load.audio('shootSound', 'assets/shoot.mp3');
+            this.load.audio('destroySound', 'assets/destroy.mp3');
+            this.load.audio('gameOverSound', 'assets/gameover.mp3'); // Adjust the path to your game over sound file
+            this.load.audio('mushroomTouchedByPlayer', 'assets/mushroomTouchedByPlayer.mp3'); 
+            this.load.image('background', 'assets/background.jpg'); // Replace 'assets/background.jpg' with the path to your background image
+            this.load.image('spider', 'assets/spider.png'); // Add spider image
+        }
+
+        function create() {
+         let score = 0;   
+            textScore = this.add.text(50, 10, 'Score: 0', { font: '24px Arial', fill: '#00ff00' });
+            // Create a background tile sprite and set its scroll factor to create a repeating pattern
+            const background = this.add.tileSprite(400, 300, 800, 600, 'background');
+            background.setScrollFactor(0); // Fix the background position
+
+            // UI Text
+            textScore = this.add.text(50, 10, 'Score: 0', { font: '24px Arial', fill: '#00ff00' });
+
+            player = this.physics.add.sprite(400, 500, 'player').setScale(0.5);
+
+                 // Create spider
+            spider = this.physics.add.sprite(400, 500, 'spider').setScale(0.5);
+            spider.setVelocityX(100);
+
+            centipede = this.physics.add.group();
+            createCentipede();
+
+            bullets = this.physics.add.group({
+                defaultKey: 'bullet',
+                maxSize: 1,
+                active: false,
+                visible: false
+            });
+
+            this.physics.world.setBoundsCollision(true, true, true, false);
+
+            // out off bounce
+            bullets.children.iterate(function (bullet) {
+                bullet.on('outofbounds', function () {
+                    bullet.destroy();
+                    canShoot = true;
+                });
+            });
+
+            bullets.children.iterate(function (bullet) {
+                bullet.on('destroy', function () {
+                    canShoot = true;
+                });
+            });
+
+            mushrooms = this.physics.add.group();
+            mushrooms.children.iterate(function (mushroom) {
+                mushroom.setScale(0.1);
+            });
+
+            this.physics.add.collider(centipede, bullets, bulletHitCentipede);
+            this.physics.add.collider(bullets, mushrooms, bulletHitMushroom);
+            this.physics.add.overlap(centipede, mushrooms, centipedeHitMushroom);
+            this.physics.add.overlap(player, centipede, playerHitCentipede);
+
+            shootSound = this.sound.add('shootSound');
+            destroySound = this.sound.add('destroySound');
+            gameOverSound = this.sound.add('gameOverSound'); // Initialize the game over sound
+            mushroomTouchedByPlayerSound = this.sound.add('mushroomTouchedByPlayer');
+
+        
+        this.input.on('pointermove', function (pointer) {
+            const minY = game.config.height * 2 / 3;
+            const newX = Phaser.Math.Clamp(pointer.x, 0, game.config.width);
+            const newY = Phaser.Math.Clamp(pointer.y, minY, game.config.height);
+
+            // Check for collisions with mushrooms
+            let overlappingMushroom = false;
+
+            // when the player touches the mushroom
+             mushrooms.children.iterate(function (mushroom) {
+            const distance = Phaser.Math.Distance.Between(player.x, player.y, mushroom.x, mushroom.y);
+
+            // Calculate the outer edge of the mushroom
+            const mushroomOuterRadius = mushroom.width * 0.1 + 4;
+            //  console.log(mushroom.width);
+            // If the player is too close to the outer edge of the mushroom, prevent moving towards it
+            if (distance < mushroomOuterRadius) {
+                overlappingMushroom = true;
+                mushroomTouchedByPlayerSound.play();
+                const angle = Phaser.Math.Angle.Between(player.x, player.y, mushroom.x, mushroom.y);
+                const stopX = player.x + (mushroomOuterRadius - 30) * Math.cos(angle);
+                const stopY = player.y + (mushroomOuterRadius - 30) * Math.sin(angle);
+
+                player.x = Phaser.Math.Clamp(stopX, 0, game.config.width);
+                player.y = Phaser.Math.Clamp(stopY, minY, game.config.height);
+                    }
+                });
+
+                // Only update player position if not overlapping with any mushroom
+                if (!overlappingMushroom) {
+                    player.x = newX;
+                    player.y = newY;
+                }
+            });
+
+                // let isPointerDown = false;
+                this.input.on('pointerdown', function (pointer) {  
+                isPointerDown = true;
+
+                if (canShoot) {
+
+                    const bullet = bullets.get(player.x, player.y);
+           
+                    if (bullet) {
+                        bullet.setActive(true);
+                        bullet.setVisible(true);
+                        bullet.body.velocity.y = -300;
+
+                        shootSound.play();
+                        canShoot = true;
+                    }
+                }
+            });
+           createRandomMushrooms(40);
+
+            this.physics.add.overlap(centipede, mushrooms, centipedeHitMushroom);
+
+
+        };
+
+        
+        function fireBullet() {
+
+      //  console.log("test fire")
+        const bullet = bullets.get(player.x, player.y);
+
+        if (bullet) {
+        bullet.setActive(true);
+        bullet.setVisible(true);
+        bullet.body.velocity.y = -500;
+
+        shootSound.play();
+}
+
+        }
+
+        function bulletHitSpider(bullet, spider) {
+            // Destroy the bullet and spider
+            bullet.destroy();
+            spider.destroy();
+
+            // Update the score
+            score += 200;
+            textScore.setText('Score: ' + score);
+        }
+
+        function update() {
+
+         // Update spider movement and behavior
+         moveSpider();
+            // Check for bullet-spider collision
+            this.physics.overlap(bullets, spider, this.bulletHitSpider);
+
+            const pointer = this.input.activePointer;
+
+        if (pointer.isDown){
+
+            fireBullet();
+        } 
+
+            centipede.children.iterate(function (segment) {
+                if (segment.active) {
+                    segment.setVelocityX(250 * segment.getData('direction'));
+
+                    // Check if the centipede segment reaches the bottom
+                    if (segment.y >= game.config.height - 20) {
+                        // Spawn a new centipede segment at the top
+                        // const newSegment = centipede.create(segment.x, 0, 'centipede').setActive(true);
+                        // newSegment.setData('direction', segment.getData('direction'));
+                     //    newSegment.setData('hasMovedDown', true);
+                        // createRandomMushrooms(10)
+                        // createCentipede
+                        // Disable the current segment    
+
+                        // Update the score when the centipede reaches the bottom
+                        score -= 50; // You can adjust the penalty for letting a segment reach the bottom
+                        textScore.setText('Score: ' + score);                
+                        segment.disableBody(true, true);
+                        restartGame();
+                    }
+                }
+            });
+            this.physics.world.wrap(bullets, 5);
+
+
+            bullets.children.iterate(function (bullet) {
+                if (bullet.active && (bullet.y < 0 || bullet.y > game.config.height)) {
+                    bullet.destroy();
+                    canShoot = true;
+                }
+            });
+
+            checkCentipedeCollision();
+
+             // Check if all centipede segments are destroyed
+            if (centipede.countActive() === 0) {
+                nextLevel();
+            }
+            
+        }
+       
+        function nextLevel() {
+            // Increase the difficulty or reset the game state for the next level
+            // You can modify this function based on your game design
+            // For simplicity, we'll just create a new centipede for the next level
+
+// Adjust the speed of existing centipedes (increase the difficulty)
+centipede.children.iterate(function (segment) {
+        if (segment.active) {
+            const currentSpeed = segment.body.velocity.x;
+            segment.setVelocityX(currentSpeed * 1.1); // Increase the speed by 10% (adjust as needed)
+        }
+    });
+
+            createCentipede();
+            createRandomMushrooms(20);
+
+        }
+
+        function createCentipede() {
+            // Increase the speed each time the game restarts
+                const speedMultiplier = 30; // You can adjust this multiplier as needed
+                const segmentVelocityX = 250 * speedMultiplier;
+            
+            for (let i = 0; i < 8; i++) {
+                const segment = centipede.create(32 + i * 40, 0, 'centipede').setActive(true);
+                segment.setData('direction', 1);
+                segment.setData('hasMovedDown', false);
+                segment.setVelocityX(segmentVelocityX);
+            }
+        }
+
+        function bulletHitCentipede(centipedeSegment, bullet) {
+            centipedeSegment.disableBody(true, true);
+            bullet.destroy();
+            destroySound.play();
+
+            // Create a mushroom at the position of the centipede segment
+            createMushroom(centipedeSegment.x, centipedeSegment.y);
+
+            // Update the score when the player shoots a centipede segment
+            score += 20;
+            textScore.setText('Score: ' + score);
+
+            canShoot = true; // Allow shooting again
+        }
+
+        function bulletHitMushroom(bullet, mushroom) {
+            bullet.destroy();
+            mushroom.destroy();
+            destroySound.play();
+
+            // Update the score when the player shoots a mushroom
+            score += 10;
+            textScore.setText("Score: " + score);
+        
+            canShoot = true; // Allow shooting again
+        }
+
+        function createRandomMushrooms(count) {
+            const mushroomWidth = 30; // Adjust this based on your mushroom image size
+            const spacing = mushroomWidth * 1;
+
+            for (let i = 0; i < count; i++) {
+                const x = Phaser.Math.Between(spacing, game.config.width - spacing);
+                const y = Phaser.Math.Between(spacing, game.config.height - spacing);
+
+                const mushroom = mushrooms.create(x, y, 'mushroom').setScale(0.1);
+            }
+        }
+
+        function centipedeHitMushroom(centipedeSegment, mushroom) {
+ 
+            // Change the movement direction to avoid being pushed out of bounds
+            if (centipedeSegment.x < game.config.width - 20 && centipedeSegment.x > 20) {
+                centipedeSegment.setData('direction', -centipedeSegment.getData('direction'));
+            } else {
+                // If at the screen edge, move down and continue in the same direction
+                centipedeSegment.y += 15; // Move down by 15 pixels
+                centipedeSegment.setData('direction', -centipedeSegment.getData('direction'));
+            }
+
+     
+    // Move down and reverse the movement direction
+    centipedeSegment.y += 5; // Adjust the value based on your preference
+    centipedeSegment.setData('direction', -centipedeSegment.getData('direction'));
+
+        }
+          
+        function restartGame() {
+            // Clear existing game elements
+            player.destroy();
+            
+            gameOverSound.play(); // Play the game over sound
+           // window.location.reload();
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function playerHitCentipede(player, centipedeSegment) {
+            restartGame(); // Call the restartGame function directly
+        }
+
+        function checkCentipedeCollision() {
+            centipede.children.iterate(function (segment) {
+                if (segment.active) {
+                    if ((segment.x >= game.config.width - 20 || segment.x <= 20) && !segment.getData('hasMovedDown')) {
+                        segment.y += 15; // Move down by 15 pixels
+                        segment.setData('direction', -segment.getData('direction'));
+                        segment.setData('hasMovedDown', true);
+                    } else if (segment.x < game.config.width - 20 && segment.x > 20) {
+                        // Reset the flag when it's not touching the sides
+                        segment.setData('hasMovedDown', false);
+                    }
+                }
+            });
+        }
+    
+        function moveSpider() {
+        // Simple movement for the spider (you can customize this)
+        spider.y += 2;
+            // Ensure spider and spider.body are defined
+            if (spider && spider.body) {
+        // If the spider reaches the screen edge, reverse its direction
+            if (spider.x < 50 || spider.x > 750) {
+            spider.setVelocityX(-spider.body.velocity.x);
+            }
+        }
+
+
+            // If the spider reaches the bottom, reset its position
+            if (spider.y > 600) {
+                spider.y = 0;
+                spider.x = Phaser.Math.Between(50, 750);
+            }
+
+             // If the spider reaches the screen edge, reverse its direction
+             if (spider.x < 50 || spider.x > 750) {
+                spider.setVelocityX(-spider.body.velocity.x);
+            }
+
+            // Check for collision with the player
+            if (Phaser.Geom.Intersects.RectangleToRectangle(player.getBounds(), spider.getBounds())) {
+                // Handle spider-player collision (you can customize this)
+                // For example, decrease player health or trigger game over
+                score -= 100;
+                textScore.setText('Score: ' + score);
+                spider.y = 0;
+                spider.x = Phaser.Math.Between(50, 750);
+           
+            }
+    
+    }
+    
+        function createMushroom(x, y) {
+        const mushroom = mushrooms.create(x, y, 'mushroom').setScale(0.1);
+}
+    </script>
+</body>
+</html>
