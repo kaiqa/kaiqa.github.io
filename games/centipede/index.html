@@ -39,6 +39,11 @@
           const centerX = this.game.config.width / 2;
           const centerY = this.game.config.height / 2;
 
+          this.add.text(centerX - 150, centerY - 100, "CENTIPEDE", {
+            fontFamily: "VT323",
+            fontSize: "80px",
+            color: "#00ff00",
+          });
           // Create the "Click to Start" text at the center
           const clickText = this.add.text(centerX, centerY, "Click to Start ", {
             fontFamily: "VT323",
