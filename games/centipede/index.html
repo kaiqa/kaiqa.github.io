@@ -117,6 +117,7 @@
           );
           this.load.image("background", "assets/background.jpg"); // Replace 'assets/background.jpg' with the path to your background image
           this.load.image("spider", "assets/spider1.png"); // Add spider image
+          this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
         }
 
         create() {
@@ -138,6 +139,19 @@
           this.mushroomTouchedByPlayerSound = this.sound.add(
             "mushroomTouchedByPlayer"
           );
+
+          // create a crab
+          this.crab = this.physics.add.sprite(
+            -100,
+            (this.game.config.height * 2) / 3,
+            "crab"
+          );
+          this.crab.setScale(0.2); // Adjust scale according to your needs
+
+          // Start moving after 3 seconds
+          this.time.delayedCall(3000, () => {
+            this.moveCrab();
+          });
 
           this.spider =
             this.physics.add.sprite(/* spider coordinates and settings */);
@@ -208,6 +222,18 @@
           this.mushrooms.children.iterate((mushroom) => {
             this.mushroom.setScale(0.1);
           });
+          // Add collision detection between the crab and the player
+          this.physics.add.collider(this.crab, this.player, () => {
+            this.lives -= 1;
+            console.log("Lives left: ", this.lives);
+          });
+          this.physics.add.collider(
+            this.bullets,
+            this.crab,
+            this.bulletHitCrab,
+            null,
+            this
+          );
 
           this.physics.add.collider(
             this.centipede,
@@ -355,30 +381,30 @@
           }
         }
 
-        bulletHitSpider(bullet, spider) {
-          // Display points at the spider's position
-          const pointsText = this.add
-            .text(spider.x, spider.y, "+200", {
-              fontFamily: "VT323",
-              fontSize: "20px",
-              color: "#ff0000",
-            })
-            .setOrigin(0.5, 0.5);
-          // pointsText = "200";
-          console.log("Points text should now be visible");
-          pointsText.setDepth(1);
-          // Remove the points text after 1 second
-          this.time.delayedCall(1000, () => {
-            pointsText.destroy();
-          });
-          // Destroy the bullet and spider
-          bullet.destroy();
-          spider.destroy();
-          this.destroySound.play();
-          // Update the score
-          score += 200;
-          //  textScore.setText("Score: " + score);
-        }
+        // bulletHitSpider(bullet, spider) {
+        //   // Display points at the spider's position
+        //   const pointsText = this.add
+        //     .text(spider.x, spider.y, "+200", {
+        //       fontFamily: "VT323",
+        //       fontSize: "20px",
+        //       color: "#ff0000",
+        //     })
+        //     .setOrigin(0.5, 0.5);
+        //   // pointsText = "200";
+        //   console.log("Points text should now be visible");
+        //   pointsText.setDepth(1);
+        //   // Remove the points text after 1 second
+        //   this.time.delayedCall(1000, () => {
+        //     pointsText.destroy();
+        //   });
+        //   // Destroy the bullet and spider
+        //   bullet.destroy();
+        //   spider.destroy();
+        //   this.destroySound.play();
+        //   // Update the score
+        //   score += 200;
+        //   //  textScore.setText("Score: " + score);
+        // }
 
         update() {
           if (this.lives === 0) {
@@ -405,6 +431,11 @@
               // Check if the centipede segment reaches the bottom
               if (segment.y >= game.config.height - 20) {
                 segment.disableBody(true, true);
+                this.score = 0;
+                this.scoreText = "0";
+                this.lives = 4;
+                this.wave = 1;
+                this.gameOverSound.play();
                 this.scene.start("bootGame");
                 // this.restartGame();
               }
@@ -644,6 +675,37 @@
           console.log("touched");
         }
 
+        moveCrab() {
+          // Set initial direction and speed
+          let speed = 200;
+          let direction = 1; // 1 for down, -1 for up
+          if (this.crab) {
+            this.crab.body.velocity.x = speed;
+
+            // Change direction every 500ms
+            this.time.addEvent({
+              delay: 1300,
+              callback: () => {
+                if (!this.crab || !this.crab.body) return;
+                if (this.crab.x > this.game.config.width + 40) {
+                  // If crab moves outside the play area, reset its position
+                  this.crab.setPosition(
+                    -100,
+                    (this.game.config.height * 2) / 3
+                  );
+                  this.crab.body.velocity.x = speed;
+                } else {
+                  // Change vertical direction
+                  this.crab.body.velocity.y = speed * direction;
+                  direction *= -1; // Change direction
+                }
+              },
+              loop: true,
+            });
+          } else {
+          }
+        }
+
         moveSpider() {
           // Simple movement for the spider
           this.spider.y += 2;
@@ -681,6 +743,14 @@
           const mushroom = mushrooms.create(x, y, "mushroom").setScale(0.1);
 
           mushroomTouchedByPlayerSound.play().this;
+        }
+        bulletHitCrab(bullet, crab) {
+          bullet.destroy(); // Destroy the bullet
+          crab.destroy(); // Destroy the crab
+          this.score += 200; // Add 200 points to the player's score
+          this.textScore.setText(`Score: ${this.score}`); // Update the score display
+
+          this.sound.play("destroySound"); // Play the destroy sound
         }
 
         createSpider() {
@@ -743,7 +813,7 @@
           const continueButton = this.add
             .text(centerX, centerY + 100, "Continue", {
               fontFamily: "VT323",
-              fontSize: "30px",
+              fontSize: "50px",
               color: "#00ff00",
             })
             .setOrigin(0.5)
@@ -759,7 +829,7 @@
           const scoreText = this.add
             .text(centerX, centerY - 120, `Score: ${displayScore}`, {
               fontFamily: "VT323",
-              fontSize: "40px",
+              fontSize: "50px",
               color: "#ffffff",
             })
             .setOrigin(0.5);
