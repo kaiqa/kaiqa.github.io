@@ -356,6 +356,21 @@
         }
 
         bulletHitSpider(bullet, spider) {
+          // Display points at the spider's position
+          const pointsText = this.add
+            .text(spider.x, spider.y, "+200", {
+              fontFamily: "VT323",
+              fontSize: "20px",
+              color: "#ff0000",
+            })
+            .setOrigin(0.5, 0.5);
+          // pointsText = "200";
+          console.log("Points text should now be visible");
+          pointsText.setDepth(1);
+          // Remove the points text after 1 second
+          this.time.delayedCall(1000, () => {
+            pointsText.destroy();
+          });
           // Destroy the bullet and spider
           bullet.destroy();
           spider.destroy();
@@ -370,7 +385,7 @@
             this.restartGame();
           }
 
-          console.log(this.isPaused);
+          // console.log(this.isPaused);
 
           // Update spider movement and behavior
           if (this.spider) {
@@ -450,6 +465,21 @@
         }
 
         bulletHitCentipede(centipedeSegment, bullet) {
+          const pointsText = this.add
+            .text(centipedeSegment.x + 10, centipedeSegment.y + 10, "80", {
+              fontFamily: "VT323",
+              fontSize: "20px",
+              color: "#ffff00",
+            })
+            .setOrigin(0.5, 0.5);
+          // pointsText = "200";
+          console.log("Points text should now be visible");
+          pointsText.setDepth(1);
+          // Remove the points text
+          this.time.delayedCall(400, () => {
+            pointsText.destroy();
+          });
+
           centipedeSegment.disableBody(true, true);
           bullet.destroy();
           this.destroySound.play();
@@ -464,17 +494,44 @@
         }
 
         bulletHitMushroom(bullet, mushroom) {
+          const pointsText = this.add
+            .text(mushroom.x, mushroom.y, "5", {
+              fontFamily: "VT323",
+              fontSize: "20px",
+              color: "#ffff00",
+            })
+            .setOrigin(0.5, 0.5);
+          // pointsText = "200";
+          pointsText.setDepth(1);
+          // Remove the points text
+          this.time.delayedCall(400, () => {
+            pointsText.destroy();
+          });
+
           bullet.destroy();
           mushroom.destroy();
           this.destroySound.play();
           // Update the score when the player shoots a mushroom
-          this.score += 10;
+          this.score += 5;
           this.textScore.setText("Score: " + this.score);
           this.textLives.setText("Lives: " + this.lives);
           this.canShoot = true; // Allow shooting again
         }
 
         bulletHitSpider(bullet, spider) {
+          const pointsText = this.add
+            .text(spider.x, spider.y, "200", {
+              fontFamily: "VT323",
+              fontSize: "20px",
+              color: "#ffff00",
+            })
+            .setOrigin(0.5, 0.5);
+          pointsText.setDepth(1);
+          // Remove the points text
+          this.time.delayedCall(400, () => {
+            pointsText.destroy();
+          });
+
           // Destroy the bullet and spider
           bullet.destroy();
           spider.destroy();
