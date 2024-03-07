@@ -434,6 +434,14 @@
         nextLevel() {
           // Increase the difficulty or reset the game state for the next level
           // Adjust the speed of existing centipedes (increase the difficulty)
+          // Transition to the ScoreScene
+
+          // Inside Scene2 or where you transition to the ScoreScene
+          this.scene.start("ScoreScene", {
+            score: this.score,
+            lives: this.lives,
+            wave: this.wave,
+          });
 
           this.wave = this.wave + 1;
           this.textWave.setText("Wave: " + this.wave);
@@ -693,6 +701,88 @@
           );
         }
       }
+      class ScoreScene extends Phaser.Scene {
+        constructor() {
+          super("ScoreScene");
+        }
+
+        init(data) {
+          // Receive score, lives, and wave from the previous scene
+          this.score = data.score;
+          this.lives = data.lives;
+          this.wave = data.wave;
+        }
+        preload() {
+          this.load.audio("tickSound", "assets/tick.mp3");
+        }
+
+        create() {
+          // Calculate the center of the screen
+          const { width, height } = this.sys.game.config;
+          const centerX = width / 2;
+          const centerY = height / 2;
+          this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
+
+          this.add
+            .text(centerX, centerY - 60, `Lives: ${this.lives}`, {
+              fontFamily: "VT323",
+              fontSize: "40px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
+
+          this.add
+            .text(centerX, centerY, `Wave: ${this.wave}`, {
+              fontFamily: "VT323",
+              fontSize: "40px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
+
+          // Create the continue button
+          const continueButton = this.add
+            .text(centerX, centerY + 100, "Continue", {
+              fontFamily: "VT323",
+              fontSize: "30px",
+              color: "#00ff00",
+            })
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true });
+
+          continueButton.on("pointerdown", () => {
+            this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
+          });
+          const tickSound = this.sound.add("tickSound");
+
+          // Initial score display
+          let displayScore = 0;
+          const scoreText = this.add
+            .text(centerX, centerY - 120, `Score: ${displayScore}`, {
+              fontFamily: "VT323",
+              fontSize: "40px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
+
+          // Function to update the score display
+          const updateScoreDisplay = () => {
+            displayScore++;
+            displayScore = displayScore + 50; // Increment the displayed score
+            scoreText.setText(`Score: ${displayScore}`);
+            tickSound.play(); // Play the tick sound
+            // Update the text
+            if (displayScore < this.score) {
+              this.time.delayedCall(80, updateScoreDisplay);
+              //   tickSound.play();
+              // Continue updating until reaching the final score
+            }
+          };
+
+          // Start updating the score display
+          updateScoreDisplay();
+        }
+      }
+
       const gameConfig = {
         type: Phaser.AUTO,
         width: 800,
@@ -704,7 +794,7 @@
             debug: false,
           },
         },
-        scene: [Scene1, Scene2],
+        scene: [Scene1, Scene2, ScoreScene],
       };
 
       let game = new Phaser.Game(gameConfig);
