@@ -227,7 +227,6 @@
             this.lives -= 1;
             this.textLives.setText("Lives: " + this.lives);
             this.player.setVelocity(0, 0);
-            console.log("Lives left: ", this.lives);
           });
           this.physics.add.collider(
             this.bullets,
@@ -674,7 +673,7 @@
           spider.y = 0;
           spider.x = Phaser.Math.Between(50, 750);
           this.destroySound.play();
-          console.log("touched");
+          // console.log("touched");
         }
 
         moveCrab() {
@@ -683,10 +682,11 @@
           let direction = 1; // 1 for down, -1 for up
           if (this.crab) {
             this.crab.body.velocity.x = speed;
-
+            this.crab.body.velocity.y = speed * direction;
+            direction *= -1; // Change direction
             // Change direction every 500ms
             this.time.addEvent({
-              delay: 1300,
+              delay: 1100,
               callback: () => {
                 if (!this.crab || !this.crab.body) return;
                 if (this.crab.x > this.game.config.width + 40) {
@@ -706,6 +706,27 @@
             });
           } else {
           }
+          // Set the crab's boundary limit based on the game's height
+          const bottomBoundary =
+            this.game.config.height - this.crab.displayHeight / 2; // Adjust if your crab has an offset
+
+          // // Change direction every 3 seconds
+          this.time.addEvent({
+            delay: 4000, // 3000 milliseconds = 3 seconds
+            callback: () => {
+              if (!this.crab || !this.crab.body) return;
+              // Randomly change direction to left or right
+              // direction = Math.random() > 0.5 ? 1 : -1;
+              // this.crab.setVelocityX(speed * direction);
+              this.crab.body.velocity.x = speed * direction;
+              direction *= +1; // Change direction
+              // Check if the crab is beyond the bottom play area and adjust
+              if (this.crab.y > bottomBoundary) {
+                this.crab.y = bottomBoundary; // Reset crab's y position to within the play area
+              }
+            },
+            loop: true,
+          });
         }
 
         moveSpider() {
@@ -747,9 +768,22 @@
           mushroomTouchedByPlayerSound.play().this;
         }
         bulletHitCrab(bullet, crab) {
+          const pointsText = this.add
+            .text(crab.x, crab.y, "300", {
+              fontFamily: "VT323",
+              fontSize: "20px",
+              color: "#ffff00",
+            })
+            .setOrigin(0.5, 0.5);
+          pointsText.setDepth(1);
+          // Remove the points text
+          this.time.delayedCall(400, () => {
+            pointsText.destroy();
+          });
+
           bullet.destroy(); // Destroy the bullet
           crab.destroy(); // Destroy the crab
-          this.score += 200; // Add 200 points to the player's score
+          this.score += 300; // Add 200 points to the player's score
           this.textScore.setText(`Score: ${this.score}`); // Update the score display
 
           this.sound.play("destroySound"); // Play the destroy sound
