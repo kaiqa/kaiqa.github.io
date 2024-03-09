@@ -106,7 +106,6 @@
           this.score = data.score || 0; // Use passed score or default to 0
           this.lives = data.lives || 4; // Use passed lives or some default
           this.wave = data.wave || 1; // Use passed wave or default to first wave
-          // Initialize any other necessary data based on what's passed
         }
 
         preload() {
@@ -364,11 +363,7 @@
         }
 
         restartGame() {
-          console.log("restart");
-
           this.gameOverSound.play();
-          // this.gameOverSound.stop();
-
           // Reset game state
           this.score = 0;
           this.lives = 4;
@@ -838,6 +833,7 @@
         }
         preload() {
           this.load.audio("tickSound", "assets/tick.mp3");
+          this.load.audio("totalSound", "assets/total.mp3");
         }
 
         create() {
@@ -904,7 +900,7 @@
             .setInteractive({ useHandCursor: true });
 
           const tickSound = this.sound.add("tickSound");
-
+          const totalSound = this.sound.add("totalSound");
           // Function to update the score display
 
           const updateScoreDisplay = () => {
@@ -922,6 +918,7 @@
               displayScore = displayTotal; // Increment the displayed score
               scoreText.setText(`Score: ${displayScore}`);
               tickSound.play();
+              totalSound.play();
               // this.score = displayScore;
             }
           };
