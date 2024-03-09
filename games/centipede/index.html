@@ -100,6 +100,7 @@
           var textLives = 3;
           var textWave = 1;
           this.isPaused = false; // Add a property to track if the game is paused
+          this.crabMushroomTouches = 0;
         }
 
         preload() {
@@ -155,11 +156,14 @@
 
           this.spider =
             this.physics.add.sprite(/* spider coordinates and settings */);
+          // Initialize the mushrooms as a static group
+          this.mushrooms = this.physics.add.staticGroup();
 
           this.createMushroom = function (x, y) {
             const mushroom = this.mushrooms
               .create(x, y, "mushroom")
               .setScale(0.1);
+            mushroom.body.immovable = true;
             this.mushroomTouchedByPlayerSound.play();
             // additional logic for creating mushrooms
           };
@@ -222,7 +226,6 @@
           this.mushrooms.children.iterate((mushroom) => {
             this.mushroom.setScale(0.1);
           });
-          // Add collision detection between the crab and the player
           this.physics.add.collider(this.crab, this.player, () => {
             this.lives -= 1;
             this.textLives.setText("Lives: " + this.lives);
@@ -235,7 +238,13 @@
             null,
             this
           );
-
+          this.physics.add.collider(
+            this.crab,
+            this.mushrooms,
+            this.crabHitsMushroom,
+            null,
+            this
+          );
           this.physics.add.collider(
             this.centipede,
             this.bullets,
@@ -715,9 +724,6 @@
             delay: 4000, // 3000 milliseconds = 3 seconds
             callback: () => {
               if (!this.crab || !this.crab.body) return;
-              // Randomly change direction to left or right
-              // direction = Math.random() > 0.5 ? 1 : -1;
-              // this.crab.setVelocityX(speed * direction);
               this.crab.body.velocity.x = speed * direction;
               direction *= +1; // Change direction
               // Check if the crab is beyond the bottom play area and adjust
@@ -729,6 +735,16 @@
           });
         }
 
+        crabHitsMushroom(crab, mushroom) {
+          // Check if this is the third mushroom touched
+          console.log(this.crabMushroomTouches);
+          this.crabMushroomTouches = ++this.crabMushroomTouches;
+          if (this.crabMushroomTouches % 2 === 0) {
+            this.sound.play("destroySound");
+            // Destroy the mushroom
+            mushroom.destroy();
+          }
+        }
         moveSpider() {
           // Simple movement for the spider
           this.spider.y += 2;
@@ -763,10 +779,13 @@
         }
 
         createMushroom(x, y) {
-          const mushroom = mushrooms.create(x, y, "mushroom").setScale(0.1);
-
+          //   const mushroom = mushrooms.create(x, y, "mushroom").setScale(0.1);
+          const mushroom = this.physics.add
+            .staticSprite(x, y, "mushroom")
+            .setScale(0.1);
           mushroomTouchedByPlayerSound.play().this;
         }
+
         bulletHitCrab(bullet, crab) {
           const pointsText = this.add
             .text(crab.x, crab.y, "300", {
