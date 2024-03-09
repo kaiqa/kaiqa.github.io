@@ -102,6 +102,12 @@
           this.isPaused = false; // Add a property to track if the game is paused
           this.crabMushroomTouches = 0;
         }
+        init(data) {
+          this.score = data.score || 0; // Use passed score or default to 0
+          this.lives = data.lives || 4; // Use passed lives or some default
+          this.wave = data.wave || 1; // Use passed wave or default to first wave
+          // Initialize any other necessary data based on what's passed
+        }
 
         preload() {
           this.load.image("startButton", "assets/startButton.png");
@@ -122,6 +128,7 @@
         }
 
         create() {
+          this.startTime = this.time.now;
           // Create a background tile sprite and set its scroll factor to create a repeating pattern
           const background = this.add.tileSprite(
             400,
@@ -358,7 +365,7 @@
 
         restartGame() {
           console.log("restart");
-          this.wave = 1;
+
           this.gameOverSound.play();
           // this.gameOverSound.stop();
 
@@ -366,6 +373,7 @@
           this.score = 0;
           this.lives = 4;
           this.wave = 1;
+          this.bonus = 0;
           this.textScore.setText("Score: " + this.score);
           this.textLives.setText("Lives: " + this.lives);
           this.textWave.setText("Wave: " + this.wave);
@@ -390,31 +398,6 @@
             this.shootSound.play();
           }
         }
-
-        // bulletHitSpider(bullet, spider) {
-        //   // Display points at the spider's position
-        //   const pointsText = this.add
-        //     .text(spider.x, spider.y, "+200", {
-        //       fontFamily: "VT323",
-        //       fontSize: "20px",
-        //       color: "#ff0000",
-        //     })
-        //     .setOrigin(0.5, 0.5);
-        //   // pointsText = "200";
-        //   console.log("Points text should now be visible");
-        //   pointsText.setDepth(1);
-        //   // Remove the points text after 1 second
-        //   this.time.delayedCall(1000, () => {
-        //     pointsText.destroy();
-        //   });
-        //   // Destroy the bullet and spider
-        //   bullet.destroy();
-        //   spider.destroy();
-        //   this.destroySound.play();
-        //   // Update the score
-        //   score += 200;
-        //   //  textScore.setText("Score: " + score);
-        // }
 
         update() {
           if (this.lives === 0) {
@@ -477,15 +460,29 @@
           // Adjust the speed of existing centipedes (increase the difficulty)
           // Transition to the ScoreScene
 
-          // Inside Scene2 or where you transition to the ScoreScene
+          const endTime = this.time.now;
+          const durationInSeconds = (endTime - this.startTime) / 1000; // Phaser's time.now is in milliseconds
+          //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
+
+          let bonusScore = Math.max(
+            0,
+            Math.round((30 - durationInSeconds) * 200)
+          );
+          // Adjust bonusScore calculation as needed. This example gives 10 points for each second under 30 seconds.
+
+          // Ensure bonusScore is not negative
+          bonusScore = Math.max(0, bonusScore);
+
           this.scene.start("ScoreScene", {
             score: this.score,
             lives: this.lives,
             wave: this.wave,
+            bonusScore: bonusScore, // Pass the bonusScore to the ScoreScene
           });
 
           this.wave = this.wave + 1;
           this.textWave.setText("Wave: " + this.wave);
+
           this.centipede.children.iterate((segment) => {
             if (segment.active) {
               const currentSpeed = segment.body.velocity.x;
@@ -494,7 +491,7 @@
           });
 
           this.createCentipede();
-          this.createRandomMushrooms(20);
+          this.createRandomMushrooms(30);
           this.createSpider();
         }
 
@@ -521,8 +518,7 @@
               color: "#ffff00",
             })
             .setOrigin(0.5, 0.5);
-          // pointsText = "200";
-          console.log("Points text should now be visible");
+
           pointsText.setDepth(1);
           // Remove the points text
           this.time.delayedCall(400, () => {
@@ -587,6 +583,7 @@
 
           // Update the score
           this.score += 200;
+          this.bonus += 300;
           this.textScore.setText("Score: " + this.score);
           this.textLives.setText("Lives: " + this.lives);
         }
@@ -737,7 +734,7 @@
 
         crabHitsMushroom(crab, mushroom) {
           // Check if this is the third mushroom touched
-          console.log(this.crabMushroomTouches);
+          //  console.log(this.crabMushroomTouches);
           this.crabMushroomTouches = ++this.crabMushroomTouches;
           if (this.crabMushroomTouches % 2 === 0) {
             this.sound.play("destroySound");
@@ -803,6 +800,7 @@
           bullet.destroy(); // Destroy the bullet
           crab.destroy(); // Destroy the crab
           this.score += 300; // Add 200 points to the player's score
+          this.bonus += 400;
           this.textScore.setText(`Score: ${this.score}`); // Update the score display
 
           this.sound.play("destroySound"); // Play the destroy sound
@@ -836,6 +834,7 @@
           this.score = data.score;
           this.lives = data.lives;
           this.wave = data.wave;
+          this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
         }
         preload() {
           this.load.audio("tickSound", "assets/tick.mp3");
@@ -847,6 +846,36 @@
           const centerX = width / 2;
           const centerY = height / 2;
           this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
+
+          // Display bonus score
+          // this.add
+          //   .text(centerX, centerY + 40, `Bonus Score: ${this.bonusScore}`, {
+          //     fontFamily: "VT323",
+          //     fontSize: "40px",
+          //     color: "#ffffff",
+          //   })
+          //   .setOrigin(0.5);
+
+          // Initial bonus score display
+          let displayBonusScore = 0;
+          let displayScore = 0;
+          var displayTotal = this.bonusScore + this.score;
+          const scoreBonusText = this.add
+            .text(centerX, centerY - 120, `Score: ${displayBonusScore}`, {
+              fontFamily: "VT323",
+              fontSize: "50px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
+          // Initial score display
+
+          const scoreText = this.add
+            .text(centerX, centerY + 40, `Score: ${displayScore}`, {
+              fontFamily: "VT323",
+              fontSize: "50px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
 
           this.add
             .text(centerX, centerY - 60, `Lives: ${this.lives}`, {
@@ -874,37 +903,62 @@
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true });
 
-          continueButton.on("pointerdown", () => {
-            this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
-          });
           const tickSound = this.sound.add("tickSound");
 
-          // Initial score display
-          let displayScore = 0;
-          const scoreText = this.add
-            .text(centerX, centerY - 120, `Score: ${displayScore}`, {
-              fontFamily: "VT323",
-              fontSize: "50px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-
           // Function to update the score display
+
           const updateScoreDisplay = () => {
             displayScore++;
             displayScore = displayScore + 50; // Increment the displayed score
             scoreText.setText(`Score: ${displayScore}`);
             tickSound.play(); // Play the tick sound
             // Update the text
-            if (displayScore < this.score) {
+            console.log(displayTotal);
+            if (displayScore < this.displayTotal) {
               this.time.delayedCall(80, updateScoreDisplay);
               //   tickSound.play();
               // Continue updating until reaching the final score
+            } else {
+              displayScore = displayTotal; // Increment the displayed score
+              scoreText.setText(`Score: ${displayScore}`);
+              tickSound.play();
+              // this.score = displayScore;
             }
           };
 
+          const updateScoreBonusDisplay = () => {
+            displayBonusScore++;
+            displayBonusScore = displayBonusScore + 50; // Increment the displayed score
+            scoreBonusText.setText(`Bonus: ${displayBonusScore}`);
+            tickSound.play(); // Play the tick sound
+            // Update the text
+            if (displayBonusScore < this.bonusScore) {
+              this.time.delayedCall(80, updateScoreBonusDisplay);
+              //   tickSound.play();
+              // Continue updating until reaching the final score
+            } else {
+              // Start updating the score display
+              updateScoreDisplay();
+            }
+          };
           // Start updating the score display
-          updateScoreDisplay();
+          updateScoreBonusDisplay();
+
+          continueButton.on("pointerdown", () => {
+            // console.log(" -score-- ");
+            // console.log(this.score);
+            // console.log(" -display-- ");
+            // console.log(displayScore);
+            this.score = displayTotal;
+            //  console.log(this.score);
+            this.scene.start("playGame", {
+              score: displayTotal, // Assuming this.score holds the final score
+              lives: this.lives, // Assuming this.lives holds the current lives count
+              wave: this.wave + 1, // Assuming this.wave holds the current wave number
+            });
+
+            // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
+          });
         }
       }
 
