@@ -225,6 +225,8 @@
           // Add collision detection between the crab and the player
           this.physics.add.collider(this.crab, this.player, () => {
             this.lives -= 1;
+            this.textLives.setText("Lives: " + this.lives);
+            this.player.setVelocity(0, 0);
             console.log("Lives left: ", this.lives);
           });
           this.physics.add.collider(
