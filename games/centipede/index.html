@@ -116,12 +116,35 @@
           this.wave = data.wave || 1; // Use passed wave or default to first wave
         }
 
+        initHeartsDisplay() {
+          this.hearts = []; // This will hold all heart images for easy management
+          const heartsSpacing = 50; // Space between hearts
+          const heartPositionY = 40; // Y position for hearts
+          const heartStartX = 750; // Starting X position for the first heart
+          for (let i = 0; i < this.lives; i++) {
+            const heart = this.add
+              .image(heartStartX - i * heartsSpacing, heartPositionY, "heart")
+              .setScale(0.5);
+            this.hearts.push(heart);
+          }
+        }
+
+        updateHeartsDisplay() {
+          // Remove all current hearts
+          this.hearts.forEach((heart) => heart.destroy());
+          this.hearts = [];
+
+          // Re-initialize the hearts display
+          this.initHeartsDisplay();
+        }
+
         preload() {
           this.load.image("startButton", "assets/startButton.png");
           this.load.image("player", "assets/player.png");
           this.load.image("centipede", "assets/centipede.png");
           this.load.image("bullet", "assets/bullet.png");
           this.load.image("mushroom", "assets/mushroom1.png");
+          this.load.image("heart", "assets/heart.png");
           this.load.audio("shootSound", "assets/shoot.mp3");
           this.load.audio("destroySound", "assets/destroy.mp3");
           this.load.audio("gameOverSound", "assets/gameover.mp3"); // Adjust the path to your game over sound file
@@ -137,6 +160,10 @@
 
         create() {
           this.startTime = this.time.now;
+          // Calculate the center of the screen
+          const { width, height } = this.sys.game.config;
+          const centerX = width / 2;
+          const centerY = height / 2;
           // Create a background tile sprite and set its scroll factor to create a repeating pattern
           const background = this.add.tileSprite(
             400,
@@ -146,6 +173,9 @@
             "background"
           );
           background.setScrollFactor(0); // Fix the background position
+
+          this.initHeartsDisplay(); // Initialize hearts display
+
           this.player = this.physics.add
             .sprite(200, 300, "player")
             .setScale(0.5);
@@ -187,19 +217,25 @@
           this.createCentipede();
 
           // UI Text
-          this.textScore = this.add.text(50, 10, "Score: 0", {
+          this.textScore = this.add.text(50, 10, "0", {
             fontFamily: "VT323",
-            fontSize: "24px",
+            fontSize: "50px",
             color: "#00ff00",
             // fill: '#00ff00'
           });
           this.textLives = this.lives;
-          this.textLives = this.add.text(50, 35, `Lives: ${this.textLives}`, {
-            fontFamily: "VT323",
-            fontSize: "24px",
-            color: "#00ff00",
-            // fill: '#00ff00'
-          });
+
+          this.textLives = this.add.text(
+            -100,
+            -100,
+            `Lives: ${this.textLives}`,
+            {
+              fontFamily: "VT323",
+              fontSize: "24px",
+              color: "#00ff00",
+              // fill: '#00ff00'
+            }
+          );
           this.textWave = this.wave;
           this.textWave = this.add.text(50, 55, `Wave: ${this.textWave}`, {
             fontFamily: "VT323",
@@ -246,6 +282,7 @@
             this.lives -= 1;
             this.textLives.setText("Lives: " + this.lives);
             this.player.setVelocity(0, 0);
+            this.updateHeartsDisplay();
           });
           this.physics.add.collider(
             this.bullets,
@@ -546,7 +583,7 @@
 
           // Update the score when the player shoots a centipede segment
           this.score += 80;
-          this.textScore.setText("Score: " + this.score);
+          this.textScore.setText("" + this.score);
           this.canShoot = true; // Allow shooting again
         }
 
@@ -570,7 +607,7 @@
           this.destroySound.play();
           // Update the score when the player shoots a mushroom
           this.score += 5;
-          this.textScore.setText("Score: " + this.score);
+          this.textScore.setText("" + this.score);
           this.textLives.setText("Lives: " + this.lives);
           this.canShoot = true; // Allow shooting again
         }
@@ -596,7 +633,7 @@
           // Update the score
           this.score += 200;
           this.bonus += 300;
-          this.textScore.setText("Score: " + this.score);
+          this.textScore.setText("" + this.score);
           this.textLives.setText("Lives: " + this.lives);
           // this.nextLevel();
         }
@@ -684,15 +721,13 @@
           // Handle spider-player collision logic
           // For example, decrease player health or trigger game over
           this.score -= 100;
-          this.lives -= 2;
+          this.lives -= 1;
           this.textLives.setText("Lives: " + this.lives);
-          console.log(this.lives);
-          console.log(this.score);
           this.mushroomTouchedByPlayerSound.play();
           spider.y = 0;
           spider.x = Phaser.Math.Between(50, 750);
           this.destroySound.play();
-          // console.log("touched");
+          this.updateHeartsDisplay();
         }
 
         moveCrab() {
@@ -815,7 +850,7 @@
           crab.destroy(); // Destroy the crab
           this.score += 300; // Add 200 points to the player's score
           this.bonus += 400;
-          this.textScore.setText(`Score: ${this.score}`); // Update the score display
+          this.textScore.setText(`${this.score}`); // Update the score display
 
           this.sound.play("destroySound"); // Play the destroy sound
         }
