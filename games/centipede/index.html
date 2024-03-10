@@ -71,7 +71,14 @@
             "pointerdown",
             function () {
               // Start the "playGame" scene when the text is clicked
-              this.scene.start("playGame");
+              // this.scene.start("playGame");
+              this.scene.start("playGame", {
+                score: (this.score = 0),
+                lives: (this.lives = 0),
+                wave: (this.wave = 1),
+                bonus: (this.bonus = 0),
+                textScore: (this.textScore = 0),
+              });
             },
             this
           );
@@ -104,6 +111,7 @@
         }
         init(data) {
           this.score = data.score || 0; // Use passed score or default to 0
+          this.textScore = data.textScore || 0;
           this.lives = data.lives || 4; // Use passed lives or some default
           this.wave = data.wave || 1; // Use passed wave or default to first wave
         }
@@ -121,6 +129,7 @@
             "mushroomTouchedByPlayer",
             "assets/mushroomTouchedByPlayer.mp3"
           );
+          this.load.audio("crabEatsSound", "assets/crabEatsSound.mp3");
           this.load.image("background", "assets/background.jpg"); // Replace 'assets/background.jpg' with the path to your background image
           this.load.image("spider", "assets/spider1.png"); // Add spider image
           this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
@@ -143,6 +152,7 @@
           this.shootSound = this.sound.add("shootSound");
           this.destroySound = this.sound.add("destroySound");
           this.gameOverSound = this.sound.add("gameOverSound"); // Initialize the game over sound
+          this.crabEatsSound = this.sound.add("crabEatsSound");
           this.mushroomTouchedByPlayerSound = this.sound.add(
             "mushroomTouchedByPlayer"
           );
@@ -365,21 +375,29 @@
         restartGame() {
           this.gameOverSound.play();
           // Reset game state
-          this.score = 0;
+          // this.score = 11110;
           this.lives = 4;
           this.wave = 1;
           this.bonus = 0;
-          this.textScore.setText("Score: " + this.score);
-          this.textLives.setText("Lives: " + this.lives);
-          this.textWave.setText("Wave: " + this.wave);
-          // Reset player position
-          this.player.setPosition(200, 300);
+          this.score = 0;
+          // this.textScore.setText("Score: " + this.score);
+          // this.textLives.setText("Lives: " + this.lives);
+          // this.textWave.setText("Wave: " + this.wave);
+          // // Reset player position
+          // this.player.setPosition(200, 300);
 
-          // Enable input events
-          this.input.enabled = true;
+          // // Enable input events
+          // this.input.enabled = true;
 
           // Restart the game loop
-          this.scene.start("bootGame");
+          // this.scene.start("bootGame");
+          this.scene.start("bootGame", {
+            score: (this.score = 0),
+            lives: (this.lives = 0),
+            wave: (this.wave = 1),
+            bonus: (this.bonus = 0),
+            textScore: (this.textScore = 0),
+          });
         }
 
         fireBullet() {
@@ -468,26 +486,25 @@
           // Ensure bonusScore is not negative
           bonusScore = Math.max(0, bonusScore);
 
+          // this.wave = this.wave + 1;
+          // this.textWave.setText("Wave: " + this.wave);
+          // this.centipede.children.iterate((segment) => {
+          //   if (segment.active) {
+          //     const currentSpeed = segment.body.velocity.x;
+          //     segment.setVelocityX(currentSpeed * 1.0); // Increase the speed by 10% (adjust as needed)
+          //   }
+          // });
+          // this.createCentipede();
+          // console.log("it me");
+          // this.createRandomMushrooms(300);
+          // this.createSpider();
+
           this.scene.start("ScoreScene", {
             score: this.score,
             lives: this.lives,
             wave: this.wave,
             bonusScore: bonusScore, // Pass the bonusScore to the ScoreScene
           });
-
-          this.wave = this.wave + 1;
-          this.textWave.setText("Wave: " + this.wave);
-
-          this.centipede.children.iterate((segment) => {
-            if (segment.active) {
-              const currentSpeed = segment.body.velocity.x;
-              segment.setVelocityX(currentSpeed * 1.0); // Increase the speed by 10% (adjust as needed)
-            }
-          });
-
-          this.createCentipede();
-          this.createRandomMushrooms(30);
-          this.createSpider();
         }
 
         createCentipede() {
@@ -581,6 +598,7 @@
           this.bonus += 300;
           this.textScore.setText("Score: " + this.score);
           this.textLives.setText("Lives: " + this.lives);
+          // this.nextLevel();
         }
 
         createRandomMushrooms(count) {
@@ -588,7 +606,7 @@
           const spacing = mushroomWidth * 1;
           let currentIndex = 0;
           let delayBetween = 100;
-
+          console.log("me again");
           const createNextMushroom = () => {
             if (currentIndex < count) {
               const x = Phaser.Math.Between(
@@ -732,11 +750,12 @@
           //  console.log(this.crabMushroomTouches);
           this.crabMushroomTouches = ++this.crabMushroomTouches;
           if (this.crabMushroomTouches % 2 === 0) {
-            this.sound.play("destroySound");
+            this.sound.play("crabEatsSound");
             // Destroy the mushroom
             mushroom.destroy();
           }
         }
+
         moveSpider() {
           // Simple movement for the spider
           this.spider.y += 2;
@@ -831,9 +850,11 @@
           this.wave = data.wave;
           this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
         }
+
         preload() {
           this.load.audio("tickSound", "assets/tick.mp3");
           this.load.audio("totalSound", "assets/total.mp3");
+          this.load.image("heart", "assets/heart.png");
         }
 
         create() {
@@ -842,6 +863,20 @@
           const centerX = width / 2;
           const centerY = height / 2;
           this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
+
+          const heartsSpacing = 40; // Adjust based on the size of your heart sprite
+          const firstHeartPositionX = centerX + 210; // Starting X position for the first heart
+          const heartPositionY = centerY - 250; // Y position for all hearts
+
+          for (let i = 0; i < this.lives; i++) {
+            this.add
+              .image(
+                firstHeartPositionX + i * heartsSpacing,
+                heartPositionY,
+                "heart"
+              )
+              .setScale(0.5); // Scale as needed
+          }
 
           // Display bonus score
           // this.add
@@ -856,48 +891,39 @@
           let displayBonusScore = 0;
           let displayScore = 0;
           var displayTotal = this.bonusScore + this.score;
-          const scoreBonusText = this.add
-            .text(centerX, centerY - 120, `Score: ${displayBonusScore}`, {
+
+          this.add
+            .text(centerX - 200, centerY - 250, `Wave ${this.wave}`, {
               fontFamily: "VT323",
-              fontSize: "50px",
+              fontSize: "100px",
+              color: "#ffffff",
+            })
+            .setOrigin(0.5);
+
+          const scoreBonusText = this.add
+            .text(centerX, centerY - 130, `Score ${displayBonusScore}`, {
+              fontFamily: "VT323",
+              fontSize: "100px",
               color: "#ffffff",
             })
             .setOrigin(0.5);
           // Initial score display
 
           const scoreText = this.add
-            .text(centerX, centerY + 40, `Score: ${displayScore}`, {
+            .text(centerX, centerY - 50, `Score ${displayScore}`, {
               fontFamily: "VT323",
-              fontSize: "50px",
+              fontSize: "100px",
               color: "#ffffff",
             })
             .setOrigin(0.5);
 
           this.add
-            .text(centerX, centerY - 60, `Lives: ${this.lives}`, {
+            .text(centerX + 110, centerY - 250, `Lives `, {
               fontFamily: "VT323",
-              fontSize: "40px",
+              fontSize: "100px",
               color: "#ffffff",
             })
             .setOrigin(0.5);
-
-          this.add
-            .text(centerX, centerY, `Wave: ${this.wave}`, {
-              fontFamily: "VT323",
-              fontSize: "40px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-
-          // Create the continue button
-          const continueButton = this.add
-            .text(centerX, centerY + 100, "Continue", {
-              fontFamily: "VT323",
-              fontSize: "50px",
-              color: "#00ff00",
-            })
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true });
 
           const tickSound = this.sound.add("tickSound");
           const totalSound = this.sound.add("totalSound");
@@ -919,7 +945,27 @@
               scoreText.setText(`Score: ${displayScore}`);
               tickSound.play();
               totalSound.play();
-              // this.score = displayScore;
+              // Create the continue button
+              const continueButton = this.add
+                .text(centerX, centerY + 150, "Continue", {
+                  fontFamily: "VT323",
+                  fontSize: "50px",
+                  color: "#00ff00",
+                })
+                .setOrigin(0.5)
+                .setInteractive({ useHandCursor: true }); // show continue
+
+              continueButton.on("pointerdown", () => {
+                this.score = displayTotal;
+                //  console.log(this.score);
+                this.scene.start("playGame", {
+                  score: displayTotal, // Assuming this.score holds the final score
+                  lives: this.lives, // Assuming this.lives holds the current lives count
+                  wave: this.wave + 1, // Assuming this.wave holds the current wave number
+                });
+
+                // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
+              });
             }
           };
 
@@ -941,21 +987,17 @@
           // Start updating the score display
           updateScoreBonusDisplay();
 
-          continueButton.on("pointerdown", () => {
-            // console.log(" -score-- ");
-            // console.log(this.score);
-            // console.log(" -display-- ");
-            // console.log(displayScore);
-            this.score = displayTotal;
-            //  console.log(this.score);
-            this.scene.start("playGame", {
-              score: displayTotal, // Assuming this.score holds the final score
-              lives: this.lives, // Assuming this.lives holds the current lives count
-              wave: this.wave + 1, // Assuming this.wave holds the current wave number
-            });
+          // continueButton.on("pointerdown", () => {
+          //   this.score = displayTotal;
+          //   //  console.log(this.score);
+          //   this.scene.start("playGame", {
+          //     score: displayTotal, // Assuming this.score holds the final score
+          //     lives: this.lives, // Assuming this.lives holds the current lives count
+          //     wave: this.wave + 1, // Assuming this.wave holds the current wave number
+          //   });
 
-            // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
-          });
+          //   // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
+          // });
         }
       }
 
