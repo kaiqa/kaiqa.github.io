@@ -117,13 +117,18 @@
         }
 
         initHeartsDisplay() {
-          this.hearts = []; // This will hold all heart images for easy management
+          const { width, height } = this.sys.game.config;
+          const centerY = height / 2;
+          const centerX = width / 2;
+          this.hearts = []; // Reset the array
           const heartsSpacing = 50; // Space between hearts
-          const heartPositionY = 40; // Y position for hearts
-          const heartStartX = 750; // Starting X position for the first heart
+          const heartPositionY = centerY - 290; // Y position for hearts
+          const heartStartX = centerX - 380; // Adjust if necessary to match your UI layout
+
+          // Start from the fixed position and add hearts to the right
           for (let i = 0; i < this.lives; i++) {
             const heart = this.add
-              .image(heartStartX - i * heartsSpacing, heartPositionY, "heart")
+              .image(heartStartX + i * heartsSpacing, heartPositionY, "heart")
               .setScale(0.5);
             this.hearts.push(heart);
           }
@@ -217,7 +222,7 @@
           this.createCentipede();
 
           // UI Text
-          this.textScore = this.add.text(50, 10, "0", {
+          this.textScore = this.add.text(centerX - 390, centerY - 280, "0", {
             fontFamily: "VT323",
             fontSize: "50px",
             color: "#00ff00",
@@ -900,8 +905,8 @@
           this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
 
           const heartsSpacing = 40; // Adjust based on the size of your heart sprite
-          const firstHeartPositionX = centerX + 210; // Starting X position for the first heart
-          const heartPositionY = centerY - 250; // Y position for all hearts
+          const firstHeartPositionX = centerX - 380; // Starting X position for the first heart
+          const heartPositionY = centerY - 290; // Y position for all hearts
 
           for (let i = 0; i < this.lives; i++) {
             this.add
@@ -928,7 +933,7 @@
           var displayTotal = this.bonusScore + this.score;
 
           this.add
-            .text(centerX - 200, centerY - 250, `Wave ${this.wave}`, {
+            .text(centerX, centerY - 250, `Wave ${this.wave}`, {
               fontFamily: "VT323",
               fontSize: "100px",
               color: "#ffffff",
@@ -945,7 +950,7 @@
           // Initial score display
 
           const scoreText = this.add
-            .text(centerX, centerY - 50, `Score ${displayScore}`, {
+            .text(centerX, centerY - 50, `Score: ${displayScore}`, {
               fontFamily: "VT323",
               fontSize: "100px",
               color: "#ffffff",
@@ -953,7 +958,7 @@
             .setOrigin(0.5);
 
           this.add
-            .text(centerX + 110, centerY - 250, `Lives `, {
+            .text(centerX + 110, centerY - 250, ``, {
               fontFamily: "VT323",
               fontSize: "100px",
               color: "#ffffff",
