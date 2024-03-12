@@ -242,12 +242,17 @@
             }
           );
           this.textWave = this.wave;
-          this.textWave = this.add.text(50, 55, `Wave: ${this.textWave}`, {
-            fontFamily: "VT323",
-            fontSize: "24px",
-            color: "#00ff00",
-            // fill: '#00ff00'
-          });
+          this.textWave = this.add.text(
+            centerX - 390,
+            centerY - 240,
+            `Wave: ${this.textWave}`,
+            {
+              fontFamily: "VT323",
+              fontSize: "24px",
+              color: "#00fff0",
+              // fill: '#00ff00'
+            }
+          );
 
           // Create spider
           this.spider = this.physics.add
