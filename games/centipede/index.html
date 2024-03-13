@@ -164,6 +164,8 @@
         }
 
         create() {
+          console.log(this.wave);
+
           this.startTime = this.time.now;
           // Calculate the center of the screen
           const { width, height } = this.sys.game.config;
@@ -209,15 +211,17 @@
             this.physics.add.sprite(/* spider coordinates and settings */);
           // Initialize the mushrooms as a static group
           this.mushrooms = this.physics.add.staticGroup();
-
+          // lets make shrooms
           this.createMushroom = function (x, y) {
             const mushroom = this.mushrooms
               .create(x, y, "mushroom")
               .setScale(0.1);
             mushroom.body.immovable = true;
+            mushroom.setData("hits", 0); // Use setData to store the hit count
             this.mushroomTouchedByPlayerSound.play();
             // additional logic for creating mushrooms
           };
+
           this.centipede = this.physics.add.group();
           this.createCentipede();
 
@@ -598,27 +602,47 @@
         }
 
         bulletHitMushroom(bullet, mushroom) {
-          const pointsText = this.add
-            .text(mushroom.x, mushroom.y, "5", {
-              fontFamily: "VT323",
-              fontSize: "20px",
-              color: "#ffff00",
-            })
-            .setOrigin(0.5, 0.5);
-          // pointsText = "200";
-          pointsText.setDepth(1);
-          // Remove the points text
-          this.time.delayedCall(400, () => {
-            pointsText.destroy();
-          });
+          let hits = mushroom.getData("hits") + 1; // Retrieve current hit count and increment
+          mushroom.setData("hits", hits); // Update the hit count
+          // Apply different tints based on the number of hits
+          if (hits === 1) {
+            mushroom.setTint(0xff9999); // Light red tint after the first hit
+          } else if (hits === 2) {
+            mushroom.setTint(0xff6666); // Darker red tint after the second hit
+          }
+
+          if (hits >= 3) {
+            const pointsText = this.add
+              .text(mushroom.x, mushroom.y, "5", {
+                fontFamily: "VT323",
+                fontSize: "20px",
+                color: "#ffff00",
+              })
+              .setOrigin(0.5, 0.5);
+            // pointsText = "200";
+            pointsText.setDepth(1);
+            // Remove the points text
+            this.time.delayedCall(400, () => {
+              pointsText.destroy();
+            });
+            // // Destroy the mushroom if it has been hit 3 times
+            // mushroom.destroy();
+            // this.destroySound.play();
+            // // Update the score when the player destroys a mushroom
+            // this.score += 5; // Adjust scoring as needed
+            // this.textScore.setText("" + this.score);
+            mushroom.destroy();
+            this.destroySound.play();
+            // Update the score when the player shoots a mushroom
+            this.score += 5;
+            this.textScore.setText("" + this.score);
+            this.textLives.setText("Lives: " + this.lives);
+          } else {
+            // Optional: Visual feedback that the mushroom was hit but not destroyed
+          }
 
           bullet.destroy();
-          mushroom.destroy();
-          this.destroySound.play();
-          // Update the score when the player shoots a mushroom
-          this.score += 5;
-          this.textScore.setText("" + this.score);
-          this.textLives.setText("Lives: " + this.lives);
+
           this.canShoot = true; // Allow shooting again
         }
 
@@ -649,11 +673,13 @@
         }
 
         createRandomMushrooms(count) {
+          if (this.wave > 1) {
+            count = count + this.wave * 2;
+          }
           const mushroomWidth = 30; // Adjust this based on your mushroom image size
           const spacing = mushroomWidth * 1;
           let currentIndex = 0;
           let delayBetween = 100;
-          console.log("me again");
           const createNextMushroom = () => {
             if (currentIndex < count) {
               const x = Phaser.Math.Between(
@@ -665,15 +691,13 @@
                 game.config.height - spacing
               );
 
-              this.createMushroom(x, y); // Assuming createMushroom is a defined function
-              // mushroomTouchedByPlayerSound.play();
+              this.createMushroom(x, y);
               currentIndex++;
 
               // Recursive call with a delay
               setTimeout(createNextMushroom, delayBetween);
             }
           };
-
           // Start the sequence
           createNextMushroom();
         }
@@ -832,14 +856,6 @@
               }
             }
           }
-        }
-
-        createMushroom(x, y) {
-          //   const mushroom = mushrooms.create(x, y, "mushroom").setScale(0.1);
-          const mushroom = this.physics.add
-            .staticSprite(x, y, "mushroom")
-            .setScale(0.1);
-          mushroomTouchedByPlayerSound.play().this;
         }
 
         bulletHitCrab(bullet, crab) {
