@@ -19,6 +19,7 @@
   </style>
   <body>
     <script>
+      let globalMushroomsData = [];
       class Scene1 extends Phaser.Scene {
         constructor() {
           super("bootGame");
@@ -420,7 +421,7 @@
               }
             }
           });
-          this.createRandomMushrooms(40);
+          this.createRandomMushrooms(10);
         }
 
         restartGame() {
@@ -612,6 +613,14 @@
           }
 
           if (hits >= 3) {
+            // Remove or update the mushroom in globalMushroomsData
+            const index = globalMushroomsData.findIndex(
+              (mData) => mData.x === mushroom.x && mData.y === mushroom.y
+            );
+            if (index > -1) {
+              globalMushroomsData.splice(index, 1); // Or mark it as destroyed
+            }
+
             const pointsText = this.add
               .text(mushroom.x, mushroom.y, "5", {
                 fontFamily: "VT323",
@@ -625,12 +634,7 @@
             this.time.delayedCall(400, () => {
               pointsText.destroy();
             });
-            // // Destroy the mushroom if it has been hit 3 times
-            // mushroom.destroy();
-            // this.destroySound.play();
-            // // Update the score when the player destroys a mushroom
-            // this.score += 5; // Adjust scoring as needed
-            // this.textScore.setText("" + this.score);
+
             mushroom.destroy();
             this.destroySound.play();
             // Update the score when the player shoots a mushroom
@@ -673,33 +677,45 @@
         }
 
         createRandomMushrooms(count) {
-          if (this.wave > 1) {
-            count = count + this.wave * 2;
+          // if (this.wave > 1) {
+          //   count = count + this.wave * 2;
+          // }
+
+          // Use global data to place mushrooms if available
+          if (this.wave > 1 && globalMushroomsData.length > 0) {
+            globalMushroomsData.forEach((mushroomData) => {
+              this.createMushroom(mushroomData.x, mushroomData.y);
+              console.log("data shroom");
+            });
+          } else {
+            // Existing logic to randomly place mushrooms
+            // For each new mushroom, add its data to globalMushroomsData
+
+            const mushroomWidth = 30; // Adjust this based on your mushroom image size
+            const spacing = mushroomWidth * 1;
+            let currentIndex = 0;
+            let delayBetween = 100;
+            const createNextMushroom = () => {
+              if (currentIndex < count) {
+                const x = Phaser.Math.Between(
+                  spacing,
+                  game.config.width - spacing
+                );
+                const y = Phaser.Math.Between(
+                  spacing,
+                  game.config.height - spacing
+                );
+
+                this.createMushroom(x, y);
+                currentIndex++;
+
+                // Recursive call with a delay
+                setTimeout(createNextMushroom, delayBetween);
+              }
+            };
+            // Start the sequence
+            createNextMushroom();
           }
-          const mushroomWidth = 30; // Adjust this based on your mushroom image size
-          const spacing = mushroomWidth * 1;
-          let currentIndex = 0;
-          let delayBetween = 100;
-          const createNextMushroom = () => {
-            if (currentIndex < count) {
-              const x = Phaser.Math.Between(
-                spacing,
-                game.config.width - spacing
-              );
-              const y = Phaser.Math.Between(
-                spacing,
-                game.config.height - spacing
-              );
-
-              this.createMushroom(x, y);
-              currentIndex++;
-
-              // Recursive call with a delay
-              setTimeout(createNextMushroom, delayBetween);
-            }
-          };
-          // Start the sequence
-          createNextMushroom();
         }
 
         centipedeHitMushroom(centipedeSegment, mushroom) {
