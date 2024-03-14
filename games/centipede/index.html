@@ -212,6 +212,7 @@
             this.physics.add.sprite(/* spider coordinates and settings */);
           // Initialize the mushrooms as a static group
           this.mushrooms = this.physics.add.staticGroup();
+
           // lets make shrooms
           this.createMushroom = function (x, y) {
             const mushroom = this.mushrooms
@@ -219,6 +220,8 @@
               .setScale(0.1);
             mushroom.body.immovable = true;
             mushroom.setData("hits", 0); // Use setData to store the hit count
+            // Add the mushroom data to globalMushroomsData
+            // globalMushroomsData.push({ x: x, y: y, hits: 0 });
             this.mushroomTouchedByPlayerSound.play();
             // additional logic for creating mushrooms
           };
@@ -421,11 +424,12 @@
               }
             }
           });
-          this.createRandomMushrooms(10);
+          this.createRandomMushrooms(15);
         }
 
         restartGame() {
           this.gameOverSound.play();
+          globalMushroomsData = [];
           // Reset game state
           // this.score = 11110;
           this.lives = 4;
@@ -528,12 +532,12 @@
           const endTime = this.time.now;
           const durationInSeconds = (endTime - this.startTime) / 1000; // Phaser's time.now is in milliseconds
           //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
-
+          console.log(globalMushroomsData.length);
           let bonusScore = Math.max(
             0,
             Math.round((30 - durationInSeconds) * 200)
           );
-          // Adjust bonusScore calculation as needed. This example gives 10 points for each second under 30 seconds.
+          // Adjust bonusScore calculation as  10 points for each second under 30 seconds.
 
           // Ensure bonusScore is not negative
           bonusScore = Math.max(0, bonusScore);
@@ -596,6 +600,20 @@
           // Create a mushroom at the position of the centipede segment
           this.createMushroom(centipedeSegment.x, centipedeSegment.y);
 
+          console.log(
+            "before Create a mushroom at the position of the centipede segment",
+            globalMushroomsData.length
+          );
+          globalMushroomsData.push({
+            x: centipedeSegment.x,
+            y: centipedeSegment.y,
+            hits: 0,
+          });
+          console.log(
+            "After Create a mushroom at the position of the centipede segment",
+            globalMushroomsData.length
+          );
+
           // Update the score when the player shoots a centipede segment
           this.score += 80;
           this.textScore.setText("" + this.score);
@@ -614,6 +632,7 @@
 
           if (hits >= 3) {
             // Remove or update the mushroom in globalMushroomsData
+            console.log("Before removal", globalMushroomsData.length);
             const index = globalMushroomsData.findIndex(
               (mData) => mData.x === mushroom.x && mData.y === mushroom.y
             );
@@ -636,6 +655,7 @@
             });
 
             mushroom.destroy();
+            console.log("After removal", globalMushroomsData.length);
             this.destroySound.play();
             // Update the score when the player shoots a mushroom
             this.score += 5;
@@ -682,40 +702,45 @@
           // }
 
           // Use global data to place mushrooms if available
+          //  console.log("data");
+          //  console.log(globalMushroomsData.length);
           if (this.wave > 1 && globalMushroomsData.length > 0) {
+            console.log("creating previous");
+            console.log("whit the amount of :", globalMushroomsData.length);
+
             globalMushroomsData.forEach((mushroomData) => {
               this.createMushroom(mushroomData.x, mushroomData.y);
-              console.log("data shroom");
             });
-          } else {
-            // Existing logic to randomly place mushrooms
-            // For each new mushroom, add its data to globalMushroomsData
-
-            const mushroomWidth = 30; // Adjust this based on your mushroom image size
-            const spacing = mushroomWidth * 1;
-            let currentIndex = 0;
-            let delayBetween = 100;
-            const createNextMushroom = () => {
-              if (currentIndex < count) {
-                const x = Phaser.Math.Between(
-                  spacing,
-                  game.config.width - spacing
-                );
-                const y = Phaser.Math.Between(
-                  spacing,
-                  game.config.height - spacing
-                );
-
-                this.createMushroom(x, y);
-                currentIndex++;
-
-                // Recursive call with a delay
-                setTimeout(createNextMushroom, delayBetween);
-              }
-            };
-            // Start the sequence
-            createNextMushroom();
           }
+          // else {
+          // Existing logic to randomly place mushrooms
+          // For each new mushroom, add its data to globalMushroomsData
+
+          const mushroomWidth = 30; // Adjust this based on your mushroom image size
+          const spacing = mushroomWidth * 1;
+          let currentIndex = 0;
+          let delayBetween = 100;
+          const createNextMushroom = () => {
+            if (currentIndex < count) {
+              const x = Phaser.Math.Between(
+                spacing,
+                game.config.width - spacing
+              );
+              const y = Phaser.Math.Between(
+                spacing,
+                game.config.height - spacing
+              );
+
+              this.createMushroom(x, y);
+
+              currentIndex++;
+
+              // Recursive call with a delay
+              setTimeout(createNextMushroom, delayBetween);
+            }
+          };
+          // Start the sequence
+          createNextMushroom();
         }
 
         centipedeHitMushroom(centipedeSegment, mushroom) {
@@ -836,8 +861,23 @@
           this.crabMushroomTouches = ++this.crabMushroomTouches;
           if (this.crabMushroomTouches % 2 === 0) {
             this.sound.play("crabEatsSound");
+
+            console.log(
+              "Before removal crab mushroom",
+              globalMushroomsData.length
+            );
+            const index = globalMushroomsData.findIndex(
+              (mData) => mData.x === mushroom.x && mData.y === mushroom.y
+            );
+            if (index > -1) {
+              globalMushroomsData.splice(index, 1); // Or mark it as destroyed
+            }
             // Destroy the mushroom
             mushroom.destroy();
+            console.log(
+              "After removal crab mushroom",
+              globalMushroomsData.length
+            );
           }
         }
 
