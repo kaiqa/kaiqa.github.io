@@ -204,8 +204,22 @@
           this.crab.setScale(0.2); // Adjust scale according to your needs
 
           // Start moving after 3 seconds
-          this.time.delayedCall(3000, () => {
+          // this.time.delayedCall(3000, () => {
+          //   this.moveCrab();
+          // });
+
+          // Randomly delay the start of crab movement after 4 seconds (4000ms)
+          const minDelay = 4000; // Minimum delay of 4 seconds
+          const randomAdditionalDelay = Phaser.Math.Between(0, 2000); // Add up to an additional 2 seconds
+
+          // Start moving the crab randomly after 4 to 6 seconds
+          this.time.delayedCall(minDelay + randomAdditionalDelay, () => {
             this.moveCrab();
+          });
+
+          // If you have a separate method or condition for `moveCrabRight`, do similarly
+          this.time.delayedCall(minDelay + Phaser.Math.Between(0, 2000), () => {
+            this.moveCrabRight();
           });
 
           this.spider =
@@ -424,7 +438,7 @@
               }
             }
           });
-          this.createRandomMushrooms(15);
+          this.createRandomMushrooms(30);
         }
 
         restartGame() {
@@ -806,7 +820,8 @@
         }
 
         moveCrab() {
-          // Set initial direction and speed
+          console.log("left");
+          //   // Set initial direction and speed
           let speed = 200;
           let direction = 1; // 1 for down, -1 for up
           if (this.crab) {
@@ -849,6 +864,63 @@
               // Check if the crab is beyond the bottom play area and adjust
               if (this.crab.y > bottomBoundary) {
                 this.crab.y = bottomBoundary; // Reset crab's y position to within the play area
+              }
+            },
+            loop: true,
+          });
+        }
+
+        moveCrabRight() {
+          console.log("left");
+          // Set initial direction and speed
+          let speed = 200;
+          let direction = 1; // 1 for down, -1 for up
+          if (this.crab) {
+            // Spawn the crab on the right side and move it to the left
+            this.crab.setPosition(
+              this.game.config.width + 100,
+              (this.game.config.height * 2) / 3
+            );
+            this.crab.body.velocity.x = -speed; // Move left
+            this.crab.body.velocity.y = speed * direction;
+            direction *= -1; // Change direction
+
+            // Adjust the timer to change vertical direction and check position
+            this.time.addEvent({
+              delay: 1000,
+              callback: () => {
+                if (!this.crab || !this.crab.body) return;
+                // Check if the crab has moved outside the play area on the left
+                if (this.crab.x < -40) {
+                  // Reset its position to the right side of the play area
+                  this.crab.setPosition(
+                    this.game.config.width + 100,
+                    (this.game.config.height * 2) / 3
+                  );
+                  this.crab.body.velocity.x = -speed; // Continue moving left
+                } else {
+                  // Change vertical direction
+                  this.crab.body.velocity.y = speed * direction;
+                  direction *= -1; // Toggle direction
+                }
+              },
+              loop: true,
+            });
+          }
+
+          // Set the crab's boundary limit based on the game's height
+          const bottomBoundary =
+            this.game.config.height - this.crab.displayHeight / 2;
+
+          // Change direction (up or down) every few seconds
+          this.time.addEvent({
+            delay: 4000,
+            callback: () => {
+              if (!this.crab || !this.crab.body) return;
+              this.crab.body.velocity.x = -Math.abs(speed); // Ensure the crab continues moving left
+              // Adjust if the crab is beyond the bottom play area
+              if (this.crab.y > bottomBoundary) {
+                this.crab.y = bottomBoundary; // Reset crab's y position within the play area
               }
             },
             loop: true,
