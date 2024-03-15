@@ -28,7 +28,7 @@
           this.load.image("background", "assets/background.jpg");
         }
         create() {
-          console.log("v1.2");
+          console.log("v1.3");
           const background = this.add.tileSprite(
             400,
             300,
@@ -281,31 +281,6 @@
             this.mushroom.setScale(0.1);
           });
 
-          // this.physics.add.collider(this.crab, this.player, () => {
-          //   this.lives -= 1;
-          //   this.textLives.setText("Lives: " + this.lives);
-          //   this.player.setVelocity(0, 0);
-          //   this.updateHeartsDisplay();
-          //   console.log("touched the crab");
-          //   console.log(this.lives);
-          //   this.destroySound.play();
-          // });
-
-          ///was active
-          // this.physics.add.collider(
-          //   this.bullets,
-          //   this.crab,
-          //   this.bulletHitCrab,
-          //   null,
-          //   this
-          // );
-          // this.physics.add.collider(
-          //   this.crab,
-          //   this.mushrooms,
-          //   this.crabHitsMushroom,
-          //   null,
-          //   this
-          // );
           this.physics.add.collider(
             this.centipede,
             this.bullets,
@@ -366,7 +341,6 @@
 
               // Calculate the outer edge of the mushroom
               const mushroomOuterRadius = mushroom.width * 0.1 + 4;
-              //  console.log(mushroom.width);
               // If the player is too close to the outer edge of the mushroom, prevent moving towards it
               if (distance < mushroomOuterRadius) {
                 overlappingMushroom = true;
@@ -515,7 +489,6 @@
           const endTime = this.time.now;
           const durationInSeconds = (endTime - this.startTime) / 1000; // Phaser's time.now is in milliseconds
           //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
-          console.log(globalMushroomsData.length);
           let bonusScore = Math.max(
             0,
             Math.round((30 - durationInSeconds) * 200)
@@ -524,20 +497,6 @@
 
           // Ensure bonusScore is not negative
           bonusScore = Math.max(0, bonusScore);
-
-          // this.wave = this.wave + 1;
-          // this.textWave.setText("Wave: " + this.wave);
-          // this.centipede.children.iterate((segment) => {
-          //   if (segment.active) {
-          //     const currentSpeed = segment.body.velocity.x;
-          //     segment.setVelocityX(currentSpeed * 1.0); // Increase the speed by 10% (adjust as needed)
-          //   }
-          // });
-          // this.createCentipede();
-          // console.log("it me");
-          // this.createRandomMushrooms(300);
-          // this.createSpider();
-
           this.scene.start("ScoreScene", {
             score: this.score,
             lives: this.lives,
@@ -583,20 +542,11 @@
           // Create a mushroom at the position of the centipede segment
           this.createMushroom(centipedeSegment.x, centipedeSegment.y);
 
-          console.log(
-            "before Create a mushroom at the position of the centipede segment",
-            globalMushroomsData.length
-          );
           globalMushroomsData.push({
             x: centipedeSegment.x,
             y: centipedeSegment.y,
             hits: 0,
           });
-          console.log(
-            "After Create a mushroom at the position of the centipede segment",
-            globalMushroomsData.length
-          );
-
           // Update the score when the player shoots a centipede segment
           this.score += 80;
           this.textScore.setText("" + this.score);
@@ -615,7 +565,6 @@
 
           if (hits >= 3) {
             // Remove or update the mushroom in globalMushroomsData
-            console.log("Before removal", globalMushroomsData.length);
             const index = globalMushroomsData.findIndex(
               (mData) => mData.x === mushroom.x && mData.y === mushroom.y
             );
@@ -638,7 +587,6 @@
             });
 
             mushroom.destroy();
-            console.log("After removal", globalMushroomsData.length);
             this.destroySound.play();
             // Update the score when the player shoots a mushroom
             this.score += 5;
@@ -682,14 +630,7 @@
           // if (this.wave > 1) {
           //   count = count + this.wave * 2;
           // }
-
-          // Use global data to place mushrooms if available
-          //  console.log("data");
-          //  console.log(globalMushroomsData.length);
           if (this.wave > 1 && globalMushroomsData.length > 0) {
-            console.log("creating previous");
-            console.log("whit the amount of :", globalMushroomsData.length);
-
             globalMushroomsData.forEach((mushroomData) => {
               this.createMushroom(mushroomData.x, mushroomData.y);
             });
@@ -947,15 +888,9 @@
 
         crabHitsMushroom(crab, mushroom) {
           // Check if this is the third mushroom touched
-          //  console.log(this.crabMushroomTouches);
           this.crabMushroomTouches = ++this.crabMushroomTouches;
           if (this.crabMushroomTouches % 2 === 0) {
             this.sound.play("crabEatsSound");
-
-            console.log(
-              "Before removal crab mushroom",
-              globalMushroomsData.length
-            );
             const index = globalMushroomsData.findIndex(
               (mData) => mData.x === mushroom.x && mData.y === mushroom.y
             );
@@ -964,10 +899,6 @@
             }
             // Destroy the mushroom
             mushroom.destroy();
-            console.log(
-              "After removal crab mushroom",
-              globalMushroomsData.length
-            );
           }
         }
 
@@ -1024,7 +955,12 @@
           this.textScore.setText(`${this.score}`); // Update the score display
           this.sound.play("destroySound"); // Play the destroy sound
           // create a crab
-          this.createCrab();
+          this.time.addEvent({
+            delay: 4000,
+            callback: () => {
+              this.createCrab();
+            },
+          });
         }
 
         createSpider() {
@@ -1142,7 +1078,6 @@
             scoreText.setText(`Score: ${displayScore}`);
             tickSound.play(); // Play the tick sound
             // Update the text
-            console.log(displayTotal);
             if (displayScore < this.displayTotal) {
               this.time.delayedCall(80, updateScoreDisplay);
               //   tickSound.play();
@@ -1164,7 +1099,6 @@
 
               continueButton.on("pointerdown", () => {
                 this.score = displayTotal;
-                //  console.log(this.score);
                 this.scene.start("playGame", {
                   score: displayTotal, // Assuming this.score holds the final score
                   lives: this.lives, // Assuming this.lives holds the current lives count
@@ -1193,18 +1127,6 @@
           };
           // Start updating the score display
           updateScoreBonusDisplay();
-
-          // continueButton.on("pointerdown", () => {
-          //   this.score = displayTotal;
-          //   //  console.log(this.score);
-          //   this.scene.start("playGame", {
-          //     score: displayTotal, // Assuming this.score holds the final score
-          //     lives: this.lives, // Assuming this.lives holds the current lives count
-          //     wave: this.wave + 1, // Assuming this.wave holds the current wave number
-          //   });
-
-          //   // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
-          // });
         }
       }
 
