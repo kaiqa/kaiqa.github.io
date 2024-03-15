@@ -79,6 +79,7 @@
                 wave: (this.wave = 1),
                 bonus: (this.bonus = 0),
                 textScore: (this.textScore = 0),
+                centipedeSegmentSpeed: this.centipedeSegmentSpeed || 250,
               });
             },
             this
@@ -115,6 +116,7 @@
           this.textScore = data.textScore || 0;
           this.lives = data.lives || 4; // Use passed lives or some default
           this.wave = data.wave || 1; // Use passed wave or default to first wave
+          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed || 250;
         }
 
         initHeartsDisplay() {
@@ -165,6 +167,8 @@
         }
 
         create() {
+          console.log("speed -");
+          console.log(this.centipedeSegmentSpeed);
           this.startTime = this.time.now;
           // Calculate the center of the screen
           const { width, height } = this.sys.game.config;
@@ -210,8 +214,8 @@
             // additional logic for creating mushrooms
           };
 
-          this.centipede = this.physics.add.group();
-          this.createCentipede();
+          //  this.centipede = this.physics.add.group();
+          //  this.createCentipede();
 
           // UI Text
           this.textScore = this.add.text(centerX - 390, centerY - 280, "0", {
@@ -448,7 +452,9 @@
           }
           this.centipede.children.iterate((segment) => {
             if (segment.active) {
-              segment.setVelocityX(250 * segment.getData("direction"));
+              segment.setVelocityX(
+                this.centipedeSegmentSpeed * segment.getData("direction")
+              );
 
               // Check if the centipede segment reaches the bottom
               if (segment.y >= game.config.height - 20) {
@@ -506,17 +512,17 @@
         }
 
         createCentipede() {
-          // Increase the speed each time the game restarts
-          const speedMultiplier = 30; // You can adjust this multiplier as needed
-          const segmentVelocityX = 250 * speedMultiplier;
-
+          //  segmentVelocityX = this.data.centipedeSegmentSpeed;
           for (let i = 0; i < 8; i++) {
             const segment = this.centipede
               .create(32 + i * 40, 0, "centipede")
               .setActive(true);
             segment.setData("direction", 1);
             segment.setData("hasMovedDown", false);
-            segment.setVelocityX(segmentVelocityX);
+            // Apply the velocity to make the centipede move
+            segment.setVelocityX(
+              this.centipedeSegmentSpeed * segment.getData("direction")
+            );
           }
         }
 
@@ -992,6 +998,7 @@
           this.lives = data.lives;
           this.wave = data.wave;
           this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
+          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed || 250;
         }
 
         preload() {
@@ -1103,8 +1110,8 @@
                   score: displayTotal, // Assuming this.score holds the final score
                   lives: this.lives, // Assuming this.lives holds the current lives count
                   wave: this.wave + 1, // Assuming this.wave holds the current wave number
+                  centipedeSegmentSpeed: this.centipedeSegmentSpeed * 1.1,
                 });
-
                 // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
               });
             }
