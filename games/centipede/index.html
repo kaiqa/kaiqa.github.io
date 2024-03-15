@@ -1106,13 +1106,17 @@
                 .setOrigin(0.5)
                 .setInteractive({ useHandCursor: true }); // show continue
 
+              if (this.centipedeSegmentSpeed <= 360) {
+                this.centipedeSegmentSpeed = this.centipedeSegmentSpeed * 1.01;
+              }
+
               continueButton.on("pointerdown", () => {
                 this.score = displayTotal;
                 this.scene.start("playGame", {
                   score: displayTotal, // Assuming this.score holds the final score
                   lives: this.lives, // Assuming this.lives holds the current lives count
                   wave: this.wave + 1, // Assuming this.wave holds the current wave number
-                  centipedeSegmentSpeed: this.centipedeSegmentSpeed * 1.01,
+                  centipedeSegmentSpeed: this.centipedeSegmentSpeed,
                 });
                 // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
               });
