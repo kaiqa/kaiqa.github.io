@@ -116,7 +116,7 @@
           this.textScore = data.textScore || 0;
           this.lives = data.lives || 4; // Use passed lives or some default
           this.wave = data.wave || 1; // Use passed wave or default to first wave
-          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed || 250;
+          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
         }
 
         initHeartsDisplay() {
@@ -508,6 +508,7 @@
             lives: this.lives,
             wave: this.wave,
             bonusScore: bonusScore, // Pass the bonusScore to the ScoreScene
+            centipedeSegmentSpeed: this.centipedeSegmentSpeed,
           });
         }
 
@@ -998,7 +999,7 @@
           this.lives = data.lives;
           this.wave = data.wave;
           this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
-          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed || 250;
+          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
         }
 
         preload() {
@@ -1009,6 +1010,7 @@
 
         create() {
           // Calculate the center of the screen
+          console.log(this.centipedeSegmentSpeed);
           const { width, height } = this.sys.game.config;
           const centerX = width / 2;
           const centerY = height / 2;
@@ -1110,7 +1112,7 @@
                   score: displayTotal, // Assuming this.score holds the final score
                   lives: this.lives, // Assuming this.lives holds the current lives count
                   wave: this.wave + 1, // Assuming this.wave holds the current wave number
-                  centipedeSegmentSpeed: this.centipedeSegmentSpeed * 1.1,
+                  centipedeSegmentSpeed: this.centipedeSegmentSpeed * 1.01,
                 });
                 // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
               });
