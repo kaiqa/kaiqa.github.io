@@ -25,7 +25,7 @@
           super("bootGame");
         }
         preload() {
-          this.load.image("background", "assets/background.jpg");
+          this.load.image("background", "assets/background4.png");
         }
         create() {
           console.log("v1.3");
@@ -147,6 +147,8 @@
         }
 
         preload() {
+          this.load.audio("backgroundMusic", "assets/backgroundMusic.mp3");
+          this.load.image("background", "assets/background4.png");
           this.load.image("startButton", "assets/startButton.png");
           this.load.image("player", "assets/player.png");
           this.load.image("centipede", "assets/centipede.png");
@@ -161,9 +163,14 @@
             "assets/mushroomTouchedByPlayer.mp3"
           );
           this.load.audio("crabEatsSound", "assets/crabEatsSound.mp3");
-          this.load.image("background", "assets/background.jpg"); // Replace 'assets/background.jpg' with the path to your background image
-          this.load.image("spider", "assets/spider1.png"); // Add spider image
+          // this.load.image("spider", "assets/spider.gif"); // Add spider image
           this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
+
+          this.load.aseprite({
+            key: "spider",
+            textureURL: "assets/spider1.png",
+            atlasURL: "assets/spider1.json",
+          });
         }
 
         create() {
@@ -186,6 +193,22 @@
 
           this.initHeartsDisplay(); // Initialize hearts display
 
+          // Play the background music
+          this.backgroundMusic = this.sound.add("backgroundMusic", {
+            volume: 0.2,
+            loop: true,
+          });
+          // this.backgroundMusic.play();
+
+          // Add key listener for 'M' key to toggle music
+          this.input.keyboard.on("keydown-M", () => {
+            if (this.backgroundMusic.isPlaying) {
+              this.backgroundMusic.pause();
+            } else {
+              this.backgroundMusic.resume();
+            }
+          });
+
           this.player = this.physics.add
             .sprite(200, 300, "player")
             .setScale(0.5);
@@ -196,9 +219,6 @@
           this.mushroomTouchedByPlayerSound = this.sound.add(
             "mushroomTouchedByPlayer"
           );
-          this.spider =
-            this.physics.add.sprite(/* spider coordinates and settings */);
-          // Initialize the mushrooms as a static group
           this.mushrooms = this.physics.add.staticGroup();
 
           // lets make shrooms
@@ -213,9 +233,6 @@
             this.mushroomTouchedByPlayerSound.play();
             // additional logic for creating mushrooms
           };
-
-          //  this.centipede = this.physics.add.group();
-          //  this.createCentipede();
 
           // UI Text
           this.textScore = this.add.text(centerX - 390, centerY - 280, "0", {
@@ -251,10 +268,23 @@
           );
 
           // Create spider
+          //Spider animated
+          this.anims.create({
+            key: "walk", // A name for the animation
+            frames: this.anims.generateFrameNumbers("spider", {
+              start: 0,
+              end: 4, // If you have 8 frames, numbering goes from 0 to 7
+            }),
+            frameRate: 15, // Number of frames per second
+            repeat: -1, // Loop forever
+          });
+
           this.spider = this.physics.add
             .sprite(500, 700, "spider")
-            .setScale(0.5);
-          this.spider.setVelocityX(100);
+            .play("walk")
+            .setOrigin(0.5, 0.5)
+            .setScale(0.5)
+            .setVelocityX(100);
 
           this.centipede = this.physics.add.group();
           this.createCentipede();
@@ -970,23 +1000,23 @@
           });
         }
 
-        createSpider() {
-          // Create spider
-          this.spider = this.physics.add
-            .sprite(500, 700, "spider")
-            .setScale(0.5);
-          this.spider.setVelocityX(100);
-          this.physics.add.collider(
-            this.bullets,
-            this.spider,
-            this.bulletHitSpider.bind(this)
-          );
-          this.physics.add.collider(
-            this.player,
-            this.spider,
-            this.playerHitSpider.bind(this)
-          );
-        }
+        // createSpider() {
+        //   // Create spider
+        //    this.anims.createFromAseprite("spider2");
+        //   spider = this.physics.add.sprite(500, 700, "spider").setScale(0.5);
+
+        //   this.spider.setVelocityX(100);
+        //   this.physics.add.collider(
+        //     this.bullets,
+        //     this.spider,
+        //     this.bulletHitSpider.bind(this)
+        //   );
+        //   this.physics.add.collider(
+        //     this.player,
+        //     this.spider,
+        //     this.playerHitSpider.bind(this)
+        //   );
+        // }
       }
       class ScoreScene extends Phaser.Scene {
         constructor() {
