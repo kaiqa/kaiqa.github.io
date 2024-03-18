@@ -164,8 +164,12 @@
           );
           this.load.audio("crabEatsSound", "assets/crabEatsSound.mp3");
           // this.load.image("spider", "assets/spider.gif"); // Add spider image
-          this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
-
+          // this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
+          this.load.aseprite({
+            key: "crab",
+            textureURL: "assets/crab.png",
+            atlasURL: "assets/crab.json",
+          });
           this.load.aseprite({
             key: "spider",
             textureURL: "assets/spider1.png",
@@ -766,13 +770,23 @@
         }
 
         createCrab() {
-          // create a crab
-          this.crab = this.physics.add.sprite(
-            -100,
-            (this.game.config.height * 2) / 3,
-            "crab"
-          );
-          this.crab.setScale(0.2); // Adjust scale according to your needs
+          // Create spider
+          //Spider animated
+          this.anims.create({
+            key: "crabWalk", // A name for the animation
+            frames: this.anims.generateFrameNumbers("crab", {
+              start: 0,
+              end: 3, // If you have 8 frames, numbering goes from 0 to 7
+            }),
+            frameRate: 15, // Number of frames per second
+            repeat: -1, // Loop forever
+          });
+
+          this.crab = this.physics.add
+            .sprite(-100, (this.game.config.height * 2) / 3, "crab")
+            .play("crabWalk")
+            .setOrigin(0.5, 0.5)
+            .setScale(0.3);
 
           // Randomly delay the start of crab movement after 4 seconds (4000ms)
           const minDelay = 4000; // Minimum delay of 4 seconds
