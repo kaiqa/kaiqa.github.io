@@ -93,6 +93,25 @@
             return "I'm sorry, I couldn't fetch a joke for you.";
           }
         });
+
+        // Define the getWeather Object Macro
+        bot.setSubroutine("getFreeWeather", async (rs, args) => {
+          // The city name is passed as the first argument
+          const city = args[0];
+          const url = `https://wttr.in/${encodeURIComponent(city)}?format=3`;
+
+          try {
+            const response = await fetch(url);
+            const weatherText = await response.text(); // wttr.in responds with plain text
+            return weatherText; // Return the weather information for the requested city
+          } catch (error) {
+            console.error(
+              "Failed to fetch weather data for " + city + ":",
+              error
+            );
+            return "I'm sorry, I couldn't fetch the weather for " + city + ".";
+          }
+        });
       }
 
       function loadingError(error, filename, lineno) {

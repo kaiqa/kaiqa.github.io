@@ -45,11 +45,22 @@
 ^ light gray|dark gray
 
 // Define responses to specific commands
+// Tell the parser to join continuation lines with line breaks
+! local concat = newline
 + help
-- Here are the commands you can use: help, about, and you can also enter URLs.
+- Here are the commands you can use:
+^ - what is the weather in ...
+^ - tell me a joke
+^ - tell me a poem
+^ - g yoursearchterm
+^ - y yoursearchterm
+^ - play centipede
+
 
 + about
-- You can ask for help or enter URLs to get specific actions.
+@ help
+
+
 
 // Catch-all for anything else
 
@@ -78,6 +89,10 @@
 
 + tell me a joke
 - <call>getJoke</call>
+
++ what is the weather in *
+- <call>getFreeWeather "<star>"</call>
+
 
 // random answer
 + how are you
