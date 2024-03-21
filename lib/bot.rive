@@ -72,7 +72,12 @@
 
 + [*] gam* [*]
 - do you want to play Centipede (yes/no){topic=game}
+// API
++ weather in *
+- <call>getWeather <star></call>
 
++ tell me a joke
+- <call>getJoke</call>
 
 // random answer
 + how are you

@@ -49,6 +49,50 @@
         console.log("Bot has finished loading!");
         bot.sortReplies();
         console.log("Replies sorted.");
+
+        // After bot.sortReplies() in the loadingDone function, define the Object Macro
+        bot.setSubroutine("getWeather", async (rs, args) => {
+          const city = args[0]; // Assumes the city name is the first argument
+          const apiKey = "YOUR_API_KEY"; // Make sure to replace this with your actual API key
+          const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(
+            city
+          )}`;
+
+          try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const weather = `The current weather in ${city} is ${data.current.condition.text}, with a temperature of ${data.current.temp_c}°C.`;
+            return rs.replyAsync("local-user", weather);
+          } catch (error) {
+            console.error("Failed to fetch weather data:", error);
+            return "I'm sorry, I couldn't fetch the weather for you.";
+          }
+        });
+        // Define the getJoke Object Macro
+        bot.setSubroutine("getJoke", async (rs) => {
+          const url = "https://v2.jokeapi.dev/joke/Any?safe-mode";
+
+          try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.error) {
+              return "Oops, I couldn't fetch a joke for you.";
+            }
+
+            // Determine if it's a single or two-part joke and format accordingly
+            let joke = "";
+            if (data.type === "single") {
+              joke = data.joke;
+            } else if (data.type === "twopart") {
+              joke = `${data.setup} ... ${data.delivery}`;
+            }
+
+            return joke; // Directly return the joke string
+          } catch (error) {
+            console.error("Failed to fetch joke:", error);
+            return "I'm sorry, I couldn't fetch a joke for you.";
+          }
+        });
       }
 
       function loadingError(error, filename, lineno) {
