@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Terminal-like Website with RiveScript</title>
+    <title>prompt</title>
     <script src="https://unpkg.com/rivescript@latest/dist/rivescript.min.js"></script>
     <style>
       body,
@@ -132,40 +132,6 @@
         console.log(formattedUrl);
         window.open(formattedUrl, "_blank");
       }
-
-      // document
-      //   .getElementById("input")
-      //   .addEventListener("keydown", async function (event) {
-      //     if (event.key === "Enter") {
-      //       event.preventDefault();
-      //       const input = this.value.trim();
-      //       this.value = ""; // Clear input field after capturing the value
-
-      //       if (!input) return; // Do not process if the input is empty
-
-      //       if (input.match(/^(https?:\/\/|www\.).*/)) {
-      //         handleChatResponse(input); // Handle URLs directly in JavaScript
-      //       } else {
-      //         // Get the response from RiveScript
-      //         var reply = await bot.reply("local-user", input);
-      //         if (reply.startsWith("open:")) {
-      //           // Extract the instruction that follows "open:"
-      //           const instruction = reply.substring(5).trim();
-      //           // Pass the instruction to the handleChatResponse function
-      //           handleChatResponse(instruction);
-      //         } else {
-      //           // Update the response div
-      //           const responseDiv = document.getElementById("response");
-      //           responseDiv.textContent = ""; // Clear previous response
-      //           for (let i = 0; i < reply.length; i++) {
-      //             playSound();
-      //             responseDiv.textContent += reply[i];
-      //             await new Promise((resolve) => setTimeout(resolve, 30));
-      //           }
-      //         }
-      //       }
-      //     }
-      //   });
 
       document
         .getElementById("input")
