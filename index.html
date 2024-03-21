@@ -11,49 +11,34 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        background-color: #000; /* Corrected background-color value */
+        background-color: #000;
         color: #33ff33;
         font-family: "Courier New", Courier, monospace;
-        overflow: hidden;
       }
 
       #terminal {
-        height: 100%;
         padding: 20px;
-        box-sizing: border-box;
-        overflow-y: auto;
-      }
-
-      #inputLine {
-        display: flex;
-        align-items: center;
-      }
-
-      #inputLine span {
-        padding-right: 5px;
       }
 
       #input {
-        border: none;
+        width: calc(100% - 40px); /* Adjust width as needed */
+        padding: 10px;
+        margin-top: 20px;
         background-color: #000;
         color: #33ff33;
-        outline: none;
-        flex-grow: 1;
+        border: none; /* Removes the border */
+        outline: none; /* Removes the outline */
       }
 
-      #output {
-        white-space: pre-wrap;
-        margin-bottom: 10px;
+      #response {
+        margin-top: 10px;
       }
     </style>
   </head>
   <body>
     <div id="terminal">
-      <div id="output"></div>
-      <div id="inputLine">
-        <span>$</span>
-        <input type="text" id="input" autofocus />
-      </div>
+      <span>$</span><input type="text" id="input" autofocus />
+      <div id="response"></div>
     </div>
     <script>
       // Initialize RiveScript
@@ -70,50 +55,19 @@
         console.log("Error when loading files: " + error);
       }
 
-      // Function to play sound for each character
       function playSound() {
         const audio = new Audio("assets/tick.mp3"); // Adjust the path as needed
         audio.play();
       }
 
       function handleChatResponse(response) {
-        // Log the original response
         console.log(response);
-
-        // Check if response starts with http:// or https://, otherwise prepend https://
         const formattedUrl =
           response.startsWith("http://") || response.startsWith("https://")
             ? response
             : `https://${response}`;
-
-        console.log(formattedUrl); // This will now show 'https://www.google.com' if 'www.google.com' was input
-
-        // Now that the URL is correctly formatted, you can safely use it
+        console.log(formattedUrl);
         window.open(formattedUrl, "_blank");
-      }
-      function linkify(inputText) {
-        var replacedText, replacePattern1;
-
-        //URLs starting with http://, https://, or ftp://
-        replacePattern1 =
-          /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-        replacedText = inputText.replace(
-          replacePattern1,
-          '<a href="$1" target="_blank">$1</a>'
-        );
-
-        return replacedText;
-      }
-
-      // Function to print characters with sound, ensuring new line for each response
-      async function printWithSound(output, text) {
-        output.textContent += "\n"; // Start the response on a new line
-        for (let i = 0; i < text.length; i++) {
-          playSound();
-          output.textContent += text[i];
-          await new Promise((resolve) => setTimeout(resolve, 30)); // Adjust delay as needed
-        }
-        output.textContent += "\n"; // Move to the next line after printing the text
       }
 
       document
@@ -122,32 +76,31 @@
           if (event.key === "Enter") {
             event.preventDefault();
             const input = this.value.trim();
-            const output = document.getElementById("output");
-            output.textContent += `\n$ ${input}`;
-            this.value = "";
+            this.value = ""; // Clear input field after capturing the value
 
-            // Simple URL detection
+            if (!input) return; // Do not process if the input is empty
+
             if (input.match(/^(https?:\/\/|www\.).*/)) {
               handleChatResponse(input); // Handle URLs directly in JavaScript
             } else {
               // Get the response from RiveScript
               var reply = await bot.reply("local-user", input);
-
-              // Check if the reply contains the "open:" indicator
               if (reply.startsWith("open:")) {
                 // Extract the instruction that follows "open:"
                 const instruction = reply.substring(5).trim();
                 // Pass the instruction to the handleChatResponse function
                 handleChatResponse(instruction);
               } else {
-                // If there's no "open:" indicator, proceed with normal handling
-                // For example, displaying the chatbot's reply to the user
-                await printWithSound(output, reply);
+                // Update the response div
+                const responseDiv = document.getElementById("response");
+                responseDiv.textContent = ""; // Clear previous response
+                for (let i = 0; i < reply.length; i++) {
+                  playSound();
+                  responseDiv.textContent += reply[i];
+                  await new Promise((resolve) => setTimeout(resolve, 30));
+                }
               }
             }
-
-            // Ensure the terminal scrolls to the bottom
-            output.scrollTop = output.scrollHeight;
           }
         });
 

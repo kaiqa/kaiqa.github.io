@@ -22,6 +22,14 @@
 ! sub what'll = what will
 ! sub who's   = who is
 
+// A lot of colors!
+! array colors = red blue green yellow orange cyan fuchsia magenta
+^ light red|dark red|light blue|dark blue|light yellow|dark yellow
+^ light orange|dark orange|light cyan|dark cyan|light fuchsia
+^ dark fuchsia|light magenta|dark magenta
+^ black gray white silver
+^ light gray|dark gray
+
 // Define responses to specific commands
 + help
 - Here are the commands you can use: help, about, and you can also enter URLs.
@@ -68,3 +76,26 @@
 
 + i am not *
 - For simplicity I will call you Dave.
+
++ i am (really|very|super) tired
+- I'm sorry to hear that you are <star> tired.
+
+//  "keyword" triggers: if the user says a magic word ANYWHERE in their message
++ [*] the machine [*]
+- How do you know about the machine!?
+
+// ! array colors = red blue green yellow
+// + i am wearing a (@colors) shirt
+// - Do you really like <star>?
++ what color is my (red|blue|green|yellow) *
+- Your <star2> is <star1>, silly!
+
++ google *{weight=10}
+- open: http://google.com/search?q=<star>
++ g *
+- open: http://google.com/search?q=<star>
+
++ youtube *
+- open: https://www.youtube.com/results?search_query=<star>
++ y *
+- open: https://www.youtube.com/results?search_query=<star>
