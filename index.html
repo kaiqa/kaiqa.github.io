@@ -44,7 +44,7 @@
       // Initialize RiveScript
       var bot = new RiveScript();
       bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
-
+      let lastInput = "";
       function loadingDone() {
         console.log("Bot has finished loading!");
         bot.sortReplies();
@@ -133,12 +133,52 @@
         window.open(formattedUrl, "_blank");
       }
 
+      // document
+      //   .getElementById("input")
+      //   .addEventListener("keydown", async function (event) {
+      //     if (event.key === "Enter") {
+      //       event.preventDefault();
+      //       const input = this.value.trim();
+      //       this.value = ""; // Clear input field after capturing the value
+
+      //       if (!input) return; // Do not process if the input is empty
+
+      //       if (input.match(/^(https?:\/\/|www\.).*/)) {
+      //         handleChatResponse(input); // Handle URLs directly in JavaScript
+      //       } else {
+      //         // Get the response from RiveScript
+      //         var reply = await bot.reply("local-user", input);
+      //         if (reply.startsWith("open:")) {
+      //           // Extract the instruction that follows "open:"
+      //           const instruction = reply.substring(5).trim();
+      //           // Pass the instruction to the handleChatResponse function
+      //           handleChatResponse(instruction);
+      //         } else {
+      //           // Update the response div
+      //           const responseDiv = document.getElementById("response");
+      //           responseDiv.textContent = ""; // Clear previous response
+      //           for (let i = 0; i < reply.length; i++) {
+      //             playSound();
+      //             responseDiv.textContent += reply[i];
+      //             await new Promise((resolve) => setTimeout(resolve, 30));
+      //           }
+      //         }
+      //       }
+      //     }
+      //   });
+
       document
         .getElementById("input")
         .addEventListener("keydown", async function (event) {
           if (event.key === "Enter") {
             event.preventDefault();
             const input = this.value.trim();
+
+            // Only update lastInput if it's not empty
+            if (input) {
+              lastInput = input; // Store the current input
+            }
+
             this.value = ""; // Clear input field after capturing the value
 
             if (!input) return; // Do not process if the input is empty
@@ -164,6 +204,16 @@
                 }
               }
             }
+          } else if (event.key === "ArrowUp") {
+            // Populate the input field with the last input when the up arrow key is pressed
+            this.value = lastInput;
+            // Move cursor to the end of the input value
+            event.preventDefault(); // Prevent the default action to ensure the text field is updated
+            setTimeout(
+              () =>
+                this.setSelectionRange(this.value.length, this.value.length),
+              0
+            );
           }
         });
 
