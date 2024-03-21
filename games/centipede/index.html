@@ -25,7 +25,7 @@
           super("bootGame");
         }
         preload() {
-          this.load.image("background", "assets/background4.png");
+          this.load.image("background", "assets/background.png");
         }
         create() {
           console.log("v1.3");
@@ -770,8 +770,6 @@
         }
 
         createCrab() {
-          // Create spider
-          //Spider animated
           this.anims.create({
             key: "crabWalk", // A name for the animation
             frames: this.anims.generateFrameNumbers("crab", {
@@ -786,7 +784,7 @@
             .sprite(-100, (this.game.config.height * 2) / 3, "crab")
             .play("crabWalk")
             .setOrigin(0.5, 0.5)
-            .setScale(0.3);
+            .setScale(0.25);
 
           // Randomly delay the start of crab movement after 4 seconds (4000ms)
           const minDelay = 4000; // Minimum delay of 4 seconds
@@ -824,7 +822,6 @@
               return; // Exit the function if crab doesn't exist
             }
             // this.moveCrab();
-            console.log("left 2 right");
             //   // Set initial direction and speed
             let speed = 200;
             let direction = 1; // 1 for down, -1 for up
@@ -880,7 +877,6 @@
               return; // Exit the function if crab doesn't exist
             }
             //  this.moveCrabRight();
-            console.log("left 2 right");
             // Set initial direction and speed
             let speed = 200;
             let direction = 1; // 1 for down, -1 for up

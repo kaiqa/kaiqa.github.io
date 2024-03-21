@@ -1,0 +1,70 @@
+! version = 2.0
+
+// Bot variables
+! var name = Tutorial
+! var age  = 5
+
+// Substitutions
+! sub i'm     = i am
+! sub i'd     = i would
+! sub i've    = i have
+! sub i'll    = i will
+! sub don't   = do not
+! sub isn't   = is not
+! sub you'd   = you would
+! sub you're  = you are
+! sub you've  = you have
+! sub you'll  = you will
+! sub what's  = what is
+! sub whats   = what is
+! sub what're = what are
+! sub what've = what have
+! sub what'll = what will
+! sub who's   = who is
+
+// Define responses to specific commands
++ help
+- Here are the commands you can use: help, about, and you can also enter URLs.
+
++ about
+- You can ask for help or enter URLs to get specific actions.
+
+// Catch-all for anything else
+
++ *
+- {random}I cannot do that, Dave|Peek-a-boo!{/random}
+
+
+// random answer
++ how are you
+- I'm great, how are you?
+- I'm good, you?
+- Good :) you?
+- Great! You?
+- I'm fine, thanks for asking!
+
+// The ^ command automatically extends the data from the previous line
++ tell me a poem
+- Little Miss Muffit sat on her tuffet,\n
+^ In a nonchalant sort of way.\n
+^ With her forcefield around her,\n
+^ The Spider, the bounder,\n
+^ Is not in the picture today
+
+ + play
+ - open: https://kaiqa.github.io/games/centipede/
+
++ google
+- open: www.google.com
+
++ i am *
+- I don't know who <star> is, Dave.
+
++ my name is *
+- I don't know who <star> is, Dave.
+
++ my name is not *
+- Sorry to hear that, Dave.
+
++ i am not *
+- For simplicity I will call you Dave.

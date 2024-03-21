@@ -3,38 +3,159 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
+    <title>Terminal-like Website with RiveScript</title>
+    <script src="https://unpkg.com/rivescript@latest/dist/rivescript.min.js"></script>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        color: beige;
-        margin: 40px;
-        background-color: black;
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #000; /* Corrected background-color value */
+        color: #33ff33;
+        font-family: "Courier New", Courier, monospace;
+        overflow: hidden;
+      }
+
+      #terminal {
+        height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+
+      #inputLine {
+        display: flex;
+        align-items: center;
+      }
+
+      #inputLine span {
+        padding-right: 5px;
+      }
+
+      #input {
+        border: none;
+        background-color: #000;
+        color: #33ff33;
+        outline: none;
+        flex-grow: 1;
+      }
+
+      #output {
+        white-space: pre-wrap;
+        margin-bottom: 10px;
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1></h1>
-    </header>
+    <div id="terminal">
+      <div id="output"></div>
+      <div id="inputLine">
+        <span>$</span>
+        <input type="text" id="input" autofocus />
+      </div>
+    </div>
+    <script>
+      // Initialize RiveScript
+      var bot = new RiveScript();
+      bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
 
-    <nav>
-      <ul>
-        <li>
-          <a href="https://kaiqa.github.io/games/centipede/index.html#"
-            >Centipede</a
-          >
-        </li>
-      </ul>
-    </nav>
+      function loadingDone() {
+        console.log("Bot has finished loading!");
+        bot.sortReplies();
+        console.log("Replies sorted.");
+      }
 
-    <section>
-      <h2></h2>
-      <p></p>
-    </section>
+      function loadingError(error, filename, lineno) {
+        console.log("Error when loading files: " + error);
+      }
 
-    <footer>
-      <p>&copy; 2024</p>
-    </footer>
+      // Function to play sound for each character
+      function playSound() {
+        const audio = new Audio("assets/tick.mp3"); // Adjust the path as needed
+        audio.play();
+      }
+
+      function handleChatResponse(response) {
+        // Log the original response
+        console.log(response);
+
+        // Check if response starts with http:// or https://, otherwise prepend https://
+        const formattedUrl =
+          response.startsWith("http://") || response.startsWith("https://")
+            ? response
+            : `https://${response}`;
+
+        console.log(formattedUrl); // This will now show 'https://www.google.com' if 'www.google.com' was input
+
+        // Now that the URL is correctly formatted, you can safely use it
+        window.open(formattedUrl, "_blank");
+      }
+      function linkify(inputText) {
+        var replacedText, replacePattern1;
+
+        //URLs starting with http://, https://, or ftp://
+        replacePattern1 =
+          /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+        replacedText = inputText.replace(
+          replacePattern1,
+          '<a href="$1" target="_blank">$1</a>'
+        );
+
+        return replacedText;
+      }
+
+      // Function to print characters with sound, ensuring new line for each response
+      async function printWithSound(output, text) {
+        output.textContent += "\n"; // Start the response on a new line
+        for (let i = 0; i < text.length; i++) {
+          playSound();
+          output.textContent += text[i];
+          await new Promise((resolve) => setTimeout(resolve, 30)); // Adjust delay as needed
+        }
+        output.textContent += "\n"; // Move to the next line after printing the text
+      }
+
+      document
+        .getElementById("input")
+        .addEventListener("keydown", async function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            const input = this.value.trim();
+            const output = document.getElementById("output");
+            output.textContent += `\n$ ${input}`;
+            this.value = "";
+
+            // Simple URL detection
+            if (input.match(/^(https?:\/\/|www\.).*/)) {
+              handleChatResponse(input); // Handle URLs directly in JavaScript
+            } else {
+              // Get the response from RiveScript
+              var reply = await bot.reply("local-user", input);
+
+              // Check if the reply contains the "open:" indicator
+              if (reply.startsWith("open:")) {
+                // Extract the instruction that follows "open:"
+                const instruction = reply.substring(5).trim();
+                // Pass the instruction to the handleChatResponse function
+                handleChatResponse(instruction);
+              } else {
+                // If there's no "open:" indicator, proceed with normal handling
+                // For example, displaying the chatbot's reply to the user
+                await printWithSound(output, reply);
+              }
+            }
+
+            // Ensure the terminal scrolls to the bottom
+            output.scrollTop = output.scrollHeight;
+          }
+        });
+
+      document
+        .getElementById("terminal")
+        .addEventListener("click", function () {
+          document.getElementById("input").focus();
+        });
+    </script>
   </body>
 </html>
