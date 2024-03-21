@@ -1,8 +1,22 @@
 ! version = 2.0
 
+> topic game
+
+  + yes
+  - open: https://kaiqa.github.io/games/centipede/ {topic=random}
+
+  + no
+  - Alright, let me know if you change your mind. {topic=random}
+
+  + *
+  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
+
+< topic
+
 // Bot variables
-! var name = Tutorial
+! var name = your friend
 ! var age  = 5
+! var user = Dave
 
 // Substitutions
 ! sub i'm     = i am
@@ -40,7 +54,24 @@
 // Catch-all for anything else
 
 + *
-- {random}I cannot do that, Dave|Peek-a-boo!{/random}
+- {random}I cannot do that, <get user>|Peek-a-boo!{/random}
+
++ hello
+- Hi there!
+- Hey!
+- Howdy!
+
++ hey
+@ hello
+
++ hi
+@ hello
+
++ls
+@ hello
+
++ [*] gam* [*]
+- do you want to play Centipede (yes/no){topic=game}
 
 
 // random answer
@@ -55,27 +86,35 @@
 + tell me a poem
 - Little Miss Muffit sat on her tuffet,\n
 ^ In a nonchalant sort of way.\n
-^ With her forcefield around her,\n
+^ With her force field around her,\n
 ^ The Spider, the bounder,\n
 ^ Is not in the picture today
 
- + play
- - open: https://kaiqa.github.io/games/centipede/
++ what is your name
+- You can call me <bot name>.
+- My name is <bot name>.
 
 + google
 - open: www.google.com
 
++ who am i
+- You are <get user>.
+
 + i am *
-- I don't know who <star> is, Dave.
+-<set user=<star>>It's nice to meet you, <get user>.
 
 + my name is *
-- I don't know who <star> is, Dave.
+- <set user=<star>>It's nice to meet you, <get user>.
+
++ what is my name *
+- Your name is <get user>, silly
+
 
 + my name is not *
-- Sorry to hear that, Dave.
+- Sorry to hear that, <get user>.
 
 + i am not *
-- For simplicity I will call you Dave.
+- For simplicity I will call you <get user>.
 
 + i am (really|very|super) tired
 - I'm sorry to hear that you are <star> tired.
