@@ -32,6 +32,9 @@
 
       #response {
         margin-top: 10px;
+        white-space: pre-wrap; /* Preserves whitespace and wraps text */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
     </style>
   </head>
@@ -50,7 +53,7 @@
         bot.sortReplies();
         console.log("Replies sorted.");
 
-        // After bot.sortReplies() in the loadingDone function, define the Object Macro
+        //define the Object Macro
         bot.setSubroutine("getWeather", async (rs, args) => {
           const city = args[0]; // Assumes the city name is the first argument
           const apiKey = "YOUR_API_KEY"; // Make sure to replace this with your actual API key
@@ -154,6 +157,8 @@
             } else {
               // Get the response from RiveScript
               var reply = await bot.reply("local-user", input);
+              console.log(reply);
+              let formattedReply = reply.replace(/\n/g, "<br>");
               if (reply.startsWith("open:")) {
                 // Extract the instruction that follows "open:"
                 const instruction = reply.substring(5).trim();
@@ -162,6 +167,10 @@
               } else {
                 // Update the response div
                 const responseDiv = document.getElementById("response");
+                // Replace newline characters (\n) with <br> tags
+
+                responseDiv.innerHTML = formattedReply; // Use innerHTML
+                console.log(formattedReply);
                 responseDiv.textContent = ""; // Clear previous response
                 for (let i = 0; i < reply.length; i++) {
                   playSound();

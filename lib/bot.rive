@@ -49,12 +49,12 @@
 ! local concat = newline
 + help
 - Here are the commands you can use:
-^ - what is the weather in ...
-^ - tell me a joke
-^ - tell me a poem
-^ - g yoursearchterm
-^ - y yoursearchterm
-^ - play centipede
+^  what is the weather in ...
+^  tell me a joke
+^  tell me a poem
+^  g yoursearchterm
+^  y yoursearchterm
+^  play centipede
 
 
 + about
@@ -104,7 +104,7 @@
 
 // The ^ command automatically extends the data from the previous line
 + tell me a poem
-- Little Miss Muffit sat on her tuffet,\n
+- Little Miss Muffit sat on her tuffet,
 ^ In a nonchalant sort of way.\n
 ^ With her force field around her,\n
 ^ The Spider, the bounder,\n
