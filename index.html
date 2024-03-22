@@ -15,6 +15,11 @@
         color: #33ff33;
         font-family: "Courier New", Courier, monospace;
       }
+      a {
+        color: #33ff33; /* Or any color that stands out */
+        text-decoration: underline; /* Make sure links are underlined */
+        pointer-events: auto;
+      }
 
       #terminal {
         padding: 20px;
@@ -40,7 +45,7 @@
   </head>
   <body>
     <div id="terminal">
-      <span>$</span><input type="text" id="input" autofocus />
+      <span>$</span><input type="text" id="input" />
       <div id="response"></div>
     </div>
     <script>
@@ -117,34 +122,43 @@
         });
       }
 
-      bot.setSubroutine("getFeed", async (rs, args) => {
-        // const feedUrl = args[0]; // Assumes the feed URL is the first argument
-        const feedUrl = "https://hnrss.org/frontpage";
-        console.log(feedUrl);
+      bot.setSubroutine("getHNFeed", async (rs, args) => {
+        //  unFocusInput();
+        const topStoriesUrl =
+          "https://hacker-news.firebaseio.com/v0/topstories.json";
 
         try {
-          const response = await fetch(feedUrl);
-          const text = await response.text();
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(text, "text/xml");
+          const response = await fetch(topStoriesUrl);
+          const storyIds = await response.json();
 
-          // Find all <item> elements which represent individual articles in the feed
-          const items = xmlDoc.getElementsByTagName("item");
-          let titles = [];
+          const top5StoryIds = storyIds.slice(0, 5);
+          const storyPromises = top5StoryIds.map((storyId) =>
+            fetch(
+              `https://hacker-news.firebaseio.com/v0/item/${storyId}.json`
+            ).then((response) => response.json())
+          );
 
-          // Extract the title from each article
-          for (let i = 0; i < items.length; i++) {
-            const title = items[i].getElementsByTagName("title")[0].textContent;
-            titles.push(title);
-            // Limiting to 5 titles for brevity
-            if (titles.length >= 5) break;
-          }
+          const stories = await Promise.all(storyPromises);
 
-          // Join the titles into a single string to return
-          return titles.join("\n");
+          let storyDetails = stories.map((story) => {
+            let details = `Title: ${story.title}`;
+            // Correctly creating HTML string for the link
+            if (story.url)
+              details += `; URL: <a href="${story.url}" target="_blank">${story.url}</a>`;
+            if (story.text) {
+              let textContent = story.text
+                .replace(/<[^>]+>/g, "")
+                .substring(0, 50);
+              textContent += story.text.length > 50 ? "..." : "";
+              details += `; Text: ${textContent}`;
+            }
+            return details;
+          });
+
+          return storyDetails.join("<br><br>");
         } catch (error) {
-          console.error("Failed to fetch or parse RSS feed:", error);
-          return "I'm sorry, I couldn't fetch the RSS feed.";
+          console.error("Failed to fetch top stories from Hacker News:", error);
+          return "I'm sorry, I couldn't fetch the top stories from Hacker News.";
         }
       });
 
@@ -173,41 +187,35 @@
           if (event.key === "Enter") {
             event.preventDefault();
             const input = this.value.trim();
-
-            // Only update lastInput if it's not empty
-            if (input) {
-              lastInput = input; // Store the current input
-            }
-
+            focusInput();
             this.value = ""; // Clear input field after capturing the value
 
             if (!input) return; // Do not process if the input is empty
 
-            if (input.match(/^(https?:\/\/|www\.).*/)) {
-              handleChatResponse(input); // Handle URLs directly in JavaScript
-            } else {
-              // Get the response from RiveScript
-              var reply = await bot.reply("local-user", input);
-              console.log(reply);
-              let formattedReply = reply.replace(/\n/g, "<br>");
-              if (reply.startsWith("open:")) {
-                // Extract the instruction that follows "open:"
-                const instruction = reply.substring(5).trim();
-                // Pass the instruction to the handleChatResponse function
-                handleChatResponse(instruction);
-              } else {
-                // Update the response div
-                const responseDiv = document.getElementById("response");
-                // Replace newline characters (\n) with <br> tags
+            // Store the current input
+            lastInput = input;
 
-                responseDiv.innerHTML = formattedReply; // Use innerHTML
-                console.log(formattedReply);
-                responseDiv.textContent = ""; // Clear previous response
-                for (let i = 0; i < reply.length; i++) {
-                  playSound();
-                  responseDiv.textContent += reply[i];
-                  await new Promise((resolve) => setTimeout(resolve, 30));
-                }
+            // Get the response from RiveScript
+            var reply = await bot.reply("local-user", input);
+            const responseDiv = document.getElementById("response");
+            responseDiv.innerHTML = ""; // Clear previous content
+
+            if (reply.startsWith("open:")) {
+              // Extract the instruction that follows "open:"
+              const instruction = reply.substring(5).trim();
+              // Pass the instruction to the handleChatResponse function
+              handleChatResponse(instruction);
+            } else if (reply.includes("<a")) {
+              // Check if the reply includes an HTML link
+              // Directly insert HTML content including links
+              responseDiv.innerHTML = reply;
+            } else {
+              // Apply the typing effect for plain text
+              responseDiv.textContent = ""; // Clear previous response
+              for (let i = 0; i < reply.length; i++) {
+                playSound();
+                responseDiv.textContent += reply[i];
+                await new Promise((resolve) => setTimeout(resolve, 30));
               }
             }
           } else if (event.key === "ArrowUp") {
@@ -223,11 +231,14 @@
           }
         });
 
-      document
-        .getElementById("terminal")
-        .addEventListener("click", function () {
-          document.getElementById("input").focus();
-        });
+      function focusInput() {
+        document.getElementById("input").focus();
+        console.log("Focusing input");
+      }
+      function unFocusInput() {
+        document.getElementById("input").blur();
+        console.log("DEFocusing input");
+      }
     </script>
   </body>
 </html>

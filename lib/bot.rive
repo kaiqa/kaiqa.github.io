@@ -55,7 +55,7 @@
 ^  g yoursearchterm
 ^  y yoursearchterm
 ^  play centipede
-
+^  hn = hacker news feed
 
 + about
 @ help
@@ -93,8 +93,8 @@
 + what is the weather in *
 - <call>getFreeWeather "<star>"</call>
 
-+ feed *
-- <call>getFeed "<star>"</call>
++ hn
+- <call>getHNFeed "<star>"</call>
 
 // random answer
 + how are you
