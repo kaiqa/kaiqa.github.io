@@ -93,6 +93,8 @@
 + what is the weather in *
 - <call>getFreeWeather "<star>"</call>
 
++ feed *
+- <call>getFeed "<star>"</call>
 
 // random answer
 + how are you
@@ -127,7 +129,9 @@
 - <set user=<star>>It's nice to meet you, <get user>.
 
 + what is my name *
-- Your name is <get user>, silly
+* <get name> == undefined => You never told me your name.
+- Your name is <get name>.
+
 
 
 + my name is not *
@@ -140,8 +144,8 @@
 - I'm sorry to hear that you are <star> tired.
 
 //  "keyword" triggers: if the user says a magic word ANYWHERE in their message
-+ [*] the machine [*]
-- How do you know about the machine!?
++ [*] fuck [*]
+- how rude!
 
 // ! array colors = red blue green yellow
 // + i am wearing a (@colors) shirt
