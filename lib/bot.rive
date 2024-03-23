@@ -3,7 +3,8 @@
 > topic game
 
   + yes
-  - open: https://kaiqa.github.io/games/centipede/ {topic=random}
+  // - open: https://kaiqa.github.io/games/centipede/ {topic=random}
+  -  <call>showCentipedeGame</call> {topic=random}
 
   + no
   - Alright, let me know if you change your mind. {topic=random}
@@ -49,24 +50,28 @@
 ! local concat = newline
 + help
 - Here are the commands you can use:
+^  g yoursearchterm
+^  y yoursearchterm
+^  play = centipede
+^  hn = hacker news feed
+^  ls = posts
 ^  what is the weather in ...
 ^  tell me a joke
 ^  tell me a poem
-^  g yoursearchterm
-^  y yoursearchterm
-^  play centipede
-^  hn = hacker news feed
-^  ls = posts
 
 + about
 @ help
 
++ questionmark
+@ help
 
++ play
+- do you want to play Centipede (yes/no){topic=game}
 
 // Catch-all for anything else
 
 + *
-- {random}I cannot do that, <get user>|Peek-a-boo!{/random}
+- {random}I cannot do that.| Peek-a-boo!{/random}
 
 + hello
 - Hi there!
@@ -79,14 +84,10 @@
 + hi
 @ hello
 
-
-
 + [*] gam* [*]
 - do you want to play Centipede (yes/no){topic=game}
-// API
 
-// + weather in *
-// - <call>getWeather <star></call>
+// API
 
 + tell me a joke
 - <call>getJoke</call>

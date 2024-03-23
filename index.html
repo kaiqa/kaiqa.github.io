@@ -48,11 +48,14 @@
       <span>$</span><input type="text" id="input" />
       <div id="response"></div>
     </div>
+    <!-- A container where the iframe will be appended -->
+    <div id="iframeContainer"></div>
     <script>
       // Initialize RiveScript
       var bot = new RiveScript();
       bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
       let lastInput = "";
+
       function loadingDone() {
         console.log("Bot has finished loading!");
         bot.sortReplies();
@@ -101,7 +104,6 @@
             return "I'm sorry, I couldn't fetch a joke for you.";
           }
         });
-
         // Define the getWeather Object Macro
         bot.setSubroutine("getFreeWeather", async (rs, args) => {
           // The city name is passed as the first argument
@@ -195,6 +197,31 @@
         }
       });
 
+      bot.setSubroutine("showCentipedeGame", async (rs) => {
+        centipede();
+        // Return the iframe HTML string
+        return "";
+      });
+
+      function centipede() {
+        // Define the iframe
+        const iframe = document.createElement("iframe");
+        iframe.src = "https://kaiqa.github.io/games/centipede/";
+        iframe.width = "810";
+        iframe.height = "610";
+        iframe.style.border = "0";
+        iframe.setAttribute("title", "CENTIPEDE");
+
+        // Identify the container where the iframe will be placed
+        const iframeContainer = document.getElementById("iframeContainer");
+
+        // Clear previous iframe content if needed
+        iframeContainer.innerHTML = "";
+
+        // Append the new iframe to the container
+        iframeContainer.appendChild(iframe);
+      }
+
       function loadingError(error, filename, lineno) {
         console.log("Error when loading files: " + error);
       }
@@ -219,8 +246,12 @@
         .addEventListener("keydown", async function (event) {
           if (event.key === "Enter") {
             event.preventDefault();
-            const input = this.value.trim();
+            let input = this.value.trim();
             focusInput();
+            if (input.trim() === "?") {
+              console.log("yes");
+              input = "questionmark";
+            }
             this.value = ""; // Clear input field after capturing the value
 
             if (!input) return; // Do not process if the input is empty
@@ -268,6 +299,7 @@
         document.getElementById("input").focus();
         console.log("Focusing input");
       }
+
       function unFocusInput() {
         document.getElementById("input").blur();
         console.log("DEFocusing input");
