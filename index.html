@@ -162,6 +162,39 @@
         }
       });
 
+      bot.setSubroutine("fetchWordPressPosts", async (rs, args) => {
+        const wordpressSiteUrl =
+          "https://public-api.wordpress.com/rest/v1.1/sites/kaiqa.wordpress.com/posts/";
+
+        try {
+          const response = await fetch(wordpressSiteUrl, { method: "GET" });
+          const json = await response.json();
+          const posts = json.posts;
+
+          // Check if posts are found
+          if (posts.length === 0) {
+            return "No posts found.";
+          }
+
+          // Format the posts into an HTML string
+          let formattedPosts =
+            "<strong>Here are the recent posts:</strong><br><br>";
+          posts.forEach((post, index) => {
+            const postDate = new Date(post.date).toLocaleDateString("en-US");
+            formattedPosts += `${index + 1}. <a href="${
+              post.URL
+            }" target="_blank">${
+              post.title
+            }</a> (Posted on: ${postDate})<br><br>`;
+          });
+          playSound();
+          return formattedPosts.trim(); // Trim the last space characters
+        } catch (error) {
+          console.error("Failed to fetch WordPress posts:", error);
+          return "I'm sorry, I couldn't fetch the posts.";
+        }
+      });
+
       function loadingError(error, filename, lineno) {
         console.log("Error when loading files: " + error);
       }
