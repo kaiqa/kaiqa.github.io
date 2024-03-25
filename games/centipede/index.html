@@ -17,7 +17,11 @@
       background-image: url("./assets/tiles-page-background.png");
     }
   </style>
+
   <body>
+    <div id="gameContainer"></div>
+    <div id="formContainer"></div>
+
     <script>
       let globalMushroomsData = [];
       class Scene1 extends Phaser.Scene {
@@ -80,6 +84,7 @@
           clickText.on(
             "pointerdown",
             function () {
+              this.clearFormIframe();
               // Start the "playGame" scene when the text is clicked
               // this.scene.start("playGame");
               this.scene.start("playGame", {
@@ -94,7 +99,19 @@
             this
           );
         }
+        clearFormIframe() {
+          const formContainer = document.getElementById("formContainer");
+          if (formContainer) {
+            // Option 1: Remove the iframe entirely
+            while (formContainer.firstChild) {
+              formContainer.removeChild(formContainer.firstChild);
+            }
 
+            // Option 2: Reset the src of the iframe (if you prefer to keep it)
+            // const iframe = formContainer.querySelector('iframe');
+            // if (iframe) iframe.src = '';
+          }
+        }
         async fetchHighScores() {
           const url =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
@@ -123,7 +140,7 @@
         }
 
         displayHighScores(highScores) {
-          let yPos = 400; // Starting y position for the first high score
+          let yPos = 350; // Starting y position for the first high score
           let processedScores = [];
 
           // Decode and parse scores and waves
@@ -156,7 +173,7 @@
             const displayText = `${index + 1}. ${scoreObj.name} - Score: ${
               scoreObj.score
             }, Wave: ${scoreObj.wave}`;
-            this.add.text(200, yPos, displayText, {
+            this.add.text(280, yPos, displayText, {
               fontFamily: "Arial",
               fontSize: "14px",
               color: "#ffffff",
@@ -509,21 +526,31 @@
           this.createCrab();
         }
 
-        encodeDataAndOpenForm(score, wave) {
-          // Convert the score and wave to a string format
-          const scoreStr = score.toString();
-          const waveStr = wave.toString();
+        // encodeDataAndOpenForm(score, wave) {
+        //   // Convert the score and wave to a string format
+        //   const scoreStr = score.toString();
+        //   const waveStr = wave.toString();
 
-          // Base64 encode the strings
-          const encodedScore = btoa(scoreStr);
-          const encodedWave = btoa(waveStr);
+        //   // Base64 encode the strings
+        //   const encodedScore = btoa(scoreStr);
+        //   const encodedWave = btoa(waveStr);
 
-          // Construct the Google Form URL with the encoded parameters
-          const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/viewform?usp=pp_url&entry.scoreFieldId=${encodedScore}&entry.waveFieldId=${encodedWave}`;
+        //   // Construct the Google Form URL with the encoded parameters
+        //   const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/viewform?usp=pp_url&entry.scoreFieldId=${encodedScore}&entry.waveFieldId=${encodedWave}`;
 
-          // Open the form in a new tab
-          window.open(formUrl, "_blank");
-        }
+        //   // // Open the form in a new tab
+        //   // window.open(formUrl, "_blank");
+        //   // Create an iframe element
+        //   var iframe = document.createElement("iframe");
+        //   iframe.style.width = "640px";
+        //   iframe.style.height = "480px";
+        //   iframe.style.border = "none";
+        //   iframe.src = formUrl;
+
+        //   // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
+        //   document.getElementById("formContainer").appendChild(iframe);
+        //   console.log(formUrl);
+        // }
 
         restartGame() {
           this.gameOverSound.play();
@@ -576,7 +603,19 @@
             encodedScore
           )}&entry.1705590754=${encodeURIComponent(encodedWave)}`;
 
-          window.open(prefillUrl, "_blank");
+          // window.open(prefillUrl, "_blank");
+          // // Open the form in a new tab
+          // window.open(formUrl, "_blank");
+          // Create an iframe element
+          var iframe = document.createElement("iframe");
+          iframe.style.width = "640px";
+          iframe.style.height = "780px";
+          iframe.style.border = "none";
+          iframe.src = prefillUrl;
+
+          // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
+          document.getElementById("formContainer").appendChild(iframe);
+          console.log(prefillUrl);
         }
 
         fireBullet() {
@@ -1307,6 +1346,7 @@
         type: Phaser.AUTO,
         width: 800,
         height: 600,
+        parent: "gameContainer",
         physics: {
           default: "arcade",
           arcade: {
