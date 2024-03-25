@@ -1,0 +1,78 @@
+! version = 2.0
+
+// Define initial topic
+> topic initial
+    + *
+    - Hello, citizen. Before we proceed with the assessment, I need to confirm: do you know why you're here? {topic=confirmation}(yes/no)
+< topic
+
+> topic confirmation
+    + yes
+    - Very well. It’s imperative we ascertain your humanity. Your emotional responses are key. {topic=evaluation}Shall we begin the evaluation? (yes/no)
+    
+    + no
+    - Understanding the purpose of our meeting is not essential, but cooperation is. You are here for a human-verification assessment. {topic=evaluation}Are you ready to begin? (yes/no)
+< topic
+
+> topic evaluation
+    + yes
+    - First question: When you see the color red, what emotions does it evoke in you? Please be specific. {topic=red_emotion}
+    
+    + no
+    - It's important that we proceed to accurately assess. Are you sure you're not ready to start? {topic=initial}
+< topic
+
+> topic red_emotion
+    + *red *anger*
+    - Anger is a strong emotion, often tied to both human and animal instincts. Why do you think red evokes anger in you? {topic=distress}
+    
+    + *red *love*
+    - Red as a symbol of love is deeply ingrained in human culture. Can you recall a personal experience where this was particularly meaningful to you? {topic=distress}
+    
+    // Catch-all within red_emotion topic
+    + *
+    - Tell me more about your feelings towards the color red. Can you associate it with another emotion? {topic=distress}
+< topic
+
+> topic distress
+    + *help* by *
+    - Offering assistance to those in distress demonstrates empathy—a trait considered uniquely human. Have you ever found yourself hesitating to help? Why or why not? {topic=hesitation}
+    
+    // Catch-all for responding to distress
+    + *
+    - Seeing someone in distress can evoke strong feelings. How does it make you feel, and what's your instinctive reaction? {topic=hesitation}
+< topic
+
+> topic hesitation
+    + *hesitate* because *
+    - Hesitation can stem from many factors—fear, confusion, or even calculation. It’s a complex response. Reflecting on this, have you ever made a decision you regret? What was it, and why do you regret it? {topic=regret}
+    
+    // Catch-all for hesitation
+    + *
+    - Hesitation is a human trait that reflects our depth of thought and emotion. Do you often find yourself hesitating in other situations? {topic=regret}
+< topic
+
+> topic regret
+    + i regret *
+    - Regret is a powerful emotion, often leading to reflection and growth. It shows a capacity for self-assessment and change. Do you believe an AI, like myself, can truly understand human emotions? {topic=ai_understanding}
+    
+    // Catch-all for regret
+    + *
+    - Everyone has regrets, and they're a big part of what makes us human. They help us grow. Speaking of growth, do you think AI can grow to understand human emotions? {topic=ai_understanding}
+< topic
+
+> topic ai_understanding
+    + *yes ai can understand emotions*
+    - Your belief in AI's potential to comprehend emotions suggests optimism about technology and empathy. How do you see this relationship evolving in the future? {topic=random}
+    
+    + *no ai cannot understand emotions*
+    - Skepticism towards AI's emotional understanding is not unfounded. The complexity of human emotions poses a significant challenge. How do you perceive the future of human-AI interaction? {topic=random}
+    
+    // Catch-all for AI understanding
+    + *
+    - Understanding emotions is a complex task, even for humans. It's interesting to think about how AI might achieve this. What are your thoughts on AI and emotions? {topic=random}
+< topic
+
+// Concluding the assessment with a general catch-all trigger at the very end
++ *
+- Based on our conversation, your responses suggest you possess a depth of emotion and self-reflection indicative of human consciousness. However, remember, the essence of humanity goes beyond simple answers. The future of human and AI relations is uncertain, but empathy and understanding will be pivotal. Thank you for participating.

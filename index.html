@@ -53,7 +53,31 @@
     <script>
       // Initialize RiveScript
       var bot = new RiveScript();
-      bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
+      // bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
+      // bot.loadFile("lib/test.rive").then(loadingDone)
+      bot
+        .loadFile(["lib/bot.rive", "lib/test.rive"])
+        .then(() => {
+          console.log("Files loaded!");
+          bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
+
+          bot.sortReplies(); // Sort the replies after loading
+        })
+        .catch((error) => {
+          console.error("Failed to load files: " + error);
+        });
+      // .catch(loadingError);
+      // Load multiple files
+      // bot
+      //   .loadFile(["lib/bot.rive", "lib/test.rive"])
+      //   .then(loadingDone)
+      //   .catch(loadingError);
+
+      //  bot.loadDirectory("lib/").then(loadingDone).catch(loadingError);
+
+      function loadingError(error) {
+        console.error("Error loading RiveScript files: ", error);
+      }
       let lastInput = "";
 
       function loadingDone() {

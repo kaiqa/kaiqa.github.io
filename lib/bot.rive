@@ -73,10 +73,10 @@
 + *
 - {random}I cannot do that.| Peek-a-boo!{/random}
 
-+ hello
-- Hi there!
-- Hey!
-- Howdy!
+//+ hello
+//- Hi there!
+//- Hey!
+//- Howdy!
 
 + hey
 @ hello
