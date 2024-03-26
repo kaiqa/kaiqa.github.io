@@ -53,6 +53,18 @@ body, html {
     margin-left: 330px; /* Space between game and form */
     margin-top: 100px;
 }
+
+    #inputContainer {
+            display: none; /* Hidden initially */
+            position: absolute;
+            text-align: center;
+            z-index: 10;
+        }
+        #playerNameInput, #submitBtn {
+            padding: 10px;
+            margin-top: 115px; /* Space above the input */
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -61,6 +73,10 @@ body, html {
         <div id="formContainer"></div>
         <div id="gameContainer"></div>
       </div>
+      <div id="inputContainer" style="display: none;">
+    <input type="text" id="playerNameInput" placeholder="Enter your name">
+    <button id="submitBtn">Enter</button>
+</div>
     <script>
  
       let globalMushroomsData = [];
@@ -70,6 +86,7 @@ body, html {
         }
         preload() {
           this.load.image("background", "assets/background.png");
+          this.load.image('logo', 'assets/logo.png');
         }
 
         create() {
@@ -93,17 +110,23 @@ body, html {
           // Calculate the center of the game window
           const centerX = this.game.config.width / 2;
           const centerY = this.game.config.height / 2;
-          this.add.text(centerX - 150, centerY - 100, "CENTIPEDE", {
+           const logo = this.add.image(centerX , centerY -50, 'logo').setOrigin(0.5);
+          this.add.text(centerX - 140, centerY - 300, "CENTIPEDE", {
             fontFamily: "VT323",
             fontSize: "80px",
             color: "#00ff00",
           });
+          
+         
+         
+
           // Create the "Click to Start" text at the center
-          const clickText = this.add.text(centerX, centerY, "Click to Start ", {
+          const clickText = this.add.text(centerX +10, centerY, "Click to Start ", {
             fontFamily: "VT323",
             fontSize: "50px",
             color: "#00ff00",
           });
+
 
           // Set the origin of the text to the center
           clickText.setOrigin(0.5);
@@ -212,13 +235,13 @@ body, html {
 
           // Display the sorted scores
           processedScores.forEach((scoreObj, index) => {
-            const displayText = `${index + 1}. ${scoreObj.name} - Score: ${
+            const displayText = `${index + 1}. ${scoreObj.name} - ${
               scoreObj.score
             }, Wave: ${scoreObj.wave}`;
-            this.add.text(280, yPos, displayText, {
-              fontFamily: "Arial",
-              fontSize: "14px",
-              color: "#ffffff",
+            this.add.text(5, yPos, displayText, {
+              fontFamily: "VT323",
+              fontSize: "25px",
+              color: "#00ffff",
             });
             yPos += 30; // Increment y position for the next high score
           });
@@ -574,8 +597,8 @@ body, html {
             console.log("high score");
             console.log(this.score);
 
-  try {
-    const highScoresFromBackEnd = await this.fetchHighScores();
+        try {
+          const highScoresFromBackEnd = await this.fetchHighScores();
 
     if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
       let highestScore = -Infinity; // Change to find the highest score
@@ -599,11 +622,41 @@ body, html {
       // console.log("Highest Score: ", highestScore);
       // console.log("My Score: ", this.score);
 
+      // if (this.score > highestScore) {
+      //   // Your code to handle new high score
+      //   this.showInputField();
+        
+      //  // this.submitToGoogleForm(this.score, this.wave, "kai"); // Replace "PlayerName" with actual player name if available
+      //  // console.log("High score sent: " + this.score);
+      // }
+      console.log(this.score); // is correct
       if (this.score > highestScore) {
-        // Your code to handle new high score
-        this.submitToGoogleForm(this.score, this.wave, "kai"); // Replace "PlayerName" with actual player name if available
-        console.log("High score sent: " + this.score);
-      }
+    //    console.log("New high score!");
+    //    this.showInputField().then(playerName => {
+    //     // This code runs after the player has entered their name
+    //     this.submitToGoogleForm(this.score, this.wave, playerName); // this.score is always 0
+    //     console.log("High score submitted:", this.score, playerName);
+    // }).catch(error => {
+    //     // Handle the case where the promise was rejected (e.g., no name entered)
+    //     console.error("Failed to get player name:", error);
+    // });
+
+console.log("New high score!");
+
+      // Capture the score before showing the input field
+      const currentScore = this.score;
+      const currentWave = this.wave;
+
+      this.showInputField().then(playerName => {
+        // Use captured score and wave
+        this.submitToGoogleForm(currentScore, currentWave, playerName);
+        console.log("High score submitted:", currentScore, playerName);
+      }).catch(error => {
+        console.error("Failed to get player name:", error);
+      });
+
+}
+
 
     } else {
       console.error("No high scores available or failed to fetch high scores.");
@@ -686,8 +739,7 @@ body, html {
             };
           });
         }
-
-        
+   
   async fetchHighScores() {
           const url =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
@@ -766,7 +818,46 @@ body, html {
         console.error("Error submitting form", error);
     }
 }
-       
+   
+    //     showInputField() {
+    //     document.getElementById('inputContainer').style.display = 'block';
+    //     document.getElementById('playerNameInput').focus();
+
+    //     document.getElementById('submitBtn').onclick = () => {
+    //         const playerName = document.getElementById('playerNameInput').value.trim();
+    //         if (playerName) {
+    //             console.log("High score sent:", this.score, "by", playerName, "wave", this.wave);
+    //            // this.submitToGoogleForm(this.score, this.wave, playerName);
+    //            // Hide input field again
+    //             document.getElementById('inputContainer').style.display = 'none';
+    //             return playerName;
+    //         } else {
+    //             alert("Please enter your name.");
+    //         }
+    //     };
+    // }
+
+        showInputField() {
+    return new Promise((resolve, reject) => {
+        // Show the input field
+        document.getElementById('inputContainer').style.display = 'block';
+        document.getElementById('playerNameInput').focus();
+
+        // Configure the submit button to resolve the promise with the player's name
+        document.getElementById('submitBtn').onclick = () => {
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            if (playerName) {
+                // Hide the input field
+                document.getElementById('inputContainer').style.display = 'none';
+                resolve(playerName); // Resolve the promise with the player name
+            } else {
+                alert("Please enter your name.");
+                reject(new Error("No name entered"));
+            }
+        };
+    });
+}
+
         fireBullet() {
           this.bullet = this.bullets.get(this.player.x, this.player.y);
 
@@ -1118,8 +1209,8 @@ body, html {
             this.textLives.setText("Lives: " + this.lives);
             this.player.setVelocity(0, 0);
             this.updateHeartsDisplay();
-            console.log("touched the crab");
-            console.log(this.lives);
+        //    console.log("touched the crab");
+        //    console.log(this.lives);
             this.destroySound.play();
           });
 
