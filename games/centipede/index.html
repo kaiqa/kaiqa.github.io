@@ -76,9 +76,9 @@ body, html {
           console.log("v1.3");
 
           this.fetchHighScores().then((highScores) => {
-            console.log("High Scores1:", highScores);
+           // console.log("High Scores1:", highScores);
             highScores.sort((a, b) => b.score - a.score);
-            console.log("High Scores2:", highScores);
+          //  console.log("High Scores2:", highScores);
             this.displayHighScores(highScores);
           });
 
@@ -140,7 +140,7 @@ body, html {
           );
         }
      
-           clearFormIframe() {
+        clearFormIframe() {
             console.log("form cleared")
           const formContainer = document.getElementById("formContainer");
           if (formContainer) {
@@ -568,16 +568,129 @@ body, html {
           this.createCrab();
         }
 
-
-        restartGame() {
+       async restartGame() {
           this.gameOverSound.play();
           // Check if the score is high enough for high score submission
-          if (this.score > 10) {
+   //       if (this.score > 10) {
             console.log("high score");
-            //  this.encodeDataAndOpenForm(this.score, this.wave);
-            this.submitToGoogleForm(this.score, this.wave, "check")
+            console.log(this.score);
+
+
+ 
+// try {
+//     // Assuming `fetchHighScores` correctly awaits any asynchronous operations and returns an array
+//     const highScoresFromBackEnd = await this.fetchHighScores();
+//             console.log(highScoresFromBackEnd);
+
+//     // Check if `highScoresFromBackEnd` is an array before proceeding
+//     if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
+//       let lowestScore = Infinity; // Start with the highest possible number
+
+//       highScoresFromBackEnd.forEach(scoreObj => {
+//         let { score } = scoreObj; // Assuming score is the base64 encoded string
+//         let decodedScore = parseInt(atob(score), 10); // Decode from base64 and convert to integer
+// console.log(score);
+//         // Update the lowest score if the current score is lower
+//         if (!isNaN(decodedScore) && decodedScore < lowestScore) {
+//           lowestScore = decodedScore;
+//         }
+//       });
+
+//       console.log("Lowest Score: ", lowestScore);
+//       // Add logic here to handle what happens if the player's score is higher than the lowest score
+//     } else {
+//       console.error("No high scores available or failed to fetch high scores.");
+//     }
+//   } catch (error) {
+//     console.error("Error in restartGame method:", error);
+//   }
+
+// try {
+//   const highScoresFromBackEnd = await this.fetchHighScores();
+//   console.log(highScoresFromBackEnd);
+
+//   if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
+//     let lowestScore = Infinity;
+
+//     highScoresFromBackEnd.forEach((scoreObj, index) => {
+//       // Assuming the first row might be headers, but keeping the check general
+//       let { score } = scoreObj;
+
+//       // Check if score is a base64 encoded string using the corrected regex
+//       if (/^[A-Za-z0-9+/=]+$/.test(score)) {
+//         try {
+//           let decodedScore = parseInt(atob(score), 10);
+//           console.log(score, decodedScore);
+
+//           if (!isNaN(decodedScore) && decodedScore < lowestScore) {
+//             lowestScore = decodedScore;
+//           }
+//         } catch (e) {
+//           console.error("Error decoding base64 string:", score, e);
+//         }
+//       } else {
+//         console.error("Invalid base64 string:", score);
+//       }
+//     });
+
+//     console.log("Lowest Score: ", lowestScore);
+  
+// }
+
+//   } else {
+//     console.error("No high scores available or failed to fetch high scores.");
+//   }
+// } catch (error) {
+//   console.error("Error in restartGame method:", error);
+// }
+
+
+
+try {
+  const highScoresFromBackEnd = await this.fetchHighScores();
+
+  if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
+    let lowestScore = Infinity;
+
+    highScoresFromBackEnd.forEach((scoreObj, index) => {
+      // Skip the header row or any non-encoded strings
+      if (index === 0 || scoreObj.score === "Score") return; // Check against "Score" to skip header
+
+      let { score } = scoreObj;
+
+      try {
+        let decodedScore = parseInt(atob(score), 10);
+        if (!isNaN(decodedScore) && decodedScore < lowestScore) {
+          lowestScore = decodedScore;
+        }
+      } catch (e) {
+        console.error("Error decoding base64 string:", score, e);
+      }
+    });
+
+    console.log("Lowest Score: ", lowestScore);
+    console.log("my Score: ", this.score);
+     if (this.score > lowestScore) {
+  this.submitToGoogleForm(this.score, this.wave, "check");
+  console.log ("high score send: " + this.score);
+  }
+
+  } else {
+    console.error("No high scores available or failed to fetch high scores.");
+  }
+} catch (error) {
+  console.error("Error in restartGame method:", error);
+}
+
+    console.log("end my Score: ", this.score);
+
+  // if (this.score > this.lowestScore) {
+  // this.submitToGoogleForm(this.score, this.wave, "check");
+  // console.log ("high score send: " + this.score);
+  // }
+        //    this.submitToGoogleForm(this.score, this.wave, "check")
           //  this.openPrefilledGoogleForm(this.score, this.wave);
-          }
+         // }
 
           globalMushroomsData = [];
           // Reset game state
@@ -595,8 +708,35 @@ body, html {
             textScore: (this.textScore = 0),
           });
         }
+ 
+         parseCSV(csvText) {
+          const lines = csvText.trim().split("\n");
+          return lines.map((line) => {
+            const columns = line.split(",");
+            // Ensure columns are correctly assigned
+            return {
+              name: columns[1].trim(), // Name is now the 2nd column
+              score: columns[2].trim(), // Keep score as a string
+              wave: columns[3].trim(), // Keep wave as a string
+            };
+          });
+        }
 
         
+  async fetchHighScores() {
+          const url =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
+
+          try {
+            const response = await fetch(url);
+            const csvText = await response.text();
+            return this.parseCSV(csvText);
+          } catch (error) {
+            console.error("Failed to fetch or parse the high scores:", error);
+            return [];
+          }
+        }
+
         openPrefilledGoogleForm(score, wave) {
           const scoreStr = score.toString();
           const waveStr = wave.toString();
