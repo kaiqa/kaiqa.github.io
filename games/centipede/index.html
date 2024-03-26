@@ -43,7 +43,7 @@ body, html {
 #formContainer {
     flex: 1; /* Allows the form container to grow and fill available space */
     max-width: 200px; /* Adjust based on the form's size */
-    height: 600px; /* Ideally match the game container's height */
+    height: 700px; /* Ideally match the game container's height */
 }
 
 #formContainer iframe {
@@ -58,7 +58,7 @@ body, html {
 <body>
     <div id="pageContainer">
     
-        <div id="formContainer"><!-- Google Form iframe will be appended here --></div>
+        <div id="formContainer"></div>
         <div id="gameContainer"></div>
       </div>
     <script>
@@ -568,31 +568,6 @@ body, html {
           this.createCrab();
         }
 
-        // encodeDataAndOpenForm(score, wave) {
-        //   // Convert the score and wave to a string format
-        //   const scoreStr = score.toString();
-        //   const waveStr = wave.toString();
-
-        //   // Base64 encode the strings
-        //   const encodedScore = btoa(scoreStr);
-        //   const encodedWave = btoa(waveStr);
-
-        //   // Construct the Google Form URL with the encoded parameters
-        //   const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/viewform?usp=pp_url&entry.scoreFieldId=${encodedScore}&entry.waveFieldId=${encodedWave}`;
-
-        //   // // Open the form in a new tab
-        //   // window.open(formUrl, "_blank");
-        //   // Create an iframe element
-        //   var iframe = document.createElement("iframe");
-        //   iframe.style.width = "640px";
-        //   iframe.style.height = "480px";
-        //   iframe.style.border = "none";
-        //   iframe.src = formUrl;
-
-        //   // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
-        //   document.getElementById("formContainer").appendChild(iframe);
-        //   console.log(formUrl);
-        // }
 
         restartGame() {
           this.gameOverSound.play();
@@ -600,7 +575,8 @@ body, html {
           if (this.score > 10) {
             console.log("high score");
             //  this.encodeDataAndOpenForm(this.score, this.wave);
-            this.openPrefilledGoogleForm(this.score, this.wave);
+            this.submitToGoogleForm(this.score, this.wave, "check")
+          //  this.openPrefilledGoogleForm(this.score, this.wave);
           }
 
           globalMushroomsData = [];
@@ -610,17 +586,6 @@ body, html {
           this.wave = 1;
           this.bonus = 0;
           this.score = 0;
-          // this.textScore.setText("Score: " + this.score);
-          // this.textLives.setText("Lives: " + this.lives);
-          // this.textWave.setText("Wave: " + this.wave);
-          // // Reset player position
-          // this.player.setPosition(200, 300);
-
-          // // Enable input events
-          // this.input.enabled = true;
-
-          // Restart the game loop
-          // this.scene.start("bootGame");
 
           this.scene.start("bootGame", {
             score: (this.score = 0),
@@ -631,6 +596,7 @@ body, html {
           });
         }
 
+        
         openPrefilledGoogleForm(score, wave) {
           const scoreStr = score.toString();
           const waveStr = wave.toString();
@@ -657,9 +623,45 @@ body, html {
 
           // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
           document.getElementById("formContainer").appendChild(iframe);
-          console.log(prefillUrl);
+  //        console.log(prefillUrl);
         }
 
+  async submitToGoogleForm(score, wave, name) {
+    // const scoreStr = score.toString();
+    // const waveStr = wave.toString();
+          const nameStr = name.toString(); // Ensure the name is a string
+
+          const scoreStr = score.toString();
+          const waveStr = wave.toString();
+
+          // Base64 encode the strings
+          const encodedScore = btoa(scoreStr);
+          const encodedWave = btoa(waveStr);
+
+    // Create a FormData object
+    const formData = new FormData();
+    formData.append("entry.1705590754", encodedWave); // Append the wave
+    formData.append("entry.141223346", encodedScore); // Append the score
+    formData.append("entry.773241883", nameStr); // Append the name is ok
+
+  //     console.log(formData);
+    // The form's action URL (replace with your form's actual action URL)
+    const formActionURL = "https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/formResponse";
+
+    try {
+        // Make the POST request using the Fetch API
+        const response = await fetch(formActionURL, {
+            method: "POST",
+            mode: "no-cors", // Note: 'no-cors' mode will prevent reading the response
+            body: formData,
+        });
+     //   console.log("Form submitted successfully");
+     //   console.log(formActionURL);
+    } catch (error) {
+        console.error("Error submitting form", error);
+    }
+}
+       
         fireBullet() {
           this.bullet = this.bullets.get(this.player.x, this.player.y);
 
