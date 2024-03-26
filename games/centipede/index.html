@@ -571,71 +571,74 @@ body, html {
        async restartGame() {
           this.gameOverSound.play();
           // Check if the score is high enough for high score submission
-   //       if (this.score > 10) {
             console.log("high score");
             console.log(this.score);
 
+  try {
+    const highScoresFromBackEnd = await this.fetchHighScores();
 
- 
-// try {
-//     // Assuming `fetchHighScores` correctly awaits any asynchronous operations and returns an array
-//     const highScoresFromBackEnd = await this.fetchHighScores();
-//             console.log(highScoresFromBackEnd);
+    if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
+      let highestScore = -Infinity; // Change to find the highest score
 
-//     // Check if `highScoresFromBackEnd` is an array before proceeding
-//     if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
-//       let lowestScore = Infinity; // Start with the highest possible number
+      highScoresFromBackEnd.forEach((scoreObj, index) => {
+        // Skip the header row or any non-encoded strings
+        if (index === 0 || scoreObj.score === "Score") return; // Skip header
 
-//       highScoresFromBackEnd.forEach(scoreObj => {
-//         let { score } = scoreObj; // Assuming score is the base64 encoded string
-//         let decodedScore = parseInt(atob(score), 10); // Decode from base64 and convert to integer
-// console.log(score);
-//         // Update the lowest score if the current score is lower
-//         if (!isNaN(decodedScore) && decodedScore < lowestScore) {
-//           lowestScore = decodedScore;
-//         }
-//       });
+        let { score } = scoreObj;
 
-//       console.log("Lowest Score: ", lowestScore);
-//       // Add logic here to handle what happens if the player's score is higher than the lowest score
-//     } else {
-//       console.error("No high scores available or failed to fetch high scores.");
-//     }
-//   } catch (error) {
-//     console.error("Error in restartGame method:", error);
-//   }
+        try {
+          let decodedScore = parseInt(atob(score), 10);
+          if (!isNaN(decodedScore) && decodedScore > highestScore) {
+            highestScore = decodedScore; // Update highest score if current score is higher
+          }
+        } catch (e) {
+          console.error("Error decoding base64 string:", score, e);
+        }
+      });
 
+      // console.log("Highest Score: ", highestScore);
+      // console.log("My Score: ", this.score);
+
+      if (this.score > highestScore) {
+        // Your code to handle new high score
+        this.submitToGoogleForm(this.score, this.wave, "kai"); // Replace "PlayerName" with actual player name if available
+        console.log("High score sent: " + this.score);
+      }
+
+    } else {
+      console.error("No high scores available or failed to fetch high scores.");
+    }
+  } catch (error) {
+    console.error("Error in restartGame method:", error);
+  }
 // try {
 //   const highScoresFromBackEnd = await this.fetchHighScores();
-//   console.log(highScoresFromBackEnd);
 
 //   if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
 //     let lowestScore = Infinity;
 
 //     highScoresFromBackEnd.forEach((scoreObj, index) => {
-//       // Assuming the first row might be headers, but keeping the check general
+//       // Skip the header row or any non-encoded strings
+//       if (index === 0 || scoreObj.score === "Score") return; // Check against "Score" to skip header
+
 //       let { score } = scoreObj;
 
-//       // Check if score is a base64 encoded string using the corrected regex
-//       if (/^[A-Za-z0-9+/=]+$/.test(score)) {
-//         try {
-//           let decodedScore = parseInt(atob(score), 10);
-//           console.log(score, decodedScore);
-
-//           if (!isNaN(decodedScore) && decodedScore < lowestScore) {
-//             lowestScore = decodedScore;
-//           }
-//         } catch (e) {
-//           console.error("Error decoding base64 string:", score, e);
+//       try {
+//         let decodedScore = parseInt(atob(score), 10);
+//         if (!isNaN(decodedScore) && decodedScore > lowestScore) {
+//           lowestScore = decodedScore;
 //         }
-//       } else {
-//         console.error("Invalid base64 string:", score);
+//       } catch (e) {
+//         console.error("Error decoding base64 string:", score, e);
 //       }
 //     });
 
 //     console.log("Lowest Score: ", lowestScore);
-  
-// }
+//     console.log("my Score: ", this.score);
+//      if (this.score > lowestScore) {
+//   this.submitToGoogleForm(this.score, this.wave, "check");
+//   console.log ("high score send: " + this.score);
+//   }
 
 //   } else {
 //     console.error("No high scores available or failed to fetch high scores.");
@@ -644,45 +647,7 @@ body, html {
 //   console.error("Error in restartGame method:", error);
 // }
 
-
-
-try {
-  const highScoresFromBackEnd = await this.fetchHighScores();
-
-  if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
-    let lowestScore = Infinity;
-
-    highScoresFromBackEnd.forEach((scoreObj, index) => {
-      // Skip the header row or any non-encoded strings
-      if (index === 0 || scoreObj.score === "Score") return; // Check against "Score" to skip header
-
-      let { score } = scoreObj;
-
-      try {
-        let decodedScore = parseInt(atob(score), 10);
-        if (!isNaN(decodedScore) && decodedScore < lowestScore) {
-          lowestScore = decodedScore;
-        }
-      } catch (e) {
-        console.error("Error decoding base64 string:", score, e);
-      }
-    });
-
-    console.log("Lowest Score: ", lowestScore);
-    console.log("my Score: ", this.score);
-     if (this.score > lowestScore) {
-  this.submitToGoogleForm(this.score, this.wave, "check");
-  console.log ("high score send: " + this.score);
-  }
-
-  } else {
-    console.error("No high scores available or failed to fetch high scores.");
-  }
-} catch (error) {
-  console.error("Error in restartGame method:", error);
-}
-
-    console.log("end my Score: ", this.score);
+//     console.log("end my Score: ", this.score);
 
   // if (this.score > this.lowestScore) {
   // this.submitToGoogleForm(this.score, this.wave, "check");
