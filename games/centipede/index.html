@@ -35,10 +35,11 @@ body, html {
 
 #gameContainer {
     flex: 1; /* Allows the game container to grow and fill available space */
-    max-width: 800px; /* Adjust based on your game's size */
-    height: 600px; /* Adjust based on your game's size */
-    background-color: #000; /* Placeholder for the game area */
-}
+    max-width: auto; /* Adjust based on your game's size */
+  height: 650px; /* Adjust based on your game's size */
+    background-color: #b8b4b4; /* Placeholder for the game area */
+
+  }
 
 #formContainer {
     flex: 1; /* Allows the form container to grow and fill available space */
@@ -90,7 +91,7 @@ body, html {
         }
 
         create() {
-          console.log("v1.3");
+          console.log("v1.5");
 
           this.fetchHighScores().then((highScores) => {
            // console.log("High Scores1:", highScores);
@@ -99,19 +100,34 @@ body, html {
             this.displayHighScores(highScores);
           });
 
-          const background = this.add.tileSprite(
-            400,
-            300,
-            800,
-            600,
-            "background"
-          );
-          background.setScrollFactor(0); // Fix the background position
-          // Calculate the center of the game window
-          const centerX = this.game.config.width / 2;
-          const centerY = this.game.config.height / 2;
-           const logo = this.add.image(centerX , centerY -50, 'logo').setOrigin(0.5);
-          this.add.text(centerX - 140, centerY - 300, "CENTIPEDE", {
+   // Calculate the center of the screen
+          const { width, height } = this.sys.game.config;
+          const centerX = width / 2;
+          const centerY = height / 2;
+          
+    this.background = this.add.tileSprite(0, 0, width, height, "background")
+        .setOrigin(0, 0)
+        .setScrollFactor(0);
+
+    // Adjust the background to the game's size, including any potential resizing
+    this.scale.on('resize', (gameSize) => {
+        this.background.setSize(gameSize.width, gameSize.height);
+    });  
+
+ this.background = this.add.tileSprite(0, 0, width, height, "background")
+        .setOrigin(0, 0)
+        .setScrollFactor(0);
+
+    // Existing code for setting up the scene...
+
+    // Adjust the background to the game's size, including any potential resizing
+    this.scale.on('resize', (gameSize) => {
+        this.background.setSize(gameSize.width, gameSize.height);
+        // If you need to adjust the tile position or scale based on the new size, do it here
+    });
+
+           const logo = this.add.image(centerX , centerY -130, 'logo').setOrigin(0.5);
+          this.add.text(centerX - 140, centerY - 400, "CENTIPEDE", {
             fontFamily: "VT323",
             fontSize: "80px",
             color: "#00ff00",
@@ -121,9 +137,9 @@ body, html {
          
 
           // Create the "Click to Start" text at the center
-          const clickText = this.add.text(centerX +10, centerY, "Click to Start ", {
+          const clickText = this.add.text(centerX +10, centerY + 140, "Click to Start ", {
             fontFamily: "VT323",
-            fontSize: "50px",
+            fontSize: "55px",
             color: "#00ff00",
           });
 
@@ -205,7 +221,7 @@ body, html {
         }
 
         displayHighScores(highScores) {
-          let yPos = 350; // Starting y position for the first high score
+          let yPos = 630; // Starting y position for the first high score
           let processedScores = [];
 
           // Decode and parse scores and waves
@@ -238,7 +254,7 @@ body, html {
             const displayText = `${index + 1}. ${scoreObj.name} - ${
               scoreObj.score
             }, Wave: ${scoreObj.wave}`;
-            this.add.text(5, yPos, displayText, {
+            this.add.text(155, yPos, displayText, {
               fontFamily: "VT323",
               fontSize: "25px",
               color: "#00ffff",
@@ -286,8 +302,8 @@ body, html {
           const centerX = width / 2;
           this.hearts = []; // Reset the array
           const heartsSpacing = 50; // Space between hearts
-          const heartPositionY = centerY - 290; // Y position for hearts
-          const heartStartX = centerX - 380; // Adjust if necessary to match your UI layout
+          const heartPositionY = centerY - 420; // Y position for hearts
+          const heartStartX = centerX - 270; // Adjust if necessary to match your UI layout
 
           // Start from the fixed position and add hearts to the right
           for (let i = 0; i < this.lives; i++) {
@@ -346,15 +362,18 @@ body, html {
           const { width, height } = this.sys.game.config;
           const centerX = width / 2;
           const centerY = height / 2;
-          // Create a background tile sprite and set its scroll factor to create a repeating pattern
-          const background = this.add.tileSprite(
-            400,
-            300,
-            800,
-            600,
-            "background"
-          );
-          background.setScrollFactor(0); // Fix the background position
+          
+           // Create a repeating background tile sprite and set it to fill the entire screen
+          this.background = this.add.tileSprite(0, 0, width, height, "background")
+        .setOrigin(0, 0)
+        .setScrollFactor(0);
+
+    // Adjust the background to the game's size, including any potential resizing
+          this.scale.on('resize', (gameSize) => {
+        this.background.setSize(gameSize.width, gameSize.height);
+        // If you need to adjust the tile position or scale based on the new size, do it here
+    });
+
 
           this.initHeartsDisplay(); // Initialize hearts display
 
@@ -400,9 +419,9 @@ body, html {
           };
 
           // UI Text
-          this.textScore = this.add.text(centerX - 390, centerY - 280, "0", {
+          this.textScore = this.add.text(centerX - 290, centerY - 400, "0", {
             fontFamily: "VT323",
-            fontSize: "50px",
+            fontSize: "55px",
             color: "#00ff00",
             // fill: '#00ff00'
           });
@@ -1456,8 +1475,9 @@ console.log("New high score!");
           this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
 
           const heartsSpacing = 40; // Adjust based on the size of your heart sprite
-          const firstHeartPositionX = centerX - 380; // Starting X position for the first heart
-          const heartPositionY = centerY - 290; // Y position for all hearts
+          const firstHeartPositionX = centerX - 270; // Starting X position for the first heart
+          const heartPositionY = centerY - 420; // Y position for all hearts
+
 
           for (let i = 0; i < this.lives; i++) {
             this.add
@@ -1582,20 +1602,41 @@ console.log("New high score!");
         }
       }
 
+      // const gameConfig = {
+      //   type: Phaser.AUTO,
+      //   width: 800,
+      //   height: 600,
+      //   parent: "gameContainer",
+      //   physics: {
+      //     default: "arcade",
+      //     arcade: {
+      //       gravity: { y: 0 },
+      //       debug: false,
+      //     },
+      //   },
+      //   scene: [Scene1, Scene2, ScoreScene],
+      // };
+
       const gameConfig = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        parent: "gameContainer",
-        physics: {
-          default: "arcade",
-          arcade: {
-            gravity: { y: 0 },
-            debug: false,
-          },
-        },
-        scene: [Scene1, Scene2, ScoreScene],
-      };
+  type: Phaser.AUTO,
+  // width: 800,
+  // height: 600,
+  parent: "gameContainer",
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: false,
+    },
+  },
+  scene: [Scene1, Scene2, ScoreScene],
+  scale: {
+    mode: Phaser.Scale.FIT, // Fit to window
+    autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
+    width: 600, // Base game width
+    height: 900, // Base game height
+  }
+};
 
       let game = new Phaser.Game(gameConfig);
     </script>
