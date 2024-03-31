@@ -470,6 +470,8 @@ body, html {
             .setScale(0.5)
             .setVelocityX(100);
 
+               this.spider.y = 0; // Reset position to the top
+
           this.centipede = this.physics.add.group();
           this.createCentipede();
 
@@ -1367,38 +1369,54 @@ console.log("New high score!");
           }
         }
 
-        moveSpider() {
-          // Simple movement for the spider
-          this.spider.y += 2;
-          // Ensure spider and spider.body are defined
-          if (this.spider && this.spider.body) {
-            // If the spider reaches the screen edge, reverse its direction
-            if (this.spider.x < 50 || this.spider.x > 750) {
-              this.spider.setVelocityX(-this.spider.body.velocity.x);
-            }
-          }
+        // moveSpider() {
+        //   // Simple movement for the spider
+        //   this.spider.y += 2;
+        //   // Ensure spider and spider.body are defined
+        //   if (this.spider && this.spider.body) {
+        //     // If the spider reaches the screen edge, reverse its direction
+        //     if (this.spider.x < 50 || this.spider.x > 750) {
+        //       this.spider.setVelocityX(-this.spider.body.velocity.x);
+        //     }
+        //   }
 
-          // If the spider reaches the bottom, reset its position
-          if (this.spider.y > 600) {
-            this.spider.y = 0;
-            this.spider.x = Phaser.Math.Between(50, 750);
-          }
+        //   // If the spider reaches the bottom, reset its position
+        //   if (this.spider.y > 900) {
+        //     this.spider.y = 0;
+        //     this.spider.x = Phaser.Math.Between(50, 750);
+        //   }
 
-          // // If the spider reaches the screen edge, reverse its direction
-          // if (this.spider.x < 50 || this.spider.x > 750) {
-          //   this.spider.setVelocityX(-this.spider.body.velocity.x);
-          // }
 
-          if (this.spider && this.spider.body) {
-            // If the spider reaches the screen edge, reverse its direction
-            if (this.spider.x < 50 || this.spider.x > 750) {
-              // Check if the spider has a velocity before accessing it
-              if (this.spider.body.velocity) {
-                this.spider.setVelocityX(-this.spider.body.velocity.x);
-              }
-            }
-          }
-        }
+        //   if (this.spider && this.spider.body) {
+        //     // If the spider reaches the screen edge, reverse its direction
+        //     if (this.spider.x < 50 || this.spider.x > 750) {
+        //       // Check if the spider has a velocity before accessing it
+        //       if (this.spider.body.velocity) {
+        //         this.spider.setVelocityX(-this.spider.body.velocity.x);
+        //       }
+        //     }
+        //   }
+        // }
+moveSpider() {
+  if (this.spider && this.spider.active) {
+  this.spider.setVelocityX(0);
+
+    // Constant downward movement for the spider
+    const downwardSpeed = 2.5; // Adjust the speed as needed
+    this.spider.y += downwardSpeed;
+
+    // If the spider reaches the bottom of the game area, reset to the top
+    if (this.spider.y > 900) { // Assuming 900 is the height of your game area
+        this.spider.y = 0; // Reset position to the top
+        // Place the spider at a random X position within the game bounds
+       
+         this.spider.x = Phaser.Math.Between(10, 600); // Adjust the range as per your game's layout
+       }
+       
+    }
+}
+
+
 
         bulletHitCrab(bullet, crab) {
           const pointsText = this.add
