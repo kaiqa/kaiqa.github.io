@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Centipede Game with Phaser</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <style>
-body, html {
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Centipede Game with Phaser</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+</head>
+<style>
+  body,
+  html {
     margin: 0;
     padding: 0;
     display: flex;
@@ -22,1641 +21,1531 @@ body, html {
     height: 100vh;
     background: url('./assets/tiles-page-background.png') no-repeat center center fixed;
     background-size: cover;
-}
+  }
 
-#pageContainer {
-    display: flex; /* Use flexbox to layout children */
-    flex-direction: row; /* Layout children in a row */
-    align-items: center; /* Center align items vertically */
-    justify-content: space-around; /* Distributes items evenly, adding space around items */
-    width: 90%; /* Set a width to control spacing */
-    max-width: 1200px; /* Adjust based on your content size */
-}
+  #pageContainer {
+    display: flex;
+    /* Use flexbox to layout children */
+    flex-direction: row;
+    /* Layout children in a row */
+    align-items: center;
+    /* Center align items vertically */
+    justify-content: space-around;
+    /* Distributes items evenly, adding space around items */
+    width: 90%;
+    /* Set a width to control spacing */
+    max-width: 1200px;
+    /* Adjust based on your content size */
+  }
 
-#gameContainer {
-    flex: 1; /* Allows the game container to grow and fill available space */
-    max-width: auto; /* Adjust based on your game's size */
-  height: 650px; /* Adjust based on your game's size */
-    background-color: #b8b4b4; /* Placeholder for the game area */
+  #gameContainer {
+    flex: 1;
+    /* Allows the game container to grow and fill available space */
+    max-width: auto;
+    /* Adjust based on your game's size */
+    height: 650px;
+    /* Adjust based on your game's size */
+    background-color: #b8b4b4;
+    /* Placeholder for the game area */
 
   }
 
-#formContainer {
-    flex: 1; /* Allows the form container to grow and fill available space */
-    max-width: 200px; /* Adjust based on the form's size */
-    height: 700px; /* Ideally match the game container's height */
-}
+  #formContainer {
+    flex: 1;
+    /* Allows the form container to grow and fill available space */
+    max-width: 200px;
+    /* Adjust based on the form's size */
+    height: 700px;
+    /* Ideally match the game container's height */
+  }
 
-#formContainer iframe {
+  #formContainer iframe {
     width: 100%;
     height: 100%;
     border: none;
-    margin-left: 330px; /* Space between game and form */
+    margin-left: 330px;
+    /* Space between game and form */
     margin-top: 100px;
-}
+  }
 
-    #inputContainer {
-            display: none; /* Hidden initially */
-            position: absolute;
-            text-align: center;
-            z-index: 10;
-        }
-        #playerNameInput, #submitBtn {
-            padding: 10px;
-            margin-top: 115px; /* Space above the input */
-            font-size: 16px;
-        }
-    </style>
+  #inputContainer {
+    display: none;
+    /* Hidden initially */
+    position: absolute;
+    text-align: center;
+    z-index: 10;
+  }
+
+  #playerNameInput,
+  #submitBtn {
+    padding: 10px;
+    margin-top: 115px;
+    /* Space above the input */
+    font-size: 16px;
+  }
+</style>
 </head>
+
 <body>
-    <div id="pageContainer">
-    
-        <div id="formContainer"></div>
-        <div id="gameContainer"></div>
-      </div>
-      <div id="inputContainer" style="display: none;">
+  <div id="pageContainer">
+
+    <div id="formContainer"></div>
+    <div id="gameContainer"></div>
+  </div>
+  <div id="inputContainer" style="display: none;">
     <input type="text" id="playerNameInput" placeholder="Enter your name">
     <button id="submitBtn">Enter</button>
-</div>
-    <script>
- 
-      let globalMushroomsData = [];
-      class Scene1 extends Phaser.Scene {
-        constructor() {
-          super("bootGame");
-        }
-        preload() {
-          this.load.image("background", "assets/background.png");
-          this.load.image('logo', 'assets/logo.png');
-        }
+  </div>
+  <script>
+    let globalMushroomsData = [];
+    class Scene1 extends Phaser.Scene {
+      constructor() {
+        super("bootGame");
+      }
+      preload() {
+        this.load.image("background", "assets/background.png");
+        this.load.image('logo', 'assets/logo.png');
+      }
 
-        create() {
-          console.log("v1.5");
+      create() {
+        console.log("v1.5");
 
-          this.fetchHighScores().then((highScores) => {
-           // console.log("High Scores1:", highScores);
-            highScores.sort((a, b) => b.score - a.score);
+        this.fetchHighScores().then((highScores) => {
+          // console.log("High Scores1:", highScores);
+          highScores.sort((a, b) => b.score - a.score);
           //  console.log("High Scores2:", highScores);
-            this.displayHighScores(highScores);
-          });
+          this.displayHighScores(highScores);
+        });
 
-   // Calculate the center of the screen
-          const { width, height } = this.sys.game.config;
-          const centerX = width / 2;
-          const centerY = height / 2;
-          
-    this.background = this.add.tileSprite(0, 0, width, height, "background")
-        .setOrigin(0, 0)
-        .setScrollFactor(0);
+        // Calculate the center of the screen
+        const { width, height } = this.sys.game.config;
+        const centerX = width / 2;
+        const centerY = height / 2;
 
-    // Adjust the background to the game's size, including any potential resizing
-    this.scale.on('resize', (gameSize) => {
-        this.background.setSize(gameSize.width, gameSize.height);
-    });  
+        this.background = this.add.tileSprite(0, 0, width, height, "background")
+          .setOrigin(0, 0)
+          .setScrollFactor(0);
 
- this.background = this.add.tileSprite(0, 0, width, height, "background")
-        .setOrigin(0, 0)
-        .setScrollFactor(0);
+        // Adjust the background to the game's size, including any potential resizing
+        this.scale.on('resize', (gameSize) => {
+          this.background.setSize(gameSize.width, gameSize.height);
+        });
 
-    // Existing code for setting up the scene...
+        this.background = this.add.tileSprite(0, 0, width, height, "background")
+          .setOrigin(0, 0)
+          .setScrollFactor(0);
 
-    // Adjust the background to the game's size, including any potential resizing
-    this.scale.on('resize', (gameSize) => {
-        this.background.setSize(gameSize.width, gameSize.height);
-        // If you need to adjust the tile position or scale based on the new size, do it here
-    });
+        // Existing code for setting up the scene...
 
-           const logo = this.add.image(centerX , centerY -130, 'logo').setOrigin(0.5);
-          this.add.text(centerX - 140, centerY - 400, "CENTIPEDE", {
-            fontFamily: "VT323",
-            fontSize: "80px",
-            color: "#00ff00",
-          });
-          
-         
-         
+        // Adjust the background to the game's size, including any potential resizing
+        this.scale.on('resize', (gameSize) => {
+          this.background.setSize(gameSize.width, gameSize.height);
+          // If you need to adjust the tile position or scale based on the new size, do it here
+        });
 
-          // Create the "Click to Start" text at the center
-          const clickText = this.add.text(centerX +10, centerY + 140, "Click to Start ", {
-            fontFamily: "VT323",
-            fontSize: "55px",
-            color: "#00ff00",
-          });
+        const logo = this.add.image(centerX, centerY - 130, 'logo').setOrigin(0.5);
+        this.add.text(centerX - 140, centerY - 400, "CENTIPEDE", {
+          fontFamily: "VT323",
+          fontSize: "80px",
+          color: "#00ff00",
+        });
 
 
-          // Set the origin of the text to the center
-          clickText.setOrigin(0.5);
 
-          // // Add a pulsing effect using tween
-          this.tweens.add({
-            targets: clickText,
-            scaleX: 1.1,
-            scaleY: 1.0,
-            duration: 1000,
-            ease: "Power2",
-            yoyo: true,
-            repeat: -1,
-          });
 
-          // Add an input event listener to the text
-          clickText.setInteractive({ useHandCursor: true });
-          clickText.on(
-            "pointerdown",
-            function () {
-              this.clearFormIframe();
-              // Start the "playGame" scene when the text is clicked
-              // this.scene.start("playGame");
-              this.scene.start("playGame", {
-                score: (this.score = 0),
-                lives: (this.lives = 0),
-                wave: (this.wave = 1),
-                bonus: (this.bonus = 0),
-                textScore: (this.textScore = 0),
-                centipedeSegmentSpeed: this.centipedeSegmentSpeed || 250,
-              });
-            },
-            this
-          );
-        }
-     
-        clearFormIframe() {
-            console.log("form cleared")
-          const formContainer = document.getElementById("formContainer");
-          if (formContainer) {
-            // Option 1: Remove the iframe entirely
-            while (formContainer.firstChild) {
-              formContainer.removeChild(formContainer.firstChild);
-            }
+        // Create the "Click to Start" text at the center
+        const clickText = this.add.text(centerX + 10, centerY + 140, "Click to Start ", {
+          fontFamily: "VT323",
+          fontSize: "55px",
+          color: "#00ff00",
+        });
 
-            // Option 2: Reset the src of the iframe (if you prefer to keep it)
-            // const iframe = formContainer.querySelector('iframe');
-            // if (iframe) iframe.src = '';
-          }
-        }
-        async fetchHighScores() {
-          const url =
-            "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
 
-          try {
-            const response = await fetch(url);
-            const csvText = await response.text();
-            return this.parseCSV(csvText);
-          } catch (error) {
-            console.error("Failed to fetch or parse the high scores:", error);
-            return [];
-          }
-        }
+        // Set the origin of the text to the center
+        clickText.setOrigin(0.5);
 
-        parseCSV(csvText) {
-          const lines = csvText.trim().split("\n");
-          return lines.map((line) => {
-            const columns = line.split(",");
-            // Ensure columns are correctly assigned
-            return {
-              name: columns[1].trim(), // Name is now the 2nd column
-              score: columns[2].trim(), // Keep score as a string
-              wave: columns[3].trim(), // Keep wave as a string
-            };
-          });
-        }
+        // // Add a pulsing effect using tween
+        this.tweens.add({
+          targets: clickText,
+          scaleX: 1.1,
+          scaleY: 1.0,
+          duration: 1000,
+          ease: "Power2",
+          yoyo: true,
+          repeat: -1,
+        });
 
-        displayHighScores(highScores) {
-          let yPos = 630; // Starting y position for the first high score
-          let processedScores = [];
-
-          // Decode and parse scores and waves
-          highScores.forEach((scoreObj) => {
-            let { name, score, wave } = scoreObj;
-
-            if (score !== "Score" && wave !== "Wave") {
-              // Assuming this check is still necessary
-              try {
-                score = parseInt(atob(score), 10);
-                wave = parseInt(atob(wave), 10);
-              } catch (error) {
-                console.error("Error decoding score or wave", error);
-                console.log(
-                  `Problematic values - Score: ${score}, Wave: ${wave}`
-                );
-                score = 0; // Default to 0 for sorting purposes
-                wave = 0;
-              }
-
-              processedScores.push({ name, score, wave });
-            }
-          });
-
-          // Sort the processed scores in descending order by score
-          processedScores.sort((a, b) => b.score - a.score);
-
-          // Display the sorted scores
-          processedScores.forEach((scoreObj, index) => {
-            const displayText = `${index + 1}. ${scoreObj.name} - ${
-              scoreObj.score
-            }, Wave: ${scoreObj.wave}`;
-            this.add.text(155, yPos, displayText, {
-              fontFamily: "VT323",
-              fontSize: "25px",
-              color: "#00ffff",
+        // Add an input event listener to the text
+        clickText.setInteractive({ useHandCursor: true });
+        clickText.on(
+          "pointerdown",
+          function () {
+            this.clearFormIframe();
+            // Start the "playGame" scene when the text is clicked
+            // this.scene.start("playGame");
+            this.scene.start("playGame", {
+              score: (this.score = 0),
+              lives: (this.lives = 0),
+              wave: (this.wave = 1),
+              bonus: (this.bonus = 0),
+              textScore: (this.textScore = 0),
+              centipedeSegmentSpeed: this.centipedeSegmentSpeed || 250,
             });
-            yPos += 30; // Increment y position for the next high score
-          });
+          },
+          this
+        );
+      }
+
+      clearFormIframe() {
+        console.log("form cleared")
+        const formContainer = document.getElementById("formContainer");
+        if (formContainer) {
+          // Option 1: Remove the iframe entirely
+          while (formContainer.firstChild) {
+            formContainer.removeChild(formContainer.firstChild);
+          }
+
+          // Option 2: Reset the src of the iframe (if you prefer to keep it)
+          // const iframe = formContainer.querySelector('iframe');
+          // if (iframe) iframe.src = '';
         }
       }
-      class Scene2 extends Phaser.Scene {
-        constructor() {
-          super("playGame");
-          // Declare class properties
-          this.player;
-          this.centipede;
-          this.bullets;
-          this.mushrooms;
-          this.canShoot = true;
-          this.lastShotTime = 0;
-          this.spider;
-          this.fireRate = 100;
-          this.shootSound;
-          this.destroySound;
-          this.gameOverSound;
-          this.mushroomTouchedByPlayerSound;
-          this.score = 0; // Declare score as a property
-          this.lives = 4;
-          this.wave = 1;
-          var textScore = 0;
-          var textLives = 3;
-          var textWave = 1;
-          this.isPaused = false; // Add a property to track if the game is paused
-          this.crabMushroomTouches = 0;
+      async fetchHighScores() {
+        const url =
+          "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
+
+        try {
+          const response = await fetch(url);
+          const csvText = await response.text();
+          return this.parseCSV(csvText);
+        } catch (error) {
+          console.error("Failed to fetch or parse the high scores:", error);
+          return [];
         }
-        init(data) {
-          this.score = data.score || 0; // Use passed score or default to 0
-          this.textScore = data.textScore || 0;
-          this.lives = data.lives || 4; // Use passed lives or some default
-          this.wave = data.wave || 1; // Use passed wave or default to first wave
-          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
-        }
+      }
 
-        initHeartsDisplay() {
-          const { width, height } = this.sys.game.config;
-          const centerY = height / 2;
-          const centerX = width / 2;
-          this.hearts = []; // Reset the array
-          const heartsSpacing = 50; // Space between hearts
-          const heartPositionY = centerY - 420; // Y position for hearts
-          const heartStartX = centerX - 270; // Adjust if necessary to match your UI layout
-
-          // Start from the fixed position and add hearts to the right
-          for (let i = 0; i < this.lives; i++) {
-            const heart = this.add
-              .image(heartStartX + i * heartsSpacing, heartPositionY, "heart")
-              .setScale(0.5);
-            this.hearts.push(heart);
-          }
-        }
-
-        updateHeartsDisplay() {
-          // Remove all current hearts
-          this.hearts.forEach((heart) => heart.destroy());
-          this.hearts = [];
-
-          // Re-initialize the hearts display
-          this.initHeartsDisplay();
-        }
-
-        preload() {
-          this.load.audio("backgroundMusic", "assets/backgroundMusic.mp3");
-          this.load.image("background", "assets/background4.png");
-          this.load.image("startButton", "assets/startButton.png");
-          this.load.image("player", "assets/player.png");
-          this.load.image("centipede", "assets/centipede.png");
-          this.load.image("bullet", "assets/bullet.png");
-          this.load.image("mushroom", "assets/mushroom1.png");
-          this.load.image("heart", "assets/heart.png");
-          this.load.audio("shootSound", "assets/shoot.mp3");
-          this.load.audio("destroySound", "assets/destroy.mp3");
-          this.load.audio("gameOverSound", "assets/gameover.mp3"); // Adjust the path to your game over sound file
-          this.load.audio(
-            "mushroomTouchedByPlayer",
-            "assets/mushroomTouchedByPlayer.mp3"
-          );
-          this.load.audio("crabEatsSound", "assets/crabEatsSound.mp3");
-          // this.load.image("spider", "assets/spider.gif"); // Add spider image
-          // this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
-          this.load.aseprite({
-            key: "crab",
-            textureURL: "assets/crab.png",
-            atlasURL: "assets/crab.json",
-          });
-          this.load.aseprite({
-            key: "spider",
-            textureURL: "assets/spider1.png",
-            atlasURL: "assets/spider1.json",
-          });
-        }
-
-        create() {
-          console.log("speed -");
-          console.log(this.centipedeSegmentSpeed);
-          this.startTime = this.time.now;
-          // Calculate the center of the screen
-          const { width, height } = this.sys.game.config;
-          const centerX = width / 2;
-          const centerY = height / 2;
-          
-           // Create a repeating background tile sprite and set it to fill the entire screen
-          this.background = this.add.tileSprite(0, 0, width, height, "background")
-        .setOrigin(0, 0)
-        .setScrollFactor(0);
-
-    // Adjust the background to the game's size, including any potential resizing
-          this.scale.on('resize', (gameSize) => {
-        this.background.setSize(gameSize.width, gameSize.height);
-        // If you need to adjust the tile position or scale based on the new size, do it here
-    });
-
-
-          this.initHeartsDisplay(); // Initialize hearts display
-
-          // Play the background music
-          this.backgroundMusic = this.sound.add("backgroundMusic", {
-            volume: 0.2,
-            loop: true,
-          });
-          // this.backgroundMusic.play();
-
-          // Add key listener for 'M' key to toggle music
-          this.input.keyboard.on("keydown-M", () => {
-            if (this.backgroundMusic.isPlaying) {
-              this.backgroundMusic.pause();
-            } else {
-              this.backgroundMusic.resume();
-            }
-          });
-
-          this.player = this.physics.add
-            .sprite(200, 300, "player")
-            .setScale(0.5);
-          this.shootSound = this.sound.add("shootSound");
-          this.destroySound = this.sound.add("destroySound");
-          this.gameOverSound = this.sound.add("gameOverSound"); // Initialize the game over sound
-          this.crabEatsSound = this.sound.add("crabEatsSound");
-          this.mushroomTouchedByPlayerSound = this.sound.add(
-            "mushroomTouchedByPlayer"
-          );
-          this.mushrooms = this.physics.add.staticGroup();
-
-          // lets make shrooms
-          this.createMushroom = function (x, y) {
-            const mushroom = this.mushrooms
-              .create(x, y, "mushroom")
-              .setScale(0.1);
-            mushroom.body.immovable = true;
-            mushroom.setData("hits", 0); // Use setData to store the hit count
-            // Add the mushroom data to globalMushroomsData
-            // globalMushroomsData.push({ x: x, y: y, hits: 0 });
-            this.mushroomTouchedByPlayerSound.play();
-            // additional logic for creating mushrooms
+      parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        return lines.map((line) => {
+          const columns = line.split(",");
+          // Ensure columns are correctly assigned
+          return {
+            name: columns[1].trim(), // Name is now the 2nd column
+            score: columns[2].trim(), // Keep score as a string
+            wave: columns[3].trim(), // Keep wave as a string
           };
+        });
+      }
 
-          // UI Text
-          this.textScore = this.add.text(centerX - 290, centerY - 400, "0", {
+      displayHighScores(highScores) {
+        let yPos = 630; // Starting y position for the first high score
+        let processedScores = [];
+
+        // Decode and parse scores and waves
+        highScores.forEach((scoreObj) => {
+          let { name, score, wave } = scoreObj;
+
+          if (score !== "Score" && wave !== "Wave") {
+            // Assuming this check is still necessary
+            try {
+              score = parseInt(atob(score), 10);
+              wave = parseInt(atob(wave), 10);
+            } catch (error) {
+              console.error("Error decoding score or wave", error);
+              console.log(
+                `Problematic values - Score: ${score}, Wave: ${wave}`
+              );
+              score = 0; // Default to 0 for sorting purposes
+              wave = 0;
+            }
+
+            processedScores.push({ name, score, wave });
+          }
+        });
+
+        // Sort the processed scores in descending order by score
+        processedScores.sort((a, b) => b.score - a.score);
+
+        // Display the sorted scores
+        processedScores.forEach((scoreObj, index) => {
+          const displayText = `${index + 1}. ${scoreObj.name} - ${scoreObj.score
+            }, Wave: ${scoreObj.wave}`;
+          this.add.text(155, yPos, displayText, {
             fontFamily: "VT323",
-            fontSize: "55px",
+            fontSize: "25px",
+            color: "#00ffff",
+          });
+          yPos += 30; // Increment y position for the next high score
+        });
+      }
+    }
+    class Scene2 extends Phaser.Scene {
+      constructor() {
+        super("playGame");
+        // Declare class properties
+        this.player;
+        this.centipede;
+        this.bullets;
+        this.mushrooms;
+        this.canShoot = true;
+        this.lastShotTime = 0;
+        this.spider;
+        this.fireRate = 100;
+        this.shootSound;
+        this.destroySound;
+        this.gameOverSound;
+        this.mushroomTouchedByPlayerSound;
+        this.score = 0; // Declare score as a property
+        this.lives = 4;
+        this.wave = 1;
+        var textScore = 0;
+        var textLives = 3;
+        var textWave = 1;
+        this.isPaused = false; // Add a property to track if the game is paused
+        this.crabMushroomTouches = 0;
+      }
+      init(data) {
+        this.score = data.score || 0; // Use passed score or default to 0
+        this.textScore = data.textScore || 0;
+        this.lives = data.lives || 4; // Use passed lives or some default
+        this.wave = data.wave || 1; // Use passed wave or default to first wave
+        this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
+      }
+
+      initHeartsDisplay() {
+        const { width, height } = this.sys.game.config;
+        const centerY = height / 2;
+        const centerX = width / 2;
+        this.hearts = []; // Reset the array
+        const heartsSpacing = 50; // Space between hearts
+        const heartPositionY = centerY - 420; // Y position for hearts
+        const heartStartX = centerX - 270; // Adjust if necessary to match your UI layout
+
+        // Start from the fixed position and add hearts to the right
+        for (let i = 0; i < this.lives; i++) {
+          const heart = this.add
+            .image(heartStartX + i * heartsSpacing, heartPositionY, "heart")
+            .setScale(0.5);
+          this.hearts.push(heart);
+        }
+      }
+
+      updateHeartsDisplay() {
+        // Remove all current hearts
+        this.hearts.forEach((heart) => heart.destroy());
+        this.hearts = [];
+
+        // Re-initialize the hearts display
+        this.initHeartsDisplay();
+      }
+
+      preload() {
+        this.load.audio("backgroundMusic", "assets/backgroundMusic.mp3");
+        this.load.image("background", "assets/background4.png");
+        this.load.image("startButton", "assets/startButton.png");
+        this.load.image("player", "assets/player.png");
+        this.load.image("centipede", "assets/centipede.png");
+        this.load.image("bullet", "assets/bullet.png");
+        this.load.image("mushroom", "assets/mushroom1.png");
+        this.load.image("heart", "assets/heart.png");
+        this.load.audio("shootSound", "assets/shoot.mp3");
+        this.load.audio("destroySound", "assets/destroy.mp3");
+        this.load.audio("gameOverSound", "assets/gameover.mp3"); // Adjust the path to your game over sound file
+        this.load.audio(
+          "mushroomTouchedByPlayer",
+          "assets/mushroomTouchedByPlayer.mp3"
+        );
+        this.load.audio("crabEatsSound", "assets/crabEatsSound.mp3");
+        // this.load.image("spider", "assets/spider.gif"); // Add spider image
+        // this.load.image("crab", "assets/crab.png"); // Ensure the path matches your asset's location
+        this.load.aseprite({
+          key: "crab",
+          textureURL: "assets/crab.png",
+          atlasURL: "assets/crab.json",
+        });
+        this.load.aseprite({
+          key: "spider",
+          textureURL: "assets/spider1.png",
+          atlasURL: "assets/spider1.json",
+        });
+      }
+
+      create() {
+        console.log("speed -");
+        console.log(this.centipedeSegmentSpeed);
+        this.startTime = this.time.now;
+        // Calculate the center of the screen
+        const { width, height } = this.sys.game.config;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Create a repeating background tile sprite and set it to fill the entire screen
+        this.background = this.add.tileSprite(0, 0, width, height, "background")
+          .setOrigin(0, 0)
+          .setScrollFactor(0);
+
+        // Adjust the background to the game's size, including any potential resizing
+        this.scale.on('resize', (gameSize) => {
+          this.background.setSize(gameSize.width, gameSize.height);
+          // If you need to adjust the tile position or scale based on the new size, do it here
+        });
+
+
+        this.initHeartsDisplay(); // Initialize hearts display
+
+        // Play the background music
+        this.backgroundMusic = this.sound.add("backgroundMusic", {
+          volume: 0.2,
+          loop: true,
+        });
+        // this.backgroundMusic.play();
+
+        // Add key listener for 'M' key to toggle music
+        this.input.keyboard.on("keydown-M", () => {
+          if (this.backgroundMusic.isPlaying) {
+            this.backgroundMusic.pause();
+          } else {
+            this.backgroundMusic.resume();
+          }
+        });
+
+        this.player = this.physics.add
+          .sprite(200, 300, "player")
+          .setScale(0.5);
+        this.shootSound = this.sound.add("shootSound");
+        this.destroySound = this.sound.add("destroySound");
+        this.gameOverSound = this.sound.add("gameOverSound"); // Initialize the game over sound
+        this.crabEatsSound = this.sound.add("crabEatsSound");
+        this.mushroomTouchedByPlayerSound = this.sound.add(
+          "mushroomTouchedByPlayer"
+        );
+        this.mushrooms = this.physics.add.staticGroup();
+
+        // lets make shrooms
+        this.createMushroom = function (x, y) {
+          const mushroom = this.mushrooms
+            .create(x, y, "mushroom")
+            .setScale(0.1);
+          mushroom.body.immovable = true;
+          mushroom.setData("hits", 0); // Use setData to store the hit count
+          // Add the mushroom data to globalMushroomsData
+          // globalMushroomsData.push({ x: x, y: y, hits: 0 });
+          this.mushroomTouchedByPlayerSound.play();
+          // additional logic for creating mushrooms
+        };
+
+        // UI Text
+        this.textScore = this.add.text(centerX - 290, centerY - 400, "0", {
+          fontFamily: "VT323",
+          fontSize: "55px",
+          color: "#00ff00",
+          // fill: '#00ff00'
+        });
+        this.textLives = this.lives;
+
+        this.textLives = this.add.text(
+          -100,
+          -100,
+          `Lives: ${this.textLives}`,
+          {
+            fontFamily: "VT323",
+            fontSize: "24px",
             color: "#00ff00",
             // fill: '#00ff00'
-          });
-          this.textLives = this.lives;
+          }
+        );
+        this.textWave = this.wave;
+        this.textWave = this.add.text(
+          centerX - 390,
+          centerY - 240,
+          `Wave: ${this.textWave}`,
+          {
+            fontFamily: "VT323",
+            fontSize: "24px",
+            color: "#00fff0",
+            // fill: '#00ff00'
+          }
+        );
 
-          this.textLives = this.add.text(
-            -100,
-            -100,
-            `Lives: ${this.textLives}`,
-            {
-              fontFamily: "VT323",
-              fontSize: "24px",
-              color: "#00ff00",
-              // fill: '#00ff00'
-            }
+        // Create spider
+        //Spider animated
+        this.anims.create({
+          key: "walk", // A name for the animation
+          frames: this.anims.generateFrameNumbers("spider", {
+            start: 0,
+            end: 4, // If you have 8 frames, numbering goes from 0 to 7
+          }),
+          frameRate: 15, // Number of frames per second
+          repeat: -1, // Loop forever
+        });
+
+        this.spider = this.physics.add
+          .sprite(500, 700, "spider")
+          .play("walk")
+          .setOrigin(0.5, 0.5)
+          .setScale(0.5)
+          .setVelocityX(100);
+
+        this.spider.y = 0; // Reset position to the top
+
+        this.centipede = this.physics.add.group();
+        this.createCentipede();
+
+        this.bullets = this.physics.add.group({
+          defaultKey: "bullet",
+          maxSize: 1,
+          active: false,
+          visible: false,
+        });
+        this.physics.world.setBoundsCollision(true, true, true, false);
+        // out off bounce
+        this.bullets.children.iterate((bullet) => {
+          bullet.on("outofbounds", () => {
+            bullet.destroy();
+            canShoot = true;
+          });
+        });
+
+        this.bullets.children.iterate((bullet) => {
+          bullet.on("destroy", () => {
+            canShoot = true;
+          });
+        });
+
+        this.mushrooms = this.physics.add.group();
+        this.mushrooms.children.iterate((mushroom) => {
+          this.mushroom.setScale(0.1);
+        });
+
+        this.physics.add.collider(
+          this.centipede,
+          this.bullets,
+          this.bulletHitCentipede.bind(this)
+        );
+        this.physics.add.collider(
+          this.bullets,
+          this.mushrooms,
+          this.bulletHitMushroom.bind(this)
+        );
+        this.physics.add.collider(
+          this.bullets,
+          this.spider,
+          this.bulletHitSpider.bind(this)
+        );
+        this.physics.add.overlap(
+          this.centipede,
+          this.mushrooms,
+          this.centipedeHitMushroom.bind(this)
+        );
+        this.physics.add.overlap(
+          this.player,
+          this.centipede,
+          this.playerHitCentipede.bind(this)
+        );
+
+        this.physics.add.collider(
+          this.player,
+          this.spider,
+          this.playerHitSpider.bind(this)
+        );
+
+        //    this.physics.add.overlap(centipede, mushrooms, centipedeHitMushroom);
+        this.input.on("pointermove", (pointer) => {
+          const minY = (this.game.config.height * 2) / 3;
+          const newX = Phaser.Math.Clamp(
+            pointer.x,
+            0,
+            this.game.config.width
           );
-          this.textWave = this.wave;
-          this.textWave = this.add.text(
-            centerX - 390,
-            centerY - 240,
-            `Wave: ${this.textWave}`,
-            {
-              fontFamily: "VT323",
-              fontSize: "24px",
-              color: "#00fff0",
-              // fill: '#00ff00'
-            }
+          const newY = Phaser.Math.Clamp(
+            pointer.y,
+            minY,
+            this.game.config.height
           );
 
-          // Create spider
-          //Spider animated
-          this.anims.create({
-            key: "walk", // A name for the animation
-            frames: this.anims.generateFrameNumbers("spider", {
-              start: 0,
-              end: 4, // If you have 8 frames, numbering goes from 0 to 7
-            }),
-            frameRate: 15, // Number of frames per second
-            repeat: -1, // Loop forever
-          });
+          // Check for collisions with mushrooms
+          let overlappingMushroom = false;
 
-          this.spider = this.physics.add
-            .sprite(500, 700, "spider")
-            .play("walk")
-            .setOrigin(0.5, 0.5)
-            .setScale(0.5)
-            .setVelocityX(100);
-
-               this.spider.y = 0; // Reset position to the top
-
-          this.centipede = this.physics.add.group();
-          this.createCentipede();
-
-          this.bullets = this.physics.add.group({
-            defaultKey: "bullet",
-            maxSize: 1,
-            active: false,
-            visible: false,
-          });
-          this.physics.world.setBoundsCollision(true, true, true, false);
-          // out off bounce
-          this.bullets.children.iterate((bullet) => {
-            bullet.on("outofbounds", () => {
-              bullet.destroy();
-              canShoot = true;
-            });
-          });
-
-          this.bullets.children.iterate((bullet) => {
-            bullet.on("destroy", () => {
-              canShoot = true;
-            });
-          });
-
-          this.mushrooms = this.physics.add.group();
+          // when the player touches the mushroom
           this.mushrooms.children.iterate((mushroom) => {
-            this.mushroom.setScale(0.1);
-          });
-
-          this.physics.add.collider(
-            this.centipede,
-            this.bullets,
-            this.bulletHitCentipede.bind(this)
-          );
-          this.physics.add.collider(
-            this.bullets,
-            this.mushrooms,
-            this.bulletHitMushroom.bind(this)
-          );
-          this.physics.add.collider(
-            this.bullets,
-            this.spider,
-            this.bulletHitSpider.bind(this)
-          );
-          this.physics.add.overlap(
-            this.centipede,
-            this.mushrooms,
-            this.centipedeHitMushroom.bind(this)
-          );
-          this.physics.add.overlap(
-            this.player,
-            this.centipede,
-            this.playerHitCentipede.bind(this)
-          );
-
-          this.physics.add.collider(
-            this.player,
-            this.spider,
-            this.playerHitSpider.bind(this)
-          );
-
-          //    this.physics.add.overlap(centipede, mushrooms, centipedeHitMushroom);
-          this.input.on("pointermove", (pointer) => {
-            const minY = (this.game.config.height * 2) / 3;
-            const newX = Phaser.Math.Clamp(
-              pointer.x,
-              0,
-              this.game.config.width
-            );
-            const newY = Phaser.Math.Clamp(
-              pointer.y,
-              minY,
-              this.game.config.height
+            const distance = Phaser.Math.Distance.Between(
+              this.player.x,
+              this.player.y,
+              mushroom.x,
+              mushroom.y
             );
 
-            // Check for collisions with mushrooms
-            let overlappingMushroom = false;
-
-            // when the player touches the mushroom
-            this.mushrooms.children.iterate((mushroom) => {
-              const distance = Phaser.Math.Distance.Between(
+            // Calculate the outer edge of the mushroom
+            const mushroomOuterRadius = mushroom.width * 0.1 + 4;
+            // If the player is too close to the outer edge of the mushroom, prevent moving towards it
+            if (distance < mushroomOuterRadius) {
+              overlappingMushroom = true;
+              // this.mushroomTouchedByPlayerSound.play();
+              const angle = Phaser.Math.Angle.Between(
                 this.player.x,
                 this.player.y,
                 mushroom.x,
                 mushroom.y
               );
+              const stopX =
+                this.player.x + (mushroomOuterRadius - 30) * Math.cos(angle);
+              const stopY =
+                this.player.y + (mushroomOuterRadius - 30) * Math.sin(angle);
 
-              // Calculate the outer edge of the mushroom
-              const mushroomOuterRadius = mushroom.width * 0.1 + 4;
-              // If the player is too close to the outer edge of the mushroom, prevent moving towards it
-              if (distance < mushroomOuterRadius) {
-                overlappingMushroom = true;
-                // this.mushroomTouchedByPlayerSound.play();
-                const angle = Phaser.Math.Angle.Between(
-                  this.player.x,
-                  this.player.y,
-                  mushroom.x,
-                  mushroom.y
-                );
-                const stopX =
-                  this.player.x + (mushroomOuterRadius - 30) * Math.cos(angle);
-                const stopY =
-                  this.player.y + (mushroomOuterRadius - 30) * Math.sin(angle);
-
-                this.player.x = Phaser.Math.Clamp(stopX, 0, game.config.width);
-                this.player.y = Phaser.Math.Clamp(
-                  stopY,
-                  minY,
-                  game.config.height
-                );
-              }
-            });
-
-            // Only update player position if not overlapping with any mushroom
-            if (!overlappingMushroom) {
-              this.player.x = newX;
-              this.player.y = newY;
+              this.player.x = Phaser.Math.Clamp(stopX, 0, game.config.width);
+              this.player.y = Phaser.Math.Clamp(
+                stopY,
+                minY,
+                game.config.height
+              );
             }
           });
-          // let isPointerDown = false;
-          this.input.on("pointerdown", (pointer) => {
-            this.isPointerDown = true;
 
-            if (this.canShoot) {
-              const bullet = this.bullets.get(this.player.x, this.player.y);
+          // Only update player position if not overlapping with any mushroom
+          if (!overlappingMushroom) {
+            this.player.x = newX;
+            this.player.y = newY;
+          }
+        });
+        // let isPointerDown = false;
+        this.input.on("pointerdown", (pointer) => {
+          this.isPointerDown = true;
 
-              if (bullet) {
-                bullet.setActive(true);
-                bullet.setVisible(true);
-                bullet.body.velocity.y = -300;
+          if (this.canShoot) {
+            const bullet = this.bullets.get(this.player.x, this.player.y);
 
-                this.shootSound.play();
-                this.canShoot = true;
-              }
+            if (bullet) {
+              bullet.setActive(true);
+              bullet.setVisible(true);
+              bullet.body.velocity.y = -300;
+              this.shootSound.play();
+              this.canShoot = true;
             }
-          });
-          this.createRandomMushrooms(30);
-          this.createCrab();
-        }
+          }
+        });
+        this.createRandomMushrooms(30);
+        this.createCrab();
+      }
 
-       async restartGame() {
-          this.gameOverSound.play();
-          // Check if the score is high enough for high score submission
-            console.log("high score");
-            console.log(this.score);
+      async restartGame() {
+        this.gameOverSound.play();
+        // Check if the score is high enough for high score submission
+        console.log("high score");
+        console.log(this.score);
 
         try {
           const highScoresFromBackEnd = await this.fetchHighScores();
 
-    if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
-      let highestScore = -Infinity; // Change to find the highest score
+          if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
+            let highestScore = -Infinity; // Change to find the highest score
 
-      highScoresFromBackEnd.forEach((scoreObj, index) => {
-        // Skip the header row or any non-encoded strings
-        if (index === 0 || scoreObj.score === "Score") return; // Skip header
+            highScoresFromBackEnd.forEach((scoreObj, index) => {
+              // Skip the header row or any non-encoded strings
+              if (index === 0 || scoreObj.score === "Score") return; // Skip header
 
-        let { score } = scoreObj;
+              let { score } = scoreObj;
+
+              try {
+                let decodedScore = parseInt(atob(score), 10);
+                if (!isNaN(decodedScore) && decodedScore > highestScore) {
+                  highestScore = decodedScore; // Update highest score if current score is higher
+                }
+              } catch (e) {
+                console.error("Error decoding base64 string:", score, e);
+              }
+            });
+
+            console.log(this.score); // is correct
+            if (this.score > highestScore) {
+
+              console.log("New high score!");
+
+              // Capture the score before showing the input field
+              const currentScore = this.score;
+              const currentWave = this.wave;
+
+              this.showInputField().then(playerName => {
+                // Use captured score and wave
+                this.submitToGoogleForm(currentScore, currentWave, playerName);
+                console.log("High score submitted:", currentScore, playerName);
+              }).catch(error => {
+                console.error("Failed to get player name:", error);
+              });
+
+            }
+
+
+          } else {
+            console.error("No high scores available or failed to fetch high scores.");
+          }
+        } catch (error) {
+          console.error("Error in restartGame method:", error);
+        }
+
+        globalMushroomsData = [];
+        // Reset game state
+        // this.score = 11110;
+        this.lives = 4;
+        this.wave = 1;
+        this.bonus = 0;
+        this.score = 0;
+
+        this.scene.start("bootGame", {
+          score: (this.score = 0),
+          lives: (this.lives = 0),
+          wave: (this.wave = 1),
+          bonus: (this.bonus = 0),
+          textScore: (this.textScore = 0),
+        });
+      }
+
+      parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        return lines.map((line) => {
+          const columns = line.split(",");
+          // Ensure columns are correctly assigned
+          return {
+            name: columns[1].trim(), // Name is now the 2nd column
+            score: columns[2].trim(), // Keep score as a string
+            wave: columns[3].trim(), // Keep wave as a string
+          };
+        });
+      }
+
+      async fetchHighScores() {
+        const url =
+          "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
 
         try {
-          let decodedScore = parseInt(atob(score), 10);
-          if (!isNaN(decodedScore) && decodedScore > highestScore) {
-            highestScore = decodedScore; // Update highest score if current score is higher
-          }
-        } catch (e) {
-          console.error("Error decoding base64 string:", score, e);
+          const response = await fetch(url);
+          const csvText = await response.text();
+          return this.parseCSV(csvText);
+        } catch (error) {
+          console.error("Failed to fetch or parse the high scores:", error);
+          return [];
         }
-      });
+      }
 
-      // console.log("Highest Score: ", highestScore);
-      // console.log("My Score: ", this.score);
+      openPrefilledGoogleForm(score, wave) {
+        const scoreStr = score.toString();
+        const waveStr = wave.toString();
 
-      // if (this.score > highestScore) {
-      //   // Your code to handle new high score
-      //   this.showInputField();
-        
-      //  // this.submitToGoogleForm(this.score, this.wave, "kai"); // Replace "PlayerName" with actual player name if available
-      //  // console.log("High score sent: " + this.score);
-      // }
-      console.log(this.score); // is correct
-      if (this.score > highestScore) {
-    //    console.log("New high score!");
-    //    this.showInputField().then(playerName => {
-    //     // This code runs after the player has entered their name
-    //     this.submitToGoogleForm(this.score, this.wave, playerName); // this.score is always 0
-    //     console.log("High score submitted:", this.score, playerName);
-    // }).catch(error => {
-    //     // Handle the case where the promise was rejected (e.g., no name entered)
-    //     console.error("Failed to get player name:", error);
-    // });
+        // Base64 encode the strings
+        const encodedScore = btoa(scoreStr);
+        const encodedWave = btoa(waveStr);
 
-console.log("New high score!");
+        const baseFormUrl =
+          "https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/viewform";
+        const prefillUrl = `${baseFormUrl}?usp=pp_url&entry.141223346=${encodeURIComponent(
+          encodedScore
+        )}&entry.1705590754=${encodeURIComponent(encodedWave)}`;
 
-      // Capture the score before showing the input field
-      const currentScore = this.score;
-      const currentWave = this.wave;
+        // window.open(prefillUrl, "_blank");
+        // // Open the form in a new tab
+        // window.open(formUrl, "_blank");
+        // Create an iframe element
+        var iframe = document.createElement("iframe");
+        iframe.style.width = "640px";
+        iframe.style.height = "780px";
+        iframe.style.border = "none";
+        iframe.src = prefillUrl;
 
-      this.showInputField().then(playerName => {
-        // Use captured score and wave
-        this.submitToGoogleForm(currentScore, currentWave, playerName);
-        console.log("High score submitted:", currentScore, playerName);
-      }).catch(error => {
-        console.error("Failed to get player name:", error);
-      });
+        // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
+        document.getElementById("formContainer").appendChild(iframe);
+        //        console.log(prefillUrl);
+      }
 
-}
+      async submitToGoogleForm(score, wave, name) {
+        // const scoreStr = score.toString();
+        // const waveStr = wave.toString();
+        const nameStr = name.toString(); // Ensure the name is a string
 
+        const scoreStr = score.toString();
+        const waveStr = wave.toString();
 
-    } else {
-      console.error("No high scores available or failed to fetch high scores.");
-    }
-  } catch (error) {
-    console.error("Error in restartGame method:", error);
-  }
-// try {
-//   const highScoresFromBackEnd = await this.fetchHighScores();
+        // Base64 encode the strings
+        const encodedScore = btoa(scoreStr);
+        const encodedWave = btoa(waveStr);
 
-//   if (Array.isArray(highScoresFromBackEnd) && highScoresFromBackEnd.length > 0) {
-//     let lowestScore = Infinity;
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append("entry.1705590754", encodedWave); // Append the wave
+        formData.append("entry.141223346", encodedScore); // Append the score
+        formData.append("entry.773241883", nameStr); // Append the name is ok
 
-//     highScoresFromBackEnd.forEach((scoreObj, index) => {
-//       // Skip the header row or any non-encoded strings
-//       if (index === 0 || scoreObj.score === "Score") return; // Check against "Score" to skip header
+        //     console.log(formData);
+        // The form's action URL (replace with your form's actual action URL)
+        const formActionURL = "https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/formResponse";
 
-//       let { score } = scoreObj;
-
-//       try {
-//         let decodedScore = parseInt(atob(score), 10);
-//         if (!isNaN(decodedScore) && decodedScore > lowestScore) {
-//           lowestScore = decodedScore;
-//         }
-//       } catch (e) {
-//         console.error("Error decoding base64 string:", score, e);
-//       }
-//     });
-
-//     console.log("Lowest Score: ", lowestScore);
-//     console.log("my Score: ", this.score);
-//      if (this.score > lowestScore) {
-//   this.submitToGoogleForm(this.score, this.wave, "check");
-//   console.log ("high score send: " + this.score);
-//   }
-
-//   } else {
-//     console.error("No high scores available or failed to fetch high scores.");
-//   }
-// } catch (error) {
-//   console.error("Error in restartGame method:", error);
-// }
-
-//     console.log("end my Score: ", this.score);
-
-  // if (this.score > this.lowestScore) {
-  // this.submitToGoogleForm(this.score, this.wave, "check");
-  // console.log ("high score send: " + this.score);
-  // }
-        //    this.submitToGoogleForm(this.score, this.wave, "check")
-          //  this.openPrefilledGoogleForm(this.score, this.wave);
-         // }
-
-          globalMushroomsData = [];
-          // Reset game state
-          // this.score = 11110;
-          this.lives = 4;
-          this.wave = 1;
-          this.bonus = 0;
-          this.score = 0;
-
-          this.scene.start("bootGame", {
-            score: (this.score = 0),
-            lives: (this.lives = 0),
-            wave: (this.wave = 1),
-            bonus: (this.bonus = 0),
-            textScore: (this.textScore = 0),
-          });
-        }
- 
-         parseCSV(csvText) {
-          const lines = csvText.trim().split("\n");
-          return lines.map((line) => {
-            const columns = line.split(",");
-            // Ensure columns are correctly assigned
-            return {
-              name: columns[1].trim(), // Name is now the 2nd column
-              score: columns[2].trim(), // Keep score as a string
-              wave: columns[3].trim(), // Keep wave as a string
-            };
-          });
-        }
-   
-  async fetchHighScores() {
-          const url =
-            "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-AiKffxz0K2seWkfnGcEt0PekMB1NEbI7Iv3BhyAaZu_HmmepebguyWqAp_py0xXG16kEKSt1DqyB/pub?output=csv";
-
-          try {
-            const response = await fetch(url);
-            const csvText = await response.text();
-            return this.parseCSV(csvText);
-          } catch (error) {
-            console.error("Failed to fetch or parse the high scores:", error);
-            return [];
-          }
-        }
-
-        openPrefilledGoogleForm(score, wave) {
-          const scoreStr = score.toString();
-          const waveStr = wave.toString();
-
-          // Base64 encode the strings
-          const encodedScore = btoa(scoreStr);
-          const encodedWave = btoa(waveStr);
-
-          const baseFormUrl =
-            "https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/viewform";
-          const prefillUrl = `${baseFormUrl}?usp=pp_url&entry.141223346=${encodeURIComponent(
-            encodedScore
-          )}&entry.1705590754=${encodeURIComponent(encodedWave)}`;
-
-          // window.open(prefillUrl, "_blank");
-          // // Open the form in a new tab
-          // window.open(formUrl, "_blank");
-          // Create an iframe element
-          var iframe = document.createElement("iframe");
-          iframe.style.width = "640px";
-          iframe.style.height = "780px";
-          iframe.style.border = "none";
-          iframe.src = prefillUrl;
-
-          // Append the iframe to a specific element in your page, e.g., a div with the ID 'formContainer'
-          document.getElementById("formContainer").appendChild(iframe);
-  //        console.log(prefillUrl);
-        }
-
-  async submitToGoogleForm(score, wave, name) {
-    // const scoreStr = score.toString();
-    // const waveStr = wave.toString();
-          const nameStr = name.toString(); // Ensure the name is a string
-
-          const scoreStr = score.toString();
-          const waveStr = wave.toString();
-
-          // Base64 encode the strings
-          const encodedScore = btoa(scoreStr);
-          const encodedWave = btoa(waveStr);
-
-    // Create a FormData object
-    const formData = new FormData();
-    formData.append("entry.1705590754", encodedWave); // Append the wave
-    formData.append("entry.141223346", encodedScore); // Append the score
-    formData.append("entry.773241883", nameStr); // Append the name is ok
-
-  //     console.log(formData);
-    // The form's action URL (replace with your form's actual action URL)
-    const formActionURL = "https://docs.google.com/forms/d/e/1FAIpQLSdd392qpsZbFhc9rx-bGZTP2zn6J6CWLi_nd9wDd8ePOPa9Zw/formResponse";
-
-    try {
-        // Make the POST request using the Fetch API
-        const response = await fetch(formActionURL, {
+        try {
+          // Make the POST request using the Fetch API
+          const response = await fetch(formActionURL, {
             method: "POST",
             mode: "no-cors", // Note: 'no-cors' mode will prevent reading the response
             body: formData,
-        });
-     //   console.log("Form submitted successfully");
-     //   console.log(formActionURL);
-    } catch (error) {
-        console.error("Error submitting form", error);
-    }
-}
-   
-    //     showInputField() {
-    //     document.getElementById('inputContainer').style.display = 'block';
-    //     document.getElementById('playerNameInput').focus();
+          });
+          //   console.log("Form submitted successfully");
+          //   console.log(formActionURL);
+        } catch (error) {
+          console.error("Error submitting form", error);
+        }
+      }
 
-    //     document.getElementById('submitBtn').onclick = () => {
-    //         const playerName = document.getElementById('playerNameInput').value.trim();
-    //         if (playerName) {
-    //             console.log("High score sent:", this.score, "by", playerName, "wave", this.wave);
-    //            // this.submitToGoogleForm(this.score, this.wave, playerName);
-    //            // Hide input field again
-    //             document.getElementById('inputContainer').style.display = 'none';
-    //             return playerName;
-    //         } else {
-    //             alert("Please enter your name.");
-    //         }
-    //     };
-    // }
+      //     showInputField() {
+      //     document.getElementById('inputContainer').style.display = 'block';
+      //     document.getElementById('playerNameInput').focus();
 
-        showInputField() {
-    return new Promise((resolve, reject) => {
-        // Show the input field
-        document.getElementById('inputContainer').style.display = 'block';
-        document.getElementById('playerNameInput').focus();
+      //     document.getElementById('submitBtn').onclick = () => {
+      //         const playerName = document.getElementById('playerNameInput').value.trim();
+      //         if (playerName) {
+      //             console.log("High score sent:", this.score, "by", playerName, "wave", this.wave);
+      //            // this.submitToGoogleForm(this.score, this.wave, playerName);
+      //            // Hide input field again
+      //             document.getElementById('inputContainer').style.display = 'none';
+      //             return playerName;
+      //         } else {
+      //             alert("Please enter your name.");
+      //         }
+      //     };
+      // }
 
-        // Configure the submit button to resolve the promise with the player's name
-        document.getElementById('submitBtn').onclick = () => {
+      showInputField() {
+        return new Promise((resolve, reject) => {
+          // Show the input field
+          document.getElementById('inputContainer').style.display = 'block';
+          document.getElementById('playerNameInput').focus();
+
+          // Configure the submit button to resolve the promise with the player's name
+          document.getElementById('submitBtn').onclick = () => {
             const playerName = document.getElementById('playerNameInput').value.trim();
             if (playerName) {
-                // Hide the input field
-                document.getElementById('inputContainer').style.display = 'none';
-                resolve(playerName); // Resolve the promise with the player name
+              // Hide the input field
+              document.getElementById('inputContainer').style.display = 'none';
+              resolve(playerName); // Resolve the promise with the player name
             } else {
-                alert("Please enter your name.");
-                reject(new Error("No name entered"));
+              alert("Please enter your name.");
+              reject(new Error("No name entered"));
             }
-        };
-    });
-}
+          };
+        });
+      }
 
-        fireBullet() {
-          this.bullet = this.bullets.get(this.player.x, this.player.y);
+      fireBullet() {
+        this.bullet = this.bullets.get(this.player.x, this.player.y);
 
-          if (this.bullet) {
-            this.bullet.setActive(true);
-            this.bullet.setVisible(true);
-            this.bullet.body.velocity.y = -500;
+        if (this.bullet) {
+          this.bullet.setActive(true);
+          this.bullet.setVisible(true);
+          this.bullet.body.velocity.y = -500;
 
-            this.shootSound.play();
-          }
+          this.shootSound.play();
+        }
+      }
+
+      update() {
+        if (this.lives === 0) {
+          this.restartGame();
         }
 
-        update() {
-          if (this.lives === 0) {
-            this.restartGame();
-          }
-
-          // Update spider movement and behavior
-          if (this.spider) {
-            this.moveSpider();
-          }
-          const pointer = this.input.activePointer;
-          if (pointer.isDown) {
-            this.fireBullet();
-          }
-          this.centipede.children.iterate((segment) => {
-            if (segment.active) {
-              segment.setVelocityX(
-                this.centipedeSegmentSpeed * segment.getData("direction")
-              );
-
-              // Check if the centipede segment reaches the bottom
-              if (segment.y >= game.config.height - 20) {
-                segment.disableBody(true, true);
-                this.score = 0;
-                this.scoreText = "0";
-                this.lives = 4;
-                this.wave = 1;
-                this.gameOverSound.play();
-                this.scene.start("bootGame");
-                // this.restartGame();
-              }
-            }
-          });
-          this.physics.world.wrap(this.bullets, 5);
-          this.physics.world.wrap(this.bullets.children, 5);
-          this.bullets.children.iterate((bullet) => {
-            if (
-              bullet.active &&
-              (bullet.y < 0 || bullet.y > game.config.height)
-            ) {
-              bullet.destroy();
-              this.canShoot = true;
-            }
-          });
-          this.checkCentipedeCollision();
-          // Check if all centipede segments are destroyed
-          if (this.centipede.countActive() === 0) {
-            this.nextLevel();
-          }
+        // Update spider movement and behavior
+        if (this.spider) {
+          this.moveSpider();
         }
-
-        nextLevel() {
-          // Increase the difficulty or reset the game state for the next level
-          // Adjust the speed of existing centipedes (increase the difficulty)
-          // Transition to the ScoreScene
-
-          const endTime = this.time.now;
-          const durationInSeconds = (endTime - this.startTime) / 1000; // Phaser's time.now is in milliseconds
-          //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
-          let bonusScore = Math.max(
-            0,
-            Math.round((30 - durationInSeconds) * 200)
-          );
-          // Adjust bonusScore calculation as  10 points for each second under 30 seconds.
-
-          // Ensure bonusScore is not negative
-          bonusScore = Math.max(0, bonusScore);
-          this.scene.start("ScoreScene", {
-            score: this.score,
-            lives: this.lives,
-            wave: this.wave,
-            bonusScore: bonusScore, // Pass the bonusScore to the ScoreScene
-            centipedeSegmentSpeed: this.centipedeSegmentSpeed,
-          });
+        const pointer = this.input.activePointer;
+        if (pointer.isDown) {
+          this.fireBullet();
         }
-
-        createCentipede() {
-          //  segmentVelocityX = this.data.centipedeSegmentSpeed;
-          for (let i = 0; i < 8; i++) {
-            const segment = this.centipede
-              .create(32 + i * 40, 0, "centipede")
-              .setActive(true);
-            segment.setData("direction", 1);
-            segment.setData("hasMovedDown", false);
-            // Apply the velocity to make the centipede move
+        this.centipede.children.iterate((segment) => {
+          if (segment.active) {
             segment.setVelocityX(
               this.centipedeSegmentSpeed * segment.getData("direction")
             );
-          }
-        }
 
-        bulletHitCentipede(centipedeSegment, bullet) {
-          const pointsText = this.add
-            .text(centipedeSegment.x + 10, centipedeSegment.y + 10, "80", {
-              fontFamily: "VT323",
-              fontSize: "20px",
-              color: "#ffff00",
-            })
-            .setOrigin(0.5, 0.5);
-
-          pointsText.setDepth(1);
-          // Remove the points text
-          this.time.delayedCall(400, () => {
-            pointsText.destroy();
-          });
-
-          centipedeSegment.disableBody(true, true);
-          bullet.destroy();
-          this.destroySound.play();
-
-          // Create a mushroom at the position of the centipede segment
-          this.createMushroom(centipedeSegment.x, centipedeSegment.y);
-
-          globalMushroomsData.push({
-            x: centipedeSegment.x,
-            y: centipedeSegment.y,
-            hits: 0,
-          });
-          // Update the score when the player shoots a centipede segment
-          this.score += 80;
-          this.textScore.setText("" + this.score);
-          this.canShoot = true; // Allow shooting again
-        }
-
-        bulletHitMushroom(bullet, mushroom) {
-          let hits = mushroom.getData("hits") + 1; // Retrieve current hit count and increment
-          mushroom.setData("hits", hits); // Update the hit count
-          // Apply different tints based on the number of hits
-          if (hits === 1) {
-            mushroom.setTint(0xff9999); // Light red tint after the first hit
-          } else if (hits === 2) {
-            mushroom.setTint(0xff6666); // Darker red tint after the second hit
-          }
-
-          if (hits >= 3) {
-            // Remove or update the mushroom in globalMushroomsData
-            const index = globalMushroomsData.findIndex(
-              (mData) => mData.x === mushroom.x && mData.y === mushroom.y
-            );
-            if (index > -1) {
-              globalMushroomsData.splice(index, 1); // Or mark it as destroyed
+            // Check if the centipede segment reaches the bottom
+            if (segment.y >= game.config.height - 20) {
+              segment.disableBody(true, true);
+              this.score = 0;
+              this.scoreText = "0";
+              this.lives = 4;
+              this.wave = 1;
+              this.gameOverSound.play();
+              this.scene.start("bootGame");
             }
-
-            const pointsText = this.add
-              .text(mushroom.x, mushroom.y, "5", {
-                fontFamily: "VT323",
-                fontSize: "20px",
-                color: "#ffff00",
-              })
-              .setOrigin(0.5, 0.5);
-            // pointsText = "200";
-            pointsText.setDepth(1);
-            // Remove the points text
-            this.time.delayedCall(400, () => {
-              pointsText.destroy();
-            });
-
-            mushroom.destroy();
-            this.destroySound.play();
-            // Update the score when the player shoots a mushroom
-            this.score += 5;
-            this.textScore.setText("" + this.score);
-            this.textLives.setText("Lives: " + this.lives);
-          } else {
-            // Optional: Visual feedback that the mushroom was hit but not destroyed
           }
+        });
+        this.physics.world.wrap(this.bullets, 5);
+        this.physics.world.wrap(this.bullets.children, 5);
+        this.bullets.children.iterate((bullet) => {
+          if (
+            bullet.active &&
+            (bullet.y < 0 || bullet.y > game.config.height)
+          ) {
+            bullet.destroy();
+            this.canShoot = true;
+          }
+        });
+        this.checkCentipedeCollision();
+        // Check if all centipede segments are destroyed
+        if (this.centipede.countActive() === 0) {
+          this.nextLevel();
+        }
+      }
 
-          bullet.destroy();
+      nextLevel() {
+        // Increase the difficulty or reset the game state for the next level
+        // Adjust the speed of existing centipedes (increase the difficulty)
+        // Transition to the ScoreScene
+        const endTime = this.time.now;
+        const durationInSeconds = (endTime - this.startTime) / 1000; // Phaser's time.now is in milliseconds
+        //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
+        let bonusScore = Math.max(
+          0,
+          Math.round((30 - durationInSeconds) * 200)
+        );
+        // Adjust bonusScore calculation as  10 points for each second under 30 seconds.
 
-          this.canShoot = true; // Allow shooting again
+        // Ensure bonusScore is not negative
+        bonusScore = Math.max(0, bonusScore);
+        this.scene.start("ScoreScene", {
+          score: this.score,
+          lives: this.lives,
+          wave: this.wave,
+          bonusScore: bonusScore, // Pass the bonusScore to the ScoreScene
+          centipedeSegmentSpeed: this.centipedeSegmentSpeed,
+        });
+      }
+
+      createCentipede() {
+        //  segmentVelocityX = this.data.centipedeSegmentSpeed;
+        for (let i = 0; i < 8; i++) {
+          const segment = this.centipede
+            .create(32 + i * 40, 0, "centipede")
+            .setActive(true);
+          segment.setData("direction", 1);
+          segment.setData("hasMovedDown", false);
+          // Apply the velocity to make the centipede move
+          segment.setVelocityX(
+            this.centipedeSegmentSpeed * segment.getData("direction")
+          );
+        }
+      }
+
+      bulletHitCentipede(centipedeSegment, bullet) {
+        const pointsText = this.add
+          .text(centipedeSegment.x + 10, centipedeSegment.y + 10, "80", {
+            fontFamily: "VT323",
+            fontSize: "20px",
+            color: "#ffff00",
+          })
+          .setOrigin(0.5, 0.5);
+
+        pointsText.setDepth(1);
+        // Remove the points text
+        this.time.delayedCall(400, () => {
+          pointsText.destroy();
+        });
+
+        centipedeSegment.disableBody(true, true);
+        bullet.destroy();
+        this.destroySound.play();
+
+        // Create a mushroom at the position of the centipede segment
+        this.createMushroom(centipedeSegment.x, centipedeSegment.y);
+
+        globalMushroomsData.push({
+          x: centipedeSegment.x,
+          y: centipedeSegment.y,
+          hits: 0,
+        });
+        // Update the score when the player shoots a centipede segment
+        this.score += 80;
+        this.textScore.setText("" + this.score);
+        this.canShoot = true; // Allow shooting again
+      }
+
+      bulletHitMushroom(bullet, mushroom) {
+        let hits = mushroom.getData("hits") + 1; // Retrieve current hit count and increment
+        mushroom.setData("hits", hits); // Update the hit count
+        // Apply different tints based on the number of hits
+        if (hits === 1) {
+          mushroom.setTint(0xff9999); // Light red tint after the first hit
+        } else if (hits === 2) {
+          mushroom.setTint(0xff6666); // Darker red tint after the second hit
         }
 
-        bulletHitSpider(bullet, spider) {
+        if (hits >= 3) {
+          // Remove or update the mushroom in globalMushroomsData
+          const index = globalMushroomsData.findIndex(
+            (mData) => mData.x === mushroom.x && mData.y === mushroom.y
+          );
+          if (index > -1) {
+            globalMushroomsData.splice(index, 1); // Or mark it as destroyed
+          }
+
           const pointsText = this.add
-            .text(spider.x, spider.y, "200", {
+            .text(mushroom.x, mushroom.y, "5", {
               fontFamily: "VT323",
               fontSize: "20px",
               color: "#ffff00",
             })
             .setOrigin(0.5, 0.5);
+          // pointsText = "200";
           pointsText.setDepth(1);
           // Remove the points text
           this.time.delayedCall(400, () => {
             pointsText.destroy();
           });
 
-          // Destroy the bullet and spider
-          bullet.destroy();
-          spider.destroy();
-
-          // Update the score
-          this.score += 200;
-          this.bonus += 300;
+          mushroom.destroy();
+          this.destroySound.play();
+          // Update the score when the player shoots a mushroom
+          this.score += 5;
           this.textScore.setText("" + this.score);
           this.textLives.setText("Lives: " + this.lives);
+        } else {
+          // Optional: Visual feedback that the mushroom was hit but not destroyed
         }
+        bullet.destroy();
+        this.canShoot = true; // Allow shooting again
+      }
 
-        createRandomMushrooms(count) {
-          // if (this.wave > 1) {
-          //   count = count + this.wave * 2;
-          // }
-          if (this.wave > 1 && globalMushroomsData.length > 0) {
-            globalMushroomsData.forEach((mushroomData) => {
-              this.createMushroom(mushroomData.x, mushroomData.y);
-            });
-          }
-          // else {
-          // Existing logic to randomly place mushrooms
-          // For each new mushroom, add its data to globalMushroomsData
+      bulletHitSpider(bullet, spider) {
+        const pointsText = this.add
+          .text(spider.x, spider.y, "200", {
+            fontFamily: "VT323",
+            fontSize: "20px",
+            color: "#ffff00",
+          })
+          .setOrigin(0.5, 0.5);
+        pointsText.setDepth(1);
+        // Remove the points text
+        this.time.delayedCall(400, () => {
+          pointsText.destroy();
+        });
 
-          const mushroomWidth = 30; // Adjust this based on your mushroom image size
-          const spacing = mushroomWidth * 1;
-          let currentIndex = 0;
-          let delayBetween = 100;
-          const createNextMushroom = () => {
-            if (currentIndex < count) {
-              const x = Phaser.Math.Between(
-                spacing,
-                game.config.width - spacing
-              );
-              const y = Phaser.Math.Between(
-                spacing,
-                game.config.height - spacing
-              );
+        // Destroy the bullet and spider
+        bullet.destroy();
+        spider.destroy();
 
-              this.createMushroom(x, y);
+        // Update the score
+        this.score += 200;
+        this.bonus += 300;
+        this.textScore.setText("" + this.score);
+        this.textLives.setText("Lives: " + this.lives);
+      }
 
-              currentIndex++;
-
-              // Recursive call with a delay
-              setTimeout(createNextMushroom, delayBetween);
-            }
-          };
-          // Start the sequence
-          createNextMushroom();
+      createRandomMushrooms(count) {
+        // if (this.wave > 1) {
+        //   count = count + this.wave * 2;
+        // }
+        if (this.wave > 1 && globalMushroomsData.length > 0) {
+          globalMushroomsData.forEach((mushroomData) => {
+            this.createMushroom(mushroomData.x, mushroomData.y);
+          });
         }
+        // else {
+        // For each new mushroom, add its data to globalMushroomsData
 
-        centipedeHitMushroom(centipedeSegment, mushroom) {
-          // Change the movement direction to avoid being pushed out of bounds
-          if (
-            centipedeSegment.x < game.config.width - 20 &&
-            centipedeSegment.x > 20
-          ) {
-            centipedeSegment.setData(
-              "direction",
-              -centipedeSegment.getData("direction")
+        const mushroomWidth = 30; // Adjust this based on your mushroom image size
+        const spacing = mushroomWidth * 1;
+        let currentIndex = 0;
+        let delayBetween = 100;
+        const createNextMushroom = () => {
+          if (currentIndex < count) {
+            const x = Phaser.Math.Between(
+              spacing,
+              game.config.width - spacing
             );
-          } else {
-            // If at the screen edge, move down and continue in the same direction
-            centipedeSegment.y += 15; // Move down by 15 pixels
-            centipedeSegment.setData(
-              "direction",
-              -centipedeSegment.getData("direction")
+            const y = Phaser.Math.Between(
+              spacing,
+              game.config.height - spacing
             );
+
+            this.createMushroom(x, y);
+
+            currentIndex++;
+
+            // Recursive call with a delay
+            setTimeout(createNextMushroom, delayBetween);
           }
+        };
+        // Start the sequence
+        createNextMushroom();
+      }
 
-          // Move down and reverse the movement direction
-          centipedeSegment.y += 5; // Adjust the value based on your preference
+      centipedeHitMushroom(centipedeSegment, mushroom) {
+        // Change the movement direction to avoid being pushed out of bounds
+        if (
+          centipedeSegment.x < game.config.width - 20 &&
+          centipedeSegment.x > 20
+        ) {
+          centipedeSegment.setData(
+            "direction",
+            -centipedeSegment.getData("direction")
+          );
+        } else {
+          // If at the screen edge, move down and continue in the same direction
+          centipedeSegment.y += 15; // Move down by 15 pixels
           centipedeSegment.setData(
             "direction",
             -centipedeSegment.getData("direction")
           );
         }
 
-        playerHitCentipede(player, centipedeSegment) {
-          this.restartGame();
-        }
+        // Move down and reverse the movement direction
+        centipedeSegment.y += 5; // Adjust the value based on your preference
+        centipedeSegment.setData(
+          "direction",
+          -centipedeSegment.getData("direction")
+        );
+      }
 
-        checkCentipedeCollision() {
-          this.centipede.children.iterate((segment) => {
-            if (segment.active) {
-              if (
-                (segment.x >= game.config.width - 20 || segment.x <= 20) &&
-                !segment.getData("hasMovedDown")
-              ) {
-                segment.y += 15; // Move down by 15 pixels
-                segment.setData("direction", -segment.getData("direction"));
-                segment.setData("hasMovedDown", true);
-              } else if (segment.x < game.config.width - 20 && segment.x > 20) {
-                // Reset the flag when it's not touching the sides
-                segment.setData("hasMovedDown", false);
-              }
+      playerHitCentipede(player, centipedeSegment) {
+        this.restartGame();
+      }
+
+      checkCentipedeCollision() {
+        this.centipede.children.iterate((segment) => {
+          if (segment.active) {
+            if (
+              (segment.x >= game.config.width - 20 || segment.x <= 20) &&
+              !segment.getData("hasMovedDown")
+            ) {
+              segment.y += 15; // Move down by 15 pixels
+              segment.setData("direction", -segment.getData("direction"));
+              segment.setData("hasMovedDown", true);
+            } else if (segment.x < game.config.width - 20 && segment.x > 20) {
+              // Reset the flag when it's not touching the sides
+              segment.setData("hasMovedDown", false);
             }
-          });
-        }
+          }
+        });
+      }
 
-        playerHitSpider(player, spider) {
-          // Handle spider-player collision logic
-          // For example, decrease player health or trigger game over
-          this.score -= 100;
+      playerHitSpider(player, spider) {
+        // Handle spider-player collision logic
+        // For example, decrease player health or trigger game over
+        this.score -= 100;
+        this.lives -= 1;
+        this.textLives.setText("Lives: " + this.lives);
+        this.mushroomTouchedByPlayerSound.play();
+        spider.y = 0;
+        spider.x = Phaser.Math.Between(50, 750);
+        this.destroySound.play();
+        this.updateHeartsDisplay();
+      }
+
+      createCrab() {
+        this.anims.create({
+          key: "crabWalk", // A name for the animation
+          frames: this.anims.generateFrameNumbers("crab", {
+            start: 0,
+            end: 3, // If you have 8 frames, numbering goes from 0 to 7
+          }),
+          frameRate: 15, // Number of frames per second
+          repeat: -1, // Loop forever
+        });
+
+        this.crab = this.physics.add
+          .sprite(-100, (this.game.config.height * 2) / 3, "crab")
+          .play("crabWalk")
+          .setOrigin(0.5, 0.5)
+          .setScale(0.25);
+
+        // Randomly delay the start of crab movement after 4 seconds (4000ms)
+        const minDelay = 4000; // Minimum delay of 4 seconds
+        const randomAdditionalDelay = Phaser.Math.Between(0, 2000); // Add up to an additional 2 seconds
+
+        this.physics.add.collider(
+          this.bullets,
+          this.crab,
+          this.bulletHitCrab,
+          null,
+          this
+        );
+        this.physics.add.collider(
+          this.crab,
+          this.mushrooms,
+          this.crabHitsMushroom,
+          null,
+          this
+        );
+
+        this.physics.add.collider(this.crab, this.player, () => {
           this.lives -= 1;
           this.textLives.setText("Lives: " + this.lives);
-          this.mushroomTouchedByPlayerSound.play();
-          spider.y = 0;
-          spider.x = Phaser.Math.Between(50, 750);
-          this.destroySound.play();
+          this.player.setVelocity(0, 0);
           this.updateHeartsDisplay();
-        }
+          //    console.log("touched the crab");
+          //    console.log(this.lives);
+          this.destroySound.play();
+        });
 
-        createCrab() {
-          this.anims.create({
-            key: "crabWalk", // A name for the animation
-            frames: this.anims.generateFrameNumbers("crab", {
-              start: 0,
-              end: 3, // If you have 8 frames, numbering goes from 0 to 7
-            }),
-            frameRate: 15, // Number of frames per second
-            repeat: -1, // Loop forever
-          });
-
-          this.crab = this.physics.add
-            .sprite(-100, (this.game.config.height * 2) / 3, "crab")
-            .play("crabWalk")
-            .setOrigin(0.5, 0.5)
-            .setScale(0.25);
-
-          // Randomly delay the start of crab movement after 4 seconds (4000ms)
-          const minDelay = 4000; // Minimum delay of 4 seconds
-          const randomAdditionalDelay = Phaser.Math.Between(0, 2000); // Add up to an additional 2 seconds
-
-          this.physics.add.collider(
-            this.bullets,
-            this.crab,
-            this.bulletHitCrab,
-            null,
-            this
-          );
-          this.physics.add.collider(
-            this.crab,
-            this.mushrooms,
-            this.crabHitsMushroom,
-            null,
-            this
-          );
-
-          this.physics.add.collider(this.crab, this.player, () => {
-            this.lives -= 1;
-            this.textLives.setText("Lives: " + this.lives);
-            this.player.setVelocity(0, 0);
-            this.updateHeartsDisplay();
-        //    console.log("touched the crab");
-        //    console.log(this.lives);
-            this.destroySound.play();
-          });
-
-          // Start moving the crab randomly after 4 to 6 seconds
-          this.time.delayedCall(minDelay + randomAdditionalDelay, () => {
-            if (!this.crab || !this.crab.body) {
-              console.log("Crab does not exist or has been destroyed.");
-              return; // Exit the function if crab doesn't exist
-            }
-            // this.moveCrab();
-            //   // Set initial direction and speed
-            let speed = 200;
-            let direction = 1; // 1 for down, -1 for up
-            if (this.crab) {
-              this.crab.body.velocity.x = speed;
-              this.crab.body.velocity.y = speed * direction;
-              direction *= -1; // Change direction
-              // Change direction every 500ms
-              this.time.addEvent({
-                delay: 1100,
-                callback: () => {
-                  if (!this.crab || !this.crab.body) return;
-                  if (this.crab.x > this.game.config.width + 40) {
-                    // If crab moves outside the play area, reset its position
-                    this.crab.setPosition(
-                      -100,
-                      (this.game.config.height * 2) / 3
-                    );
-                    this.crab.body.velocity.x = speed;
-                  } else {
-                    // Change vertical direction
-                    this.crab.body.velocity.y = speed * direction;
-                    direction *= -1; // Change direction
-                  }
-                },
-                loop: true,
-              });
-            } else {
-            }
-            // Set the crab's boundary limit based on the game's height
-            const bottomBoundary =
-              this.game.config.height - this.crab.displayHeight / 2; // Adjust if your crab has an offset
-
-            // // Change direction every 3 seconds
-            this.time.addEvent({
-              delay: 4000, // 3000 milliseconds = 3 seconds
-              callback: () => {
-                if (!this.crab || !this.crab.body) return;
-                this.crab.body.velocity.x = speed * direction;
-                direction *= +1; // Change direction
-                // Check if the crab is beyond the bottom play area and adjust
-                if (this.crab.y > bottomBoundary) {
-                  this.crab.y = bottomBoundary; // Reset crab's y position to within the play area
-                }
-              },
-              loop: true,
-            });
-          });
-          // moveCrabRight`, do similarly
-          this.time.delayedCall(minDelay + Phaser.Math.Between(0, 2000), () => {
-            if (!this.crab || !this.crab.body) {
-              console.log("Crab does not exist or has been destroyed.");
-              return; // Exit the function if crab doesn't exist
-            }
-            //  this.moveCrabRight();
-            // Set initial direction and speed
-            let speed = 200;
-            let direction = 1; // 1 for down, -1 for up
-            if (this.crab) {
-              // Spawn the crab on the right side and move it to the left
-              this.crab.setPosition(
-                this.game.config.width + 100,
-                (this.game.config.height * 2) / 3
-              );
-              this.crab.body.velocity.x = -speed; // Move left
-              this.crab.body.velocity.y = speed * direction;
-              direction *= -1; // Change direction
-
-              // Adjust the timer to change vertical direction and check position
-              this.time.addEvent({
-                delay: 1000,
-                callback: () => {
-                  if (!this.crab || !this.crab.body) return;
-                  // Check if the crab has moved outside the play area on the left
-                  if (this.crab.x < -40) {
-                    // Reset its position to the right side of the play area
-                    this.crab.setPosition(
-                      this.game.config.width + 100,
-                      (this.game.config.height * 2) / 3
-                    );
-                    this.crab.body.velocity.x = -speed; // Continue moving left
-                  } else {
-                    // Change vertical direction
-                    this.crab.body.velocity.y = speed * direction;
-                    direction *= -1; // Toggle direction
-                  }
-                },
-                loop: true,
-              });
-            }
-
-            // Set the crab's boundary limit based on the game's height
-            const bottomBoundary =
-              this.game.config.height - this.crab.displayHeight / 2;
-
-            // Change direction (up or down) every few seconds
-            this.time.addEvent({
-              delay: 4000,
-              callback: () => {
-                if (!this.crab || !this.crab.body) return;
-                this.crab.body.velocity.x = -Math.abs(speed); // Ensure the crab continues moving left
-                // Adjust if the crab is beyond the bottom play area
-                if (this.crab.y > bottomBoundary) {
-                  this.crab.y = bottomBoundary; // Reset crab's y position within the play area
-                }
-              },
-              loop: true,
-            });
-          });
-        }
-
-        crabHitsMushroom(crab, mushroom) {
-          // Check if this is the third mushroom touched
-          this.crabMushroomTouches = ++this.crabMushroomTouches;
-          if (this.crabMushroomTouches % 2 === 0) {
-            this.sound.play("crabEatsSound");
-            const index = globalMushroomsData.findIndex(
-              (mData) => mData.x === mushroom.x && mData.y === mushroom.y
-            );
-            if (index > -1) {
-              globalMushroomsData.splice(index, 1); // Or mark it as destroyed
-            }
-            // Destroy the mushroom
-            mushroom.destroy();
+        // Start moving the crab randomly after 4 to 6 seconds
+        this.time.delayedCall(minDelay + randomAdditionalDelay, () => {
+          if (!this.crab || !this.crab.body) {
+            console.log("Crab does not exist or has been destroyed.");
+            return; // Exit the function if crab doesn't exist
           }
-        }
+          //   // Set initial direction and speed
+          let speed = 200;
+          let direction = 1; // 1 for down, -1 for up
+          if (this.crab) {
+            this.crab.body.velocity.x = speed;
+            this.crab.body.velocity.y = speed * direction;
+            direction *= -1; // Change direction
+            // Change direction every 500ms
+            this.time.addEvent({
+              delay: 1100,
+              callback: () => {
+                if (!this.crab || !this.crab.body) return;
+                if (this.crab.x > this.game.config.width + 40) {
+                  // If crab moves outside the play area, reset its position
+                  this.crab.setPosition(
+                    -100,
+                    (this.game.config.height * 2) / 3
+                  );
+                  this.crab.body.velocity.x = speed;
+                } else {
+                  // Change vertical direction
+                  this.crab.body.velocity.y = speed * direction;
+                  direction *= -1; // Change direction
+                }
+              },
+              loop: true,
+            });
+          } else {
+          }
+          // Set the crab's boundary limit based on the game's height
+          const bottomBoundary =
+            this.game.config.height - this.crab.displayHeight / 2; // Adjust if your crab has an offset
 
-        // moveSpider() {
-        //   // Simple movement for the spider
-        //   this.spider.y += 2;
-        //   // Ensure spider and spider.body are defined
-        //   if (this.spider && this.spider.body) {
-        //     // If the spider reaches the screen edge, reverse its direction
-        //     if (this.spider.x < 50 || this.spider.x > 750) {
-        //       this.spider.setVelocityX(-this.spider.body.velocity.x);
-        //     }
-        //   }
-
-        //   // If the spider reaches the bottom, reset its position
-        //   if (this.spider.y > 900) {
-        //     this.spider.y = 0;
-        //     this.spider.x = Phaser.Math.Between(50, 750);
-        //   }
-
-
-        //   if (this.spider && this.spider.body) {
-        //     // If the spider reaches the screen edge, reverse its direction
-        //     if (this.spider.x < 50 || this.spider.x > 750) {
-        //       // Check if the spider has a velocity before accessing it
-        //       if (this.spider.body.velocity) {
-        //         this.spider.setVelocityX(-this.spider.body.velocity.x);
-        //       }
-        //     }
-        //   }
-        // }
-moveSpider() {
-  if (this.spider && this.spider.active) {
-  this.spider.setVelocityX(0);
-
-    // Constant downward movement for the spider
-    const downwardSpeed = 2.5; // Adjust the speed as needed
-    this.spider.y += downwardSpeed;
-
-    // If the spider reaches the bottom of the game area, reset to the top
-    if (this.spider.y > 900) { // Assuming 900 is the height of your game area
-        this.spider.y = 0; // Reset position to the top
-        // Place the spider at a random X position within the game bounds
-       
-         this.spider.x = Phaser.Math.Between(10, 600); // Adjust the range as per your game's layout
-       }
-       
-    }
-}
-
-
-
-        bulletHitCrab(bullet, crab) {
-          const pointsText = this.add
-            .text(crab.x, crab.y, "300", {
-              fontFamily: "VT323",
-              fontSize: "20px",
-              color: "#ffff00",
-            })
-            .setOrigin(0.5, 0.5);
-          pointsText.setDepth(1);
-          // Remove the points text
-          this.time.delayedCall(400, () => {
-            pointsText.destroy();
+          // // Change direction every 3 seconds
+          this.time.addEvent({
+            delay: 4000, // 3000 milliseconds = 3 seconds
+            callback: () => {
+              if (!this.crab || !this.crab.body) return;
+              this.crab.body.velocity.x = speed * direction;
+              direction *= +1; // Change direction
+              // Check if the crab is beyond the bottom play area and adjust
+              if (this.crab.y > bottomBoundary) {
+                this.crab.y = bottomBoundary; // Reset crab's y position to within the play area
+              }
+            },
+            loop: true,
           });
-          bullet.destroy(); // Destroy the bullet
-          crab.destroy(); // Destroy the crab
-          this.score += 300; // Add 200 points to the player's score
-          this.bonus += 400;
-          this.textScore.setText(`${this.score}`); // Update the score display
-          this.sound.play("destroySound"); // Play the destroy sound
-          // create a crab
+        });
+        this.time.delayedCall(minDelay + Phaser.Math.Between(0, 2000), () => {
+          if (!this.crab || !this.crab.body) {
+            console.log("Crab does not exist or has been destroyed.");
+            return; // Exit the function if crab doesn't exist
+          }
+          //  this.moveCrabRight();
+          // Set initial direction and speed
+          let speed = 200;
+          let direction = 1; // 1 for down, -1 for up
+          if (this.crab) {
+            // Spawn the crab on the right side and move it to the left
+            this.crab.setPosition(
+              this.game.config.width + 100,
+              (this.game.config.height * 2) / 3
+            );
+            this.crab.body.velocity.x = -speed; // Move left
+            this.crab.body.velocity.y = speed * direction;
+            direction *= -1; // Change direction
+
+            // Adjust the timer to change vertical direction and check position
+            this.time.addEvent({
+              delay: 1000,
+              callback: () => {
+                if (!this.crab || !this.crab.body) return;
+                // Check if the crab has moved outside the play area on the left
+                if (this.crab.x < -40) {
+                  // Reset its position to the right side of the play area
+                  this.crab.setPosition(
+                    this.game.config.width + 100,
+                    (this.game.config.height * 2) / 3
+                  );
+                  this.crab.body.velocity.x = -speed; // Continue moving left
+                } else {
+                  // Change vertical direction
+                  this.crab.body.velocity.y = speed * direction;
+                  direction *= -1; // Toggle direction
+                }
+              },
+              loop: true,
+            });
+          }
+
+          // Set the crab's boundary limit based on the game's height
+          const bottomBoundary =
+            this.game.config.height - this.crab.displayHeight / 2;
+
+          // Change direction (up or down) every few seconds
           this.time.addEvent({
             delay: 4000,
             callback: () => {
-              this.createCrab();
+              if (!this.crab || !this.crab.body) return;
+              this.crab.body.velocity.x = -Math.abs(speed); // Ensure the crab continues moving left
+              // Adjust if the crab is beyond the bottom play area
+              if (this.crab.y > bottomBoundary) {
+                this.crab.y = bottomBoundary; // Reset crab's y position within the play area
+              }
             },
+            loop: true,
           });
-        }
-
-        // createSpider() {
-        //   // Create spider
-        //    this.anims.createFromAseprite("spider2");
-        //   spider = this.physics.add.sprite(500, 700, "spider").setScale(0.5);
-
-        //   this.spider.setVelocityX(100);
-        //   this.physics.add.collider(
-        //     this.bullets,
-        //     this.spider,
-        //     this.bulletHitSpider.bind(this)
-        //   );
-        //   this.physics.add.collider(
-        //     this.player,
-        //     this.spider,
-        //     this.playerHitSpider.bind(this)
-        //   );
-        // }
+        });
       }
-      class ScoreScene extends Phaser.Scene {
-        constructor() {
-          super("ScoreScene");
+
+      crabHitsMushroom(crab, mushroom) {
+        // Check if this is the third mushroom touched
+        this.crabMushroomTouches = ++this.crabMushroomTouches;
+        if (this.crabMushroomTouches % 2 === 0) {
+          this.sound.play("crabEatsSound");
+          const index = globalMushroomsData.findIndex(
+            (mData) => mData.x === mushroom.x && mData.y === mushroom.y
+          );
+          if (index > -1) {
+            globalMushroomsData.splice(index, 1); // Or mark it as destroyed
+          }
+          // Destroy the mushroom
+          mushroom.destroy();
         }
+      }
 
-        init(data) {
-          // Receive score, lives, and wave from the previous scene
-          this.score = data.score;
-          this.lives = data.lives;
-          this.wave = data.wave;
-          this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
-          this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
-        }
+      moveSpider() {
+        if (this.spider && this.spider.active) {
+          this.spider.setVelocityX(0);
 
-        preload() {
-          this.load.audio("tickSound", "assets/tick.mp3");
-          this.load.audio("totalSound", "assets/total.mp3");
-          this.load.image("heart", "assets/heart.png");
-        }
+          // Constant downward movement for the spider
+          const downwardSpeed = 2.5; // Adjust the speed as needed
+          this.spider.y += downwardSpeed;
 
-        create() {
-          // Calculate the center of the screen
-          console.log(this.centipedeSegmentSpeed);
-          const { width, height } = this.sys.game.config;
-          const centerX = width / 2;
-          const centerY = height / 2;
-          this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
+          // If the spider reaches the bottom of the game area, reset to the top
+          if (this.spider.y > 900) { // Assuming 900 is the height of your game area
+            this.spider.y = 0; // Reset position to the top
+            // Place the spider at a random X position within the game bounds
 
-          const heartsSpacing = 40; // Adjust based on the size of your heart sprite
-          const firstHeartPositionX = centerX - 270; // Starting X position for the first heart
-          const heartPositionY = centerY - 420; // Y position for all hearts
-
-
-          for (let i = 0; i < this.lives; i++) {
-            this.add
-              .image(
-                firstHeartPositionX + i * heartsSpacing,
-                heartPositionY,
-                "heart"
-              )
-              .setScale(0.5); // Scale as needed
+            this.spider.x = Phaser.Math.Between(10, 600); // Adjust the range as per your game's layout
           }
 
-          // Display bonus score
-          // this.add
-          //   .text(centerX, centerY + 40, `Bonus Score: ${this.bonusScore}`, {
-          //     fontFamily: "VT323",
-          //     fontSize: "40px",
-          //     color: "#ffffff",
-          //   })
-          //   .setOrigin(0.5);
-
-          // Initial bonus score display
-          let displayBonusScore = 0;
-          let displayScore = 0;
-          var displayTotal = this.bonusScore + this.score;
-
-          this.add
-            .text(centerX, centerY - 250, `Wave ${this.wave}`, {
-              fontFamily: "VT323",
-              fontSize: "100px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-
-          const scoreBonusText = this.add
-            .text(centerX, centerY - 130, `Score ${displayBonusScore}`, {
-              fontFamily: "VT323",
-              fontSize: "100px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-          // Initial score display
-
-          const scoreText = this.add
-            .text(centerX, centerY - 50, `Score: ${displayScore}`, {
-              fontFamily: "VT323",
-              fontSize: "100px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-
-          this.add
-            .text(centerX + 110, centerY - 250, ``, {
-              fontFamily: "VT323",
-              fontSize: "100px",
-              color: "#ffffff",
-            })
-            .setOrigin(0.5);
-
-          const tickSound = this.sound.add("tickSound");
-          const totalSound = this.sound.add("totalSound");
-          // Function to update the score display
-
-          const updateScoreDisplay = () => {
-            displayScore++;
-            displayScore = displayScore + 50; // Increment the displayed score
-            scoreText.setText(`Score: ${displayScore}`);
-            tickSound.play(); // Play the tick sound
-            // Update the text
-            if (displayScore < this.displayTotal) {
-              this.time.delayedCall(80, updateScoreDisplay);
-              //   tickSound.play();
-              // Continue updating until reaching the final score
-            } else {
-              displayScore = displayTotal; // Increment the displayed score
-              scoreText.setText(`Score: ${displayScore}`);
-              tickSound.play();
-              totalSound.play();
-              // Create the continue button
-              const continueButton = this.add
-                .text(centerX, centerY + 150, "Continue", {
-                  fontFamily: "VT323",
-                  fontSize: "50px",
-                  color: "#00ff00",
-                })
-                .setOrigin(0.5)
-                .setInteractive({ useHandCursor: true }); // show continue
-
-              if (this.centipedeSegmentSpeed <= 360) {
-                this.centipedeSegmentSpeed = this.centipedeSegmentSpeed * 1.01;
-              }
-
-              continueButton.on("pointerdown", () => {
-                this.score = displayTotal;
-                this.scene.start("playGame", {
-                  score: displayTotal, // Assuming this.score holds the final score
-                  lives: this.lives, // Assuming this.lives holds the current lives count
-                  wave: this.wave + 1, // Assuming this.wave holds the current wave number
-                  centipedeSegmentSpeed: this.centipedeSegmentSpeed,
-                });
-                // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
-              });
-            }
-          };
-
-          const updateScoreBonusDisplay = () => {
-            displayBonusScore++;
-            displayBonusScore = displayBonusScore + 50; // Increment the displayed score
-            scoreBonusText.setText(`Bonus: ${displayBonusScore}`);
-            tickSound.play(); // Play the tick sound
-            // Update the text
-            if (displayBonusScore < this.bonusScore) {
-              this.time.delayedCall(80, updateScoreBonusDisplay);
-              //   tickSound.play();
-              // Continue updating until reaching the final score
-            } else {
-              // Start updating the score display
-              updateScoreDisplay();
-            }
-          };
-          // Start updating the score display
-          updateScoreBonusDisplay();
         }
       }
 
-      // const gameConfig = {
-      //   type: Phaser.AUTO,
-      //   width: 800,
-      //   height: 600,
-      //   parent: "gameContainer",
-      //   physics: {
-      //     default: "arcade",
-      //     arcade: {
-      //       gravity: { y: 0 },
-      //       debug: false,
-      //     },
-      //   },
-      //   scene: [Scene1, Scene2, ScoreScene],
-      // };
+      bulletHitCrab(bullet, crab) {
+        const pointsText = this.add
+          .text(crab.x, crab.y, "300", {
+            fontFamily: "VT323",
+            fontSize: "20px",
+            color: "#ffff00",
+          })
+          .setOrigin(0.5, 0.5);
+        pointsText.setDepth(1);
+        // Remove the points text
+        this.time.delayedCall(400, () => {
+          pointsText.destroy();
+        });
+        bullet.destroy(); // Destroy the bullet
+        crab.destroy(); // Destroy the crab
+        this.score += 300; // Add 200 points to the player's score
+        this.bonus += 400;
+        this.textScore.setText(`${this.score}`); // Update the score display
+        this.sound.play("destroySound"); // Play the destroy sound
+        // create a crab
+        this.time.addEvent({
+          delay: 4000,
+          callback: () => {
+            this.createCrab();
+          },
+        });
+      }
 
-      const gameConfig = {
-  type: Phaser.AUTO,
-  // width: 800,
-  // height: 600,
-  parent: "gameContainer",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
-  scene: [Scene1, Scene2, ScoreScene],
-  scale: {
-    mode: Phaser.Scale.FIT, // Fit to window
-    autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
-    width: 600, // Base game width
-    height: 900, // Base game height
-  }
-};
+    }
+    class ScoreScene extends Phaser.Scene {
+      constructor() {
+        super("ScoreScene");
+      }
 
-      let game = new Phaser.Game(gameConfig);
-    </script>
-  </body>
+      init(data) {
+        // Receive score, lives, and wave from the previous scene
+        this.score = data.score;
+        this.lives = data.lives;
+        this.wave = data.wave;
+        this.bonusScore = data.bonusScore || 0; // Default to 0 if not provided
+        this.centipedeSegmentSpeed = data.centipedeSegmentSpeed;
+      }
+
+      preload() {
+        this.load.audio("tickSound", "assets/tick.mp3");
+        this.load.audio("totalSound", "assets/total.mp3");
+        this.load.image("heart", "assets/heart.png");
+      }
+
+      create() {
+        // Calculate the center of the screen
+        console.log(this.centipedeSegmentSpeed);
+        const { width, height } = this.sys.game.config;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        this.add.tileSprite(0, 0, width, height, "background").setOrigin(0);
+
+        const heartsSpacing = 40; // Adjust based on the size of your heart sprite
+        const firstHeartPositionX = centerX - 270; // Starting X position for the first heart
+        const heartPositionY = centerY - 420; // Y position for all hearts
+
+
+        for (let i = 0; i < this.lives; i++) {
+          this.add
+            .image(
+              firstHeartPositionX + i * heartsSpacing,
+              heartPositionY,
+              "heart"
+            )
+            .setScale(0.5); // Scale as needed
+        }
+
+        // Initial bonus score display
+        let displayBonusScore = 0;
+        let displayScore = 0;
+        var displayTotal = this.bonusScore + this.score;
+
+        this.add
+          .text(centerX, centerY - 250, `Wave ${this.wave}`, {
+            fontFamily: "VT323",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setOrigin(0.5);
+
+        const scoreBonusText = this.add
+          .text(centerX, centerY - 130, `Score ${displayBonusScore}`, {
+            fontFamily: "VT323",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setOrigin(0.5);
+        // Initial score display
+
+        const scoreText = this.add
+          .text(centerX, centerY - 50, `Score: ${displayScore}`, {
+            fontFamily: "VT323",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setOrigin(0.5);
+
+        this.add
+          .text(centerX + 110, centerY - 250, ``, {
+            fontFamily: "VT323",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setOrigin(0.5);
+
+        const tickSound = this.sound.add("tickSound");
+        const totalSound = this.sound.add("totalSound");
+        // Function to update the score display
+
+        const updateScoreDisplay = () => {
+          displayScore++;
+          displayScore = displayScore + 50; // Increment the displayed score
+          scoreText.setText(`Score: ${displayScore}`);
+          tickSound.play(); // Play the tick sound
+          // Update the text
+          if (displayScore < this.displayTotal) {
+            this.time.delayedCall(80, updateScoreDisplay);
+            //   tickSound.play();
+            // Continue updating until reaching the final score
+          } else {
+            displayScore = displayTotal; // Increment the displayed score
+            scoreText.setText(`Score: ${displayScore}`);
+            tickSound.play();
+            totalSound.play();
+            // Create the continue button
+            const continueButton = this.add
+              .text(centerX, centerY + 150, "Continue", {
+                fontFamily: "VT323",
+                fontSize: "50px",
+                color: "#00ff00",
+              })
+              .setOrigin(0.5)
+              .setInteractive({ useHandCursor: true }); // show continue
+
+            if (this.centipedeSegmentSpeed <= 360) {
+              this.centipedeSegmentSpeed = this.centipedeSegmentSpeed * 1.01;
+            }
+
+            continueButton.on("pointerdown", () => {
+              this.score = displayTotal;
+              this.scene.start("playGame", {
+                score: displayTotal, // Assuming this.score holds the final score
+                lives: this.lives, // Assuming this.lives holds the current lives count
+                wave: this.wave + 1, // Assuming this.wave holds the current wave number
+                centipedeSegmentSpeed: this.centipedeSegmentSpeed,
+              });
+              // this.scene.start("playGame", { newLevel: true }); // Optionally pass data to the play scene
+            });
+          }
+        };
+
+        const updateScoreBonusDisplay = () => {
+          displayBonusScore++;
+          displayBonusScore = displayBonusScore + 50; // Increment the displayed score
+          scoreBonusText.setText(`Bonus: ${displayBonusScore}`);
+          tickSound.play(); // Play the tick sound
+          // Update the text
+          if (displayBonusScore < this.bonusScore) {
+            this.time.delayedCall(80, updateScoreBonusDisplay);
+            //   tickSound.play();
+            // Continue updating until reaching the final score
+          } else {
+            // Start updating the score display
+            updateScoreDisplay();
+          }
+        };
+        // Start updating the score display
+        updateScoreBonusDisplay();
+      }
+    }
+
+    // const gameConfig = {
+    //   type: Phaser.AUTO,
+    //   width: 800,
+    //   height: 600,
+    //   parent: "gameContainer",
+    //   physics: {
+    //     default: "arcade",
+    //     arcade: {
+    //       gravity: { y: 0 },
+    //       debug: false,
+    //     },
+    //   },
+    //   scene: [Scene1, Scene2, ScoreScene],
+    // };
+
+    const gameConfig = {
+      type: Phaser.AUTO,
+      // width: 800,
+      // height: 600,
+      parent: "gameContainer",
+      physics: {
+        default: "arcade",
+        arcade: {
+          gravity: { y: 0 },
+          debug: false,
+        },
+      },
+      scene: [Scene1, Scene2, ScoreScene],
+      scale: {
+        mode: Phaser.Scale.FIT, // Fit to window
+        autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game
+        width: 600, // Base game width
+        height: 900, // Base game height
+      }
+    };
+
+    let game = new Phaser.Game(gameConfig);
+  </script>
+</body>
+
 </html>
