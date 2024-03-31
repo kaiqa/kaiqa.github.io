@@ -351,6 +351,7 @@
         this.load.audio("shootSound", "assets/shoot.mp3");
         this.load.audio("destroySound", "assets/destroy.mp3");
         this.load.audio("gameOverSound", "assets/gameover.mp3"); // Adjust the path to your game over sound file
+        this.load.audio("spiderSound", "assets/spiderSound.mp3");
         this.load.audio(
           "mushroomTouchedByPlayer",
           "assets/mushroomTouchedByPlayer.mp3"
@@ -487,7 +488,9 @@
           .setVelocityX(100);
 
         this.spider.y = 0; // Reset position to the top
-
+        // Add this line to play the sound
+        this.spiderSound = this.sound.add("spiderSound", { volume: 0.2 });
+        this.spiderSound.play();
         this.centipede = this.physics.add.group();
         this.createCentipede();
 
@@ -1324,6 +1327,8 @@
           // If the spider reaches the bottom of the game area, reset to the top
           if (this.spider.y > 900) { // Assuming 900 is the height of your game area
             this.spider.y = 0; // Reset position to the top
+            this.spiderSound = this.sound.add("spiderSound", { volume: 0.2 });
+            this.spiderSound.play();
             // Place the spider at a random X position within the game bounds
 
             this.spider.x = Phaser.Math.Between(10, 600); // Adjust the range as per your game's layout
