@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Meeting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #meetingNotes {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Schedule a meeting</h1>
+        <form id="scheduleForm">
+            <div class="form-group">
+                <label for="name">Your Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" name="companyName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="meetingNotes">Meeting Notes:</label>
+                <textarea id="meetingNotes" name="meetingNotes" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="dayTime">Select Day:</label>
+                <select id="dayTime" name="dayTime">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="time">Select Time:</label>
+                <select id="time" name="time">
+                    <option value="9:30 AM">9:30 AM</option>
+                    <option value="1:15 PM">1:15 PM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="10:30 AM">10:30 AM</option>
+                    <option value="3:30 PM">3:30 PM</option>
+                </select>
+            </div>
+            <button type="submit">Schedule</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('scheduleForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            if (!validateEmail(email)) {
+                alert('Please enter a valid email address.');
+                return; // Stop the form submission
+            }
+            const name = document.getElementById('name').value;
+            const day = document.getElementById('dayTime').value;
+            const time = document.getElementById('time').value;  // Retrieve the time from the new select element
+
+
+            // Encode the name, day, and time for URL safety
+            // const encodedName = encodeURIComponent(name);
+            // const encodedDay = encodeURIComponent(day);
+            // const encodedTime = encodeURIComponent(time);  // Encode the time
+            const encodedName = name.toString();
+            const encodedDay = day.toString();
+            const encodedTime = time.toString();
+
+
+            // Create a FormData object
+            // Name: 1681679464
+            // Company: 309978335
+            // email: 1137905960
+            // notes: 2009173540
+            // Date: 1828971772
+            // Time: 709396947
+            const formData = new FormData();
+            formData.append("entry.1681679464", encodedName);  // Assuming 1971062335 is the entry ID for 'Name'
+            formData.append("entry.1828971772", encodedDay);  // Assuming 505222708 is the entry ID for 'Day'
+            formData.append("entry.709396947", encodedTime);  // Assuming 654321 is the entry ID for 'Time'
+            formData.append("entry.309978335", document.getElementById('companyName').value.toString());
+            formData.append("entry.1137905960", document.getElementById('email').value.toString());
+            formData.append("entry.2009173540", document.getElementById('meetingNotes').value.toString());
+
+            console.log("Data being sent:", Object.fromEntries(formData));
+
+            // The form's action URL (replace with your form's actual action URL)
+            const formActionURL = "https://docs.google.com/forms/d/e/1FAIpQLSemVSKRNS9N6Pu6sV-ay3p4jwfOPKbsY-HGrQTuUsqWnVdXGQ/formResponse";
+            try {
+                // Make the POST request using the Fetch API
+                const response = await fetch(formActionURL, {
+                    method: "POST",
+                    mode: "no-cors", // Note: 'no-cors' mode will prevent reading the response
+                    body: formData,
+                });
+                alert(`Meeting scheduled for ${name} on ${day} at ${time}`);
+                // Reset the form or handle the UI after submission
+            } catch (error) {
+                alert("Failed to schedule meeting. Please check the console for more details.");
+                console.error("Error submitting form", error);
+
+            }
+        });
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+    </script>
+</body>
+
+</html>

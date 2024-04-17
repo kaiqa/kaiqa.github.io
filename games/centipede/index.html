@@ -491,6 +491,18 @@
         // Add this line to play the sound
         this.spiderSound = this.sound.add("spiderSound", { volume: 0.2 });
         this.spiderSound.play();
+
+        // Timed event to create a mushroom at the spider's position every second
+        this.time.addEvent({
+          delay: 500, // 1000 milliseconds = 1 second
+          callback: () => {
+            if (this.spider && this.spider.active) {
+              this.createMushroom(this.spider.x, this.spider.y);
+            }
+          },
+          loop: true,
+        });
+
         this.centipede = this.physics.add.group();
         this.createCentipede();
 
