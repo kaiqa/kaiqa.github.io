@@ -186,33 +186,39 @@
 
         async function fetchMeetings() {
             const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBavYPlfj31GCXXy2o6_1CyBWNZClbt-y19mHcLHbRZjknJEtLHbm9C8aB4QsYfrntxvwEUqam-RXA/pub?output=csv";
-
             try {
                 const response = await fetch(url);
                 const csvText = await response.text();
-
                 const data = parseCSV(csvText);
+                console.log("Data", data);
 
-                const dayTimeMap = data.reduce((acc, row) => {
-                    const confirmed = (row.confirmed && row.confirmed.trim().toUpperCase()) || "FALSE"; // Correct key and default handling
+                const confirmedTimes = {}; // To track confirmed times by day
+                const availableTimes = {}; // To track potentially available times
 
-                    console.log(`${row.Date} - ${row.Time} - Confirmed: ${confirmed}`); // Debug output
-
-                    if (row.Date && row.Time && confirmed !== "TRUE") {
-                        if (!acc[row.Date]) acc[row.Date] = [];
-                        if (!acc[row.Date].includes(row.Time)) {
-                            acc[row.Date].push(row.Time);
+                // First pass to collect confirmed times
+                data.forEach(row => {
+                    if (row.Date && row.Time) {
+                        if (!confirmedTimes[row.Date]) {
+                            confirmedTimes[row.Date] = new Set();
+                        }
+                        if (row.confirmed.trim().toUpperCase() === "TRUE") {
+                            confirmedTimes[row.Date].add(row.Time);
                         }
                     }
-                    return acc;
-                }, {});
+                });
 
-                const availableDays = Object.keys(dayTimeMap).filter(day => dayTimeMap[day].length > 0);
-                console.log('Available Days:', availableDays);
-                console.log('Day-Time Map:', dayTimeMap);
-
-                updateDayDropdown(availableDays);
-                updateDayDropdownChange(dayTimeMap);
+                // Second pass to filter out times matching any confirmed
+                data.forEach(row => {
+                    if (row.Date && row.Time && !confirmedTimes[row.Date].has(row.Time)) {
+                        if (!availableTimes[row.Date]) {
+                            availableTimes[row.Date] = new Set();
+                        }
+                        availableTimes[row.Date].add(row.Time);
+                    }
+                });
+                console.log("Available times", availableTimes);
+                updateDayDropdown(Object.keys(availableTimes));
+                updateDayDropdownChange(availableTimes);
             } catch (error) {
                 console.error("Failed to fetch or parse the data:", error);
             }
