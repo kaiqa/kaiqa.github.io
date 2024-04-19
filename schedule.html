@@ -131,7 +131,6 @@
             const encodedDay = day.toString();
             const encodedTime = time.toString();
 
-
             // Create a FormData object
             // Name: 1681679464
             // Company: 309978335
@@ -146,6 +145,7 @@
             formData.append("entry.309978335", document.getElementById('companyName').value.toString());
             formData.append("entry.1137905960", document.getElementById('email').value.toString());
             formData.append("entry.2009173540", document.getElementById('meetingNotes').value.toString());
+            formData.append("entry.885207383", "TRUE"); // Appending 'confirmed' as "TRUE"
 
             console.log("Data being sent:", Object.fromEntries(formData));
 
@@ -170,6 +170,101 @@
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(String(email).toLowerCase());
         }
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(header => header.trim()); // Trim headers to remove extra spaces
+            const data = lines.slice(1).map(line => {
+                const values = line.split(',');
+                return headers.reduce((object, header, index) => {
+                    object[header] = values[index].trim(); // Trim values to remove extra spaces and line breaks
+                    return object;
+                }, {});
+            });
+            console.log(data);
+            return data;
+        }
+
+        async function fetchMeetings() {
+            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBavYPlfj31GCXXy2o6_1CyBWNZClbt-y19mHcLHbRZjknJEtLHbm9C8aB4QsYfrntxvwEUqam-RXA/pub?output=csv";
+
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+
+                const data = parseCSV(csvText);
+
+                const dayTimeMap = data.reduce((acc, row) => {
+                    const confirmed = (row.confirmed && row.confirmed.trim().toUpperCase()) || "FALSE"; // Correct key and default handling
+
+                    console.log(`${row.Date} - ${row.Time} - Confirmed: ${confirmed}`); // Debug output
+
+                    if (row.Date && row.Time && confirmed !== "TRUE") {
+                        if (!acc[row.Date]) acc[row.Date] = [];
+                        if (!acc[row.Date].includes(row.Time)) {
+                            acc[row.Date].push(row.Time);
+                        }
+                    }
+                    return acc;
+                }, {});
+
+                const availableDays = Object.keys(dayTimeMap).filter(day => dayTimeMap[day].length > 0);
+                console.log('Available Days:', availableDays);
+                console.log('Day-Time Map:', dayTimeMap);
+
+                updateDayDropdown(availableDays);
+                updateDayDropdownChange(dayTimeMap);
+            } catch (error) {
+                console.error("Failed to fetch or parse the data:", error);
+            }
+        }
+
+        fetchMeetings();
+
+
+
+        function updateDayDropdown(days) {
+            const daySelect = document.getElementById('dayTime');
+            daySelect.innerHTML = ''; // Clear existing options
+            days.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                daySelect.appendChild(option);
+            });
+
+            // Trigger update for the time dropdown
+            if (days.length > 0) {
+                daySelect.dispatchEvent(new Event('change')); // Automatically trigger change to load times
+            } else {
+                document.getElementById('time').innerHTML = ''; // Clear time dropdown if no days available
+            }
+        }
+
+        function updateDayDropdownChange(dayTimeMap) {
+            const daySelect = document.getElementById('dayTime');
+            const timeSelect = document.getElementById('time');
+
+            daySelect.addEventListener('change', function () {
+                const selectedDay = this.value;
+                const times = dayTimeMap[selectedDay] || [];
+                timeSelect.innerHTML = ''; // Clear existing options
+                times.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = time;
+                    timeSelect.appendChild(option);
+                });
+                if (times.length > 0) {
+                    timeSelect.value = times[0]; // Set to first available time
+                }
+            });
+
+            // Initialize the time dropdown if there are initial days
+            if (daySelect.children.length > 0) {
+                daySelect.dispatchEvent(new Event('change'));
+            }
+        }
+
 
     </script>
 </body>
