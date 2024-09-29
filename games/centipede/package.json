@@ -1,0 +1,32 @@
+{
+  "name": "centipede",
+  "version": "1.0.0",
+  "description": "Centipede Game built with Phaser and Electron",
+  "main": "main.js", 
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "NODE_ENV=production electron-builder --mac",
+    "build:win": "cross-env NODE_ENV=production electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.centipede.game",
+    "mac": {
+      "category": "public.app-category.games",
+       "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "assets/**/*",
+      "index.html",
+      "main.js",
+      "package.json"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^13.1.7",
+    "electron-builder": "^22.11.7",
+    "cross-env": "^7.0.3" 
+  }
+}
