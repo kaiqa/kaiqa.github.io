@@ -6,6 +6,6 @@
 */Files/Data/docs.checksum
 */QuickLook/
 */Settings/ui.plist
-
+*.DS_Store
 # Ableton generated files
 *.asd
