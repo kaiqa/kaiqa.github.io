@@ -4,13 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Centipede Game with Phaser</title>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+  <title>Centipede</title>
+  <script src="./assets/js/phaser.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
 </head>
 <style>
+
+@font-face {
+    font-family: 'VT323';
+    src: url('./assets/fonts/VT323.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
   body,
   html {
     margin: 0;
@@ -32,7 +38,7 @@
     /* Center align items vertically */
     justify-content: space-around;
     /* Distributes items evenly, adding space around items */
-    width: 90%;
+    width: 100%;
     /* Set a width to control spacing */
     max-width: 1200px;
     /* Adjust based on your content size */
@@ -43,7 +49,7 @@
     /* Allows the game container to grow and fill available space */
     max-width: auto;
     /* Adjust based on your game's size */
-    height: 650px;
+    height: 850px;
     /* Adjust based on your game's size */
     background-color: #b8b4b4;
     /* Placeholder for the game area */
@@ -108,6 +114,8 @@
       }
 
       create() {
+         // Show the mouse pointer
+        document.body.style.cursor = 'default';
         console.log("v1.5");
 
         this.fetchHighScores().then((highScores) => {
@@ -144,7 +152,7 @@
         });
 
         const logo = this.add.image(centerX, centerY - 130, 'logo').setOrigin(0.5);
-        this.add.text(centerX - 140, centerY - 400, "CENTIPEDE", {
+        this.add.text(centerX - 200, centerY - 400, "CENTIPEDE", {
           fontFamily: "VT323",
           fontSize: "80px",
           color: "#00ff00",
@@ -160,6 +168,7 @@
           color: "#00ff00",
         });
 
+        
 
         // Set the origin of the text to the center
         clickText.setOrigin(0.5);
@@ -372,6 +381,8 @@
       }
 
       create() {
+        // Hide the mouse pointer
+        document.body.style.cursor = 'none';
         console.log("speed -");
         console.log(this.centipedeSegmentSpeed);
         this.startTime = this.time.now;
@@ -1399,6 +1410,8 @@
       }
 
       create() {
+         // Show the mouse pointer
+        document.body.style.cursor = 'default';
         // Calculate the center of the screen
         console.log(this.centipedeSegmentSpeed);
         const { width, height } = this.sys.game.config;
@@ -1542,8 +1555,8 @@
 
     const gameConfig = {
       type: Phaser.AUTO,
-      // width: 800,
-      // height: 600,
+       width: 600,
+       height: 900,
       parent: "gameContainer",
       physics: {
         default: "arcade",
