@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Centipede Game built with Phaser and Electron",
   "main": "main.js",
+  "author": "kaiqa",
   "scripts": {
     "start": "electron .",
     "build:mac": "NODE_ENV=production electron-builder --mac --universal",
@@ -17,7 +18,8 @@
       "icon": "assets/icon.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icon.ico"
     },
     "files": [
       "assets/**/*",
