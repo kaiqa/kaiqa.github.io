@@ -12,6 +12,7 @@
 
 </head>
 <style>
+
     @font-face {
         font-family: 'VT323';
         src: url('./assets/fonts/VT323.woff2') format('woff2'),
@@ -161,9 +162,6 @@
           color: "#00ff00",
         });
 
-
-
-
         // Create the "Click to Start" text at the center
         const clickText = this.add.text(centerX + 10, centerY + 140, "Click to Start ", {
           fontFamily: "VT323",
@@ -171,12 +169,10 @@
           color: "#00ff00",
         });
 
-        
-
         // Set the origin of the text to the center
         clickText.setOrigin(0.5);
 
-        // // Add a pulsing effect using tween
+        // Add a pulsing effect using tween
         this.tweens.add({
           targets: clickText,
           scaleX: 1.1,
@@ -217,9 +213,6 @@
             formContainer.removeChild(formContainer.firstChild);
           }
 
-          // Option 2: Reset the src of the iframe (if you prefer to keep it)
-          // const iframe = formContainer.querySelector('iframe');
-          // if (iframe) iframe.src = '';
         }
       }
       async fetchHighScores() {
@@ -769,10 +762,6 @@
           encodedScore
         )}&entry.1705590754=${encodeURIComponent(encodedWave)}`;
 
-        // window.open(prefillUrl, "_blank");
-        // // Open the form in a new tab
-        // window.open(formUrl, "_blank");
-        // Create an iframe element
         var iframe = document.createElement("iframe");
         iframe.style.width = "640px";
         iframe.style.height = "780px";
@@ -820,23 +809,6 @@
         }
       }
 
-      //     showInputField() {
-      //     document.getElementById('inputContainer').style.display = 'block';
-      //     document.getElementById('playerNameInput').focus();
-
-      //     document.getElementById('submitBtn').onclick = () => {
-      //         const playerName = document.getElementById('playerNameInput').value.trim();
-      //         if (playerName) {
-      //             console.log("High score sent:", this.score, "by", playerName, "wave", this.wave);
-      //            // this.submitToGoogleForm(this.score, this.wave, playerName);
-      //            // Hide input field again
-      //             document.getElementById('inputContainer').style.display = 'none';
-      //             return playerName;
-      //         } else {
-      //             alert("Please enter your name.");
-      //         }
-      //     };
-      // }
 
       showInputField() {
         return new Promise((resolve, reject) => {
@@ -929,10 +901,9 @@
         //  let bonusScore = Math.max(0, (30 - durationInSeconds) * 10); // Example bonus calculation
         let bonusScore = Math.max(
           0,
-          Math.round((30 - durationInSeconds) * 200)
+          Math.round((30 - durationInSeconds) * 900)
         );
         // Adjust bonusScore calculation as  10 points for each second under 30 seconds.
-
         // Ensure bonusScore is not negative
         bonusScore = Math.max(0, bonusScore);
         this.scene.start("ScoreScene", {
@@ -1425,7 +1396,6 @@
         const heartsSpacing = 40; // Adjust based on the size of your heart sprite
         const firstHeartPositionX = centerX - 270; // Starting X position for the first heart
         const heartPositionY = centerY - 420; // Y position for all hearts
-
 
         for (let i = 0; i < this.lives; i++) {
           this.add
