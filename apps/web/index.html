@@ -30,16 +30,19 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>slashpad</title>
+  <title>GhostPad</title>
   <link rel="manifest" href="manifest.json">
   <style>
+
+
+
     header {
       background-color: transparent;
       padding: 5px;
       text-align: center;
       position: fixed;
       top: 80%;
-      left: 90%;
+      left: 50%;
    
       width: 150px;
       z-index: 100; /* Ensure header stays on top */
@@ -62,9 +65,10 @@
       padding: 20px;
       text-align: center;
       position: fixed;
-      bottom: 100;
+      bottom: 0; /* Changed from 100 to 0 */
       left: 0;
       width: 100%;
+      z-index: 1;
     }
 
     footer img {
@@ -72,7 +76,6 @@
       height: 24px; /* Adjust as needed */
       vertical-align: middle; /* Align icon vertically with text */
       margin-right: 5px;
-      z-index: 100; /* Ensure footer stays on top */
     }
 
     footer a {
@@ -88,8 +91,20 @@
         padding-top: 64px; /* Adjust based on header height */
     }
     /* Add this to push the footer to the bottom */
-    body > script {
+    #main-content {
         flex-grow: 1;
+    }
+
+    /* Style the footer by ID */
+    #myFooter {
+      background-color: transparent; /* Make the background transparent */
+    }
+
+    #myFooter img {
+       width: 154px; /* Adjust as needed */
+      height: 154px; /* Adjust as needed */
+      vertical-align: middle; /* Align icon vertically with text */
+      margin-right: 5px;
     }
 
   </style>
@@ -97,16 +112,27 @@
 <body>
 
   <header>
-      <a href="https://kaiqa.wordpress.com/ghostpad/">
-          <img src="icons/downloadSpeechBubble.png" alt="Ghostpad">
-
-      </a>
+     
   </header>
+
+  <div id="main-content">
+    <!-- Your main content goes here -->
+  </div>
 
   <script src="flutter_bootstrap.js" async></script>
 
-  <footer>
+  <footer id="myFooter">
+  <a href="https://kaiqa.wordpress.com/ghostpad/">
+          <img src="icons/downloadSpeechBubble.png" alt="Ghostpad">
   </footer>
+
+
+
+  <script>
+    setTimeout(function() {
+      document.getElementById("myFooter").style.display = "none";
+    }, 5000); // 5000 milliseconds = 5 seconds
+  </script>
 
 </body>
 </html>
