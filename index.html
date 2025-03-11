@@ -11,6 +11,9 @@
 
     body {
       font-family: "Playfair Display", serif;
+      min-height: 100vh; /* Ensure the body takes up at least the full viewport height */
+      display: flex; /* Use flexbox to control vertical alignment */
+      flex-direction: column; /* Stack content vertically */
     }
 
     html {
@@ -32,18 +35,6 @@
       padding: 20px;
     }
 
-    /* #input {
-        width: calc(100% - 40px);
-        padding: 10px;
-        margin-top: 20px;
-        background-color: #000;
-        color: #33ff33;
-        border: none;
-        outline: none;
-        font-size: 16px;
-        height: auto;
-      } */
-
     #response {
       font-family: "Playfair Display", serif;
       font-size: 1em;
@@ -53,7 +44,6 @@
       overflow-wrap: break-word;
     }
 
-    /* new */
     #input-container {
       display: flex;
       align-items: center;
@@ -74,6 +64,15 @@
       font-size: 1em;
       outline: none;
     }
+
+    #iframeContainer {
+      display: flex;
+      justify-content: center; /* Center horizontally */
+      align-items: center;      /* Center vertically */
+      margin-bottom: 100px;   /* 100px space from the bottom */
+      flex: 1; /* Take up the remaining vertical space */
+    }
+
   </style>
 </head>
 
@@ -85,7 +84,8 @@
     </div>
     <div id="response"></div>
   </div>
-  
+  <div id="iframeContainer"></div>
+
 
   <script>
     const promptSpan = document.getElementById('prompt');
@@ -315,8 +315,8 @@
       // Define the iframe
       const iframe = document.createElement("iframe");
       iframe.src = "https://kaiqa.github.io/games/centipede/";
-      iframe.width = "810";
-      iframe.height = "610";
+      iframe.width = "600";
+      iframe.height = "860";
       iframe.style.border = "0";
       iframe.setAttribute("title", "CENTIPEDE");
 
