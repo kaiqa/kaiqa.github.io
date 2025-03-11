@@ -6,8 +6,7 @@
     <title>prompt</title>
     <script src="https://unpkg.com/rivescript@latest/dist/rivescript.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=VT323&display=swap');
-      body {font-family: 'VT323', monospace;}
+   body,
       html {
         height: 100%;
         margin: 0;
@@ -15,6 +14,7 @@
         background-color: #000;
         color: #33ff33;
         font-family: "Courier New", Courier, monospace;
+        font-size: 16px;
       }
       a {
         color: #33ff33;
@@ -24,7 +24,7 @@
       #terminal {
         padding: 20px;
       }
-      /* #input {
+      #input {
         width: calc(100% - 40px);
         padding: 10px;
         margin-top: 20px;
@@ -34,58 +34,28 @@
         outline: none;
         font-size: 16px;
         height: auto;
-      } */
+      }
       #response {
-        font-family: 'VT323', monospace;
-         font-size: 2.5em;
         margin-top: 10px;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
       }
- /* new */
-#input-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-#prompt {
-  font-size: 2.5em;
-  margin-right: 5px;
-}
-
-#input {
-  font-family: 'VT323', monospace;
-  flex-grow: 1;
-  border: none;
-  background: transparent;
-  color: #33ff33;
-  font-size: 2.5em;
-  outline: none;
-}
-
-
     </style>
   </head>
   <body>
-    <!-- <div id="terminal">
-      <span id="prompt">$</span>
-      <input type="text" id="input" />
+    <div id="terminal">
+      <span>$</span><input type="text" id="input" />
       <div id="response"></div>
     </div>
-    <div id="iframeContainer"></div> -->
-<div id="terminal">
-  <div id="input-container">
-    <span id="prompt">$</span>
-    <input type="text" id="input" />
-  </div>
-  <div id="response"></div>
-</div>
+    <!-- A container where the iframe will be appended -->
+    <div id="iframeContainer"></div>
 
 
     <script>
-      let baseFontSize = 16;
+
+        // shortcuts
+             let baseFontSize = 16;
       const scaleAmount = 6;
 
       function updateFontSize() {
@@ -120,7 +90,8 @@
         }
       });
 
-         // Initialize RiveScript
+
+      // Initialize RiveScript
       var bot = new RiveScript();
       // bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
       // bot.loadFile("lib/test.rive").then(loadingDone)
@@ -377,7 +348,7 @@
             }
           } else if (event.key === "ArrowUp") {
             // Populate the input field with the last input when the up arrow key is pressed
-           // this.value = lastInput;
+            this.value = lastInput;
             // Move cursor to the end of the input value
             event.preventDefault(); // Prevent the default action to ensure the text field is updated
             setTimeout(
@@ -398,7 +369,6 @@
         console.log("DEFocusing input");
       }
     
-
     </script>
   </body>
 </html>
