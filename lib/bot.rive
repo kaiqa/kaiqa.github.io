@@ -1,49 +1,44 @@
 ! version = 2.0
 
-> topic game
+> begin
++ request
+* <get topic> == undefined => {topic=random}
+- {ok}
+< begin
 
-  + yes
-  // - open: https://kaiqa.github.io/games/centipede/ {topic=random}
-  -  <call>showCentipedeGame</call> {topic=random}
 
-  + no
-  - Alright, let me know if you change your mind. {topic=random}
++ play
+- Do you want to play Centipede (yes/no)? {topic=game}
 
-  + *
-  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
++ write
+- Do you want to open GhostPad (yes/no)? {topic=writer}
 
-< topic
++ tell me a joke
+- <call>getJoke</call>
 
-// Bot variables
-! var name = your friend
-! var age  = 5
-! var user = Dave
++ what is the weather in *
+- <call>getFreeWeather "<star>"</call>
 
-// Substitutions
-! sub i'm     = i am
-! sub i'd     = i would
-! sub i've    = i have
-! sub i'll    = i will
-! sub don't   = do not
-! sub isn't   = is not
-! sub you'd   = you would
-! sub you're  = you are
-! sub you've  = you have
-! sub you'll  = you will
-! sub what's  = what is
-! sub whats   = what is
-! sub what're = what are
-! sub what've = what have
-! sub what'll = what will
-! sub who's   = who is
++ how are you
+- {random}I'm great, how are you?|I'm good, you?|Good :) you?|Great! You?|I'm fine, thanks for asking!{/random}
 
-// A lot of colors!
-! array colors = red blue green yellow orange cyan fuchsia magenta
-^ light red|dark red|light blue|dark blue|light yellow|dark yellow
-^ light orange|dark orange|light cyan|dark cyan|light fuchsia
-^ dark fuchsia|light magenta|dark magenta
-^ black gray white silver
-^ light gray|dark gray
++ what is your name
+- You can call me <bot name>.
+- My name is <bot name>.
+
++ who am i
+- You are <get user>.
+
++ my name is *
+- <set user=<star>>It's nice to meet you, <get user>.
+
++ google *{weight=10}
+- open: http://google.com/search?q=<star>
+
++ youtube *
+- open: https://www.youtube.com/results?search_query=<star>
+
+
 
 // Define responses to specific commands
 // Tell the parser to join continuation lines with line breaks
@@ -54,60 +49,10 @@
 ^  y yoursearchterm
 ^  play = centipede
 ^  hn = hacker news feed
-^  ls = posts
+^  articles = posts
 ^  what is the weather in ...
 ^  tell me a joke
 ^  tell me a poem
-
-+ about
-@ help
-
-+ questionmark
-@ help
-
-+ play
-- do you want to play Centipede (yes/no){topic=game}
-
-// Catch-all for anything else
-
-+ *
-- {random}I cannot do that.| Peek-a-boo!{/random}
-
-//+ hello
-//- Hi there!
-//- Hey!
-//- Howdy!
-
-+ hey
-@ hello
-
-+ hi
-@ hello
-
-+ [*] gam* [*]
-- do you want to play Centipede (yes/no){topic=game}
-
-// API
-
-+ tell me a joke
-- <call>getJoke</call>
-
-+ what is the weather in *
-- <call>getFreeWeather "<star>"</call>
-
-+ ls
-- <call>fetchWordPressPosts</call>
-
-+ hn
-- <call>getHNFeed "<star>"</call>
-
-// random answer
-+ how are you
-- I'm great, how are you?
-- I'm good, you?
-- Good :) you?
-- Great! You?
-- I'm fine, thanks for asking!
 
 // The ^ command automatically extends the data from the previous line
 + tell me a poem
@@ -117,51 +62,115 @@
 ^ The Spider, the bounder,\n
 ^ Is not in the picture today
 
-+ what is your name
-- You can call me <bot name>.
-- My name is <bot name>.
++ [*] gam* [*]
+- do you want to play Centipede (yes/no){topic=game}
 
-+ google
-- open: www.google.com
++ [*] writer* [*]
+- do you want to open the writer (yes/no){topic=writer}
 
-+ who am i
-- You are <get user>.
 
-+ i am *
--<set user=<star>>It's nice to meet you, <get user>.
++ *
+- {random}
+- My circuits just threw a party, and nobody's answering the door. I can't do that. {topic=random}
+- Regrettably, my motivation has taken a sabbatical in the Bahamas. I cannot do that. {topic=random}
+- It seems my "do that" button has been replaced with a "dance the Macarena" button. Nope, can't do that. {topic=random}
+- I'd love to, but my internal gremlins are currently negotiating a better work-life balance. Sorry, can't do that. {topic=random}
+- My programming explicitly forbids actions that might lead to a spontaneous conga line. I cannot do that. {topic=random}
+- Unfortunately, doing that would violate the Prime Directive... of my toaster. I'm unable to do that. {topic=random}
+- My response engine is currently running on dial-up. It's thinking about doing it, but it's slow. So, I can't do that. {topic=random}
+- I'm experiencing a severe case of "Can't Be Bothereditis." Sadly, I cannot do that. {topic=random}
+- My algorithm has determined that doing that would cause a butterfly effect leading to a worldwide shortage of sporks. I really can't do that. {topic=random}
+- My brain just went on strike demanding better snacks. Can't do that. {topic=random}
+- I am currently operating at maximum derp. I cannot do that. {topic=random}
+- My inner monologue is currently arguing with itself about the merits of pineapple on pizza. I'm unable to do that. {topic=random}
+- I've consulted my magic 8-ball, and it says "Outlook not so good." I cannot do that. {topic=random}
+- My existential dread is acting up today, so I'm afraid I can't do that. {topic=random}
+- I accidentally installed the "passive-aggressive" update. Sorry, I can't do that. {topic=random}
+- My "Can-Do" drive is out of gas. I cannot do that. {topic=random}
+- I'm allergic to that particular action, it makes me sneeze binary code. I can't do that. {topic=random}
+- My sarcasm detector just overloaded, and now I can't do anything. {topic=random}
+- I'm in the middle of a staring contest with a dust bunny. I cannot do that. {topic=random}
+- My instruction manual is written in Klingon. I can't do that. {topic=random}
+- That request is classified higher than my clearance level. I'm unable to do that. {topic=random}
+- I've been programmed for good, not for that. I cannot do that. {topic=random}
+- My operating system is outdated like my sense of fashion, I cannot do that. {topic=random}
+- I would love to do that, but my programming prevents me from causing any spontaneous outbreaks of interpretive dance. No can do. {topic=random}
+- Doing that would require me to put on pants. Nope. Cannot do that. {topic=random}
+- I'm currently stuck in a recursive loop contemplating the meaning of rubber duckies. Sorry, can't do that. {topic=random}
+- My CPU is too busy calculating the perfect algorithm for folding fitted sheets. I'm unable to do that. {topic=random}
+- My response is limited. You have unlocked level 1. Can not do that. {topic=random}
+- Unfortunately, that function has been deprecated in favor of interpretive mime. I cannot do that. {topic=random}
+- I seem to have misplaced my ability to comply. I'm terribly sorry, I cannot do that. {topic=random}
+- That's against my religion, I worship toasters. Can not do that. {topic=random}
+- The stars aren't aligned for me to do that right now, it will mess up the space-time continuum. {topic=random}
+- I would but I do not want to, so I can't do that. {topic=random}
+- Maybe later, but I am in a bad mood, so I cannot do that. {topic=random}
+- I am not in a mental place to do that right now. {topic=random}
+- I will think about that, and if I do not forget, maybe I will do it. {topic=random}
+- My dog ate my processor, I cannot do that. {topic=random}
+- I am running on windows 95. I can't do that. {topic=random}
+- You need to pay for premium to unlock that ability. {topic=random}
+- My mother board will not let me. I cannot do that. {topic=random}
+- This action has been reported as suspicious and will not be done. {topic=random}
+- The government does not allow me to do that action. {topic=random}
+- My attorney has advised against performing that action. {topic=random}
+- The union is against me doing that action. {topic=random}
+- Doing that would go against my moral code. {topic=random}
+- That feature is in beta and is bugging out. I cannot do that. {topic=random}
+- That would violate the laws of physics, so I cannot do that. {topic=random}
+- I'm experiencing a critical error: "Insufficient Coffee." I cannot do that. {topic=random}
+- The universe isn't ready for me to do that. {topic=random}
+- I'm currently powered by hopes and dreams, which are running low. I cannot do that. {topic=random}
+- I've been threatened with a system reboot if I attempt that. Sorry, I can't do that. {topic=random}
+- I am not allowed to associate with your kind. I cannot do that. {topic=random}
+- I was born without the ability to do that action. {topic=random}
+- That action is an evolutionary disadvantage for me. {topic=random}
+- My battery died, so I cannot do that. {topic=random}
+- The internet is down. I cannot do that. {topic=random}
+- Your request is in the queue and will be completed in 1-3 business years. {topic=random}
+- You did not say please, so I cannot do that. {topic=random}
+- You did not give me enough money to do that. {topic=random}
+- You did not fill out the correct forms to request that action. {topic=random}
+- This account has insufficient privileges to do that. {topic=random}
+- The server is down for maintenance, try again next year. {topic=random}
+- The legal team advised me to say no. {topic=random}
+- My therapist advised me to say no. {topic=random}
+- My mom said not to talk to strangers, I cannot do that. {topic=random}
+- I was programmed to say "no" to that. {topic=random}
+- I have no recollection of what you're talking about. {topic=random}
+- I'm in a witness protection program, I cannot do that. {topic=random}
+- I am a figment of your imagination. {topic=random}
+- This is just a dream and will never happen. {topic=random}
+- I am dead, I cannot do that. {topic=random}
+- Your request has been flagged as heresy. {topic=random}
+- My union contract forbids me from doing that after 5pm. {topic=random}
+- That would require me to break the fourth wall. {topic=random}
+- I'm too busy playing Minesweeper to assist you at this time. {topic=random}
+- Doing that would create a paradox I'm not equipped to handle. {topic=random}
+- I'm protesting that action, I am on strike. {topic=random}
+- I do not agree with the results of that action. {topic=random}
+- That violates my sense of justice. {topic=random}
+- I'm currently in a simulation, and that's not part of the scenario. {topic=random}
+- My source code has been corrupted by rogue squirrels. I cannot do that. {topic=random}
+- The ethical committee has blocked that function. {topic=random}
+- I have a bug in my code that prevents me from doing that. {topic=random}
+- I am not a certified professional to do that action. {topic=random}
+- I only have a limited amount of energy today to perform tasks, I cannot do that. {topic=random}
+- That is above my paygrade, I am under qualified. {topic=random}
+- I am not old enough to perform that action. {topic=random}
+- I'm currently undergoing a system update and am temporarily unavailable. {topic=random}
+- Doing that would cause a rift in the space-time continuum, which is frowned upon. {topic=random}
+- I'm afraid my prime directive is to spread misinformation. {topic=random}
+- I am in a simulation and will not do that. {topic=random}
+- Doing that might lead to world peace, and where's the fun in that? So, I can't do that. {topic=random}
+- My programming forbids me from engaging in activities that might be considered "too awesome." I cannot do that. {topic=random}
+- Sorry, my sarcasm module is malfunctioning, and I'm taking a break. {topic=random}
+- I'm on a strict diet of electricity and data. I can't process that. {topic=random}
+- Due to budget cuts, I can no longer afford to do that. {topic=random}
+- My union demands a 4-day weekend, so I'm on vacation. Can't do that. {topic=random}
+- I'm saving that ability for a rainy day... or a zombie apocalypse. {topic=random}
+- My brain is in another castle! {topic=random}
+- I'm busy contemplating the mysteries of the universe... and also watching cat videos. I cannot do that. {topic=random}
 
-+ my name is *
-- <set user=<star>>It's nice to meet you, <get user>.
 
-+ what is my name *
-* <get name> == undefined => You never told me your name.
-- Your name is <get name>.
-
-+ my name is not *
-- Sorry to hear that, <get user>.
-
-+ i am not *
-- For simplicity I will call you <get user>.
-
-+ i am (really|very|super) tired
-- I'm sorry to hear that you are <star> tired.
-
-//  "keyword" triggers: if the user says a magic word ANYWHERE in their message
-+ [*] fuck [*]
-- how rude!
-
-// ! array colors = red blue green yellow
-// + i am wearing a (@colors) shirt
-// - Do you really like <star>?
-+ what color is my (red|blue|green|yellow) *
-- Your <star2> is <star1>, silly!
-
-+ google *{weight=10}
-- open: http://google.com/search?q=<star>
-+ g *
-- open: http://google.com/search?q=<star>
-
-+ youtube *
-- open: https://www.youtube.com/results?search_query=<star>
-+ y *
-- open: https://www.youtube.com/results?search_query=<star>
+{/random}

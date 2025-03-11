@@ -1,0 +1,50 @@
+! version = 2.0
+
+// A lot of colors!
+! array colors = red blue green yellow orange cyan fuchsia magenta
+^ light red|dark red|light blue|dark blue|light yellow|dark yellow
+^ light orange|dark orange|light cyan|dark cyan|light fuchsia
+^ dark fuchsia|light magenta|dark magenta
+^ black gray white silver
+^ light gray|dark gray
+
+! var name = your friend
+! var age  = 5
+! var user = Dave
+
+! sub i'm     = i am
+! sub i'd     = i would
+! sub i've    = i have
+! sub i'll    = i will
+! sub don't   = do not
+! sub isn't   = is not
+! sub you'd   = you would
+! sub you're  = you are
+! sub you've  = you have
+! sub you'll   = you will
+! sub what's  = what is
+! sub whats   = what is
+! sub what're = what are
+! sub what've = what have
+! sub what'll = what will
+! sub who's   = who i
+
+// API
+
++ tell me a joke
+- <call>getJoke</call>
+
++ what is the weather in *
+- <call>getFreeWeather "<star>"</call>
+
++ posts
+- <call>fetchWordPressPosts</call>
+
++ hn
+- <call>getHNFeed "<star>"</call>
+
++ about
+@ help
+
++ questionmark
+@ help

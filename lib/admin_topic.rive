@@ -1,0 +1,87 @@
+! version = 2.0
+
+> topic admin
++ no
+  - Alright, let me know if you change your mind. {topic=random}
+
+  
+  + (yes|administrator|admin|sudo)
+  - Authenticating...
+  - Access granted. Welcome to the administrative interface. What is your command?
+  - Entering privileged mode... Accessing system.
+
+  + (ls|dir)
+  - listing files...
+  - boot/  dev/  etc/  home/  lib/  media/  mnt/  opt/  proc/  root/  run/  sbin/  srv/  tmp/  usr/  var/
+
+  + cd *
+  - Changing directory to <star>...
+  * <star> == /etc => Access Denied: Insufficient privileges.
+  * <star> == /root => Access Denied: Insufficient privileges.
+  - Directory changed.
+
+  + cat *
+  - Reading file <star>...
+  * <star> == /etc/shadow => Access Denied: Insufficient privileges.
+  * <star> == /root/important.txt => Access Denied: Insufficient privileges.
+  - File not found or inaccessible.
+
+
+  + uname *
+  - Linux version 5.4.0-80-generic (build server) (gcc version 9.3.0) #90-Ubuntu SMP Fri Jul 9 22:49:44 UTC 2021
+
+  + whoami
+  - root
+
+  + ifconfig
+  - eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+  ^        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255
+  ^        ether 00:11:22:33:44:55  txqueuelen 1000  (Ethernet)
+  ^        RX packets 12345  bytes 67890123 (67.8 MB)
+  ^        TX packets 54321  bytes 32109876 (32.1 MB)
+
+  + ps*
+  - USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+  ^ root         1  0.0  0.0   4567   890 ?        Ss   Jan01   0:01 /sbin/init
+  ^ root         2  0.0  0.0      0     0 ?        S    Jan01   0:00 [kthreadd]
+  ^ chatbot   1234  0.5  2.3 123456 78901 ?        Sl   Jan01   1:23 /usr/bin/python3 chatbot.py
+
+  + reboot
+  - Rebooting...
+  - Connection closed.
+
+  + shutdown *
+  - Shutting down...
+  - Connection closed.
+
++ exit
+  - Exiting admin mode...{topic=random}
++ bye
+  - Exiting admin mode...{topic=random}
+
++ clear
+  - \x1b[2J\x1b[H  //Clears the screen
+
++ sudo rm *
+  - ERROR: Operation not permitted
+  - Aborted.
+
+  + install *
+  - Trying to install <star>.
+  - E: Could not get lock /var/lib/dpkg/lock-frontend - open (11: Resource temporarily unavailable)
+  - E: Unable to acquire the dpkg frontend lock; is another process running?
+
+  + update
+  - Checking for updates
+  - All packages are up to date
+
+  + help
+  - Available commands: ls, cd, cat, uname -a, whoami, ifconfig, ps aux, reboot, shutdown -h now, exit, clear, install, update
+
+  + *
+  - Command not found. Type 'help' for available commands.
+< topic
+
++ login*|sudo|admin
+- (yes/no)? {topic=admin}
+

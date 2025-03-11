@@ -140,11 +140,13 @@
     // bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
     // bot.loadFile("lib/test.rive").then(loadingDone)
     bot
-      .loadFile(["lib/bot.rive", "lib/test.rive"])
+      //.loadFile(["lib/bot.rive", "lib/test.rive"])
+       .loadFile(["lib/bot.rive", "lib/admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive"])
       .then(() => {
         console.log("Files loaded!");
         bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
 
+        bot.setUservar("local-user", "topic", "random");
         bot.sortReplies(); // Sort the replies after loading
       })
       .catch((error) => {
@@ -311,6 +313,12 @@
       return "";
     });
 
+       bot.setSubroutine("showWriter", async (rs) => {
+      writer();
+      // Return the iframe HTML string
+      return "";
+    });
+
     function centipede() {
       // Define the iframe
       const iframe = document.createElement("iframe");
@@ -319,6 +327,25 @@
       iframe.height = "860";
       iframe.style.border = "0";
       iframe.setAttribute("title", "CENTIPEDE");
+
+      // Identify the container where the iframe will be placed
+      const iframeContainer = document.getElementById("iframeContainer");
+
+      // Clear previous iframe content if needed
+      iframeContainer.innerHTML = "";
+
+      // Append the new iframe to the container
+      iframeContainer.appendChild(iframe);
+    }
+    
+    function writer() {
+      // Define the iframe
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://kaiqa.github.io/apps/web/";
+      iframe.width = "600";
+      iframe.height = "860";
+      iframe.style.border = "0";
+      iframe.setAttribute("title", "GhostPad");
 
       // Identify the container where the iframe will be placed
       const iframeContainer = document.getElementById("iframeContainer");
