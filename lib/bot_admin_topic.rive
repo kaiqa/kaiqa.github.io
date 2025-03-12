@@ -2,10 +2,10 @@
 
 > topic admin
 
-+ no
++ n
   - Alright, let me know if you change your mind. {topic=random}
 
-+ (yes|administrator|admin|sudo)
++ (y|administrator|admin|sudo)
   - Authenticating..
   - Accessing system.
 
