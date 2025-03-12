@@ -3,16 +3,16 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"flutter_bootstrap.js": "8e050b2d436bf18ef723bebfbf683147",
+const RESOURCES = {"flutter_bootstrap.js": "5c0d327b1f4fdf050b1e30b84504f2d2",
 "version.json": "3dd4ac04faf5c5f596f25c56477e8d1b",
-"index.html": "dff3162b6d2fb64e74063e57856778e8",
-"/": "dff3162b6d2fb64e74063e57856778e8",
-"main.dart.js": "200c96d5ca19cc7b19f75bdf41cee361",
+"index.html": "a38a373f7795b5f3621d0d05797617da",
+"/": "a38a373f7795b5f3621d0d05797617da",
+"main.dart.js": "c3d7a4fe9e76937e9118a5f9ed2383a8",
 "flutter.js": "4b2350e14c6650ba82871f60906437ea",
 "favicon.png": "193c60e5e840e398b0ad54767cd482a1",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
-"icons/downloadSpeechBubble.png": "c8f17ead9c80271da30a503e688927a2",
+"icons/downloadSpeechBubble.png": "16be219d2a56e85a778997aba16d6ac6",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "manifest.json": "c0760319a22bf41f581c2bda08fcfc82",
