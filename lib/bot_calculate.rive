@@ -1,0 +1,22 @@
++ what is * divided by *
+- <call>floating_point_divide <star1> <star2></call>
+
+> object floating_point_divide javascript
+    return new Promise(async (resolve) => {
+        let num1 = args[0];
+        let num2 = args[1];
+
+        let a = parseFloat(num1);
+        let b = parseFloat(num2);
+
+        if (isNaN(a) || isNaN(b)) {
+            return resolve("Those don't look like valid numbers.");
+        }
+
+        if (b === 0) {
+            return resolve("I can't divide by zero.");
+        }
+
+        return resolve(`${a} / ${b} = ${a / b}`);
+    });
+< object
