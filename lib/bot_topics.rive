@@ -43,7 +43,6 @@
   - I'm sorry, I didn't catch that. Can you please answer with "y" or "no"?
 < topic
 
-
 > topic zine
   + y
   - open: https://kaiqa.github.io/zine/ {topic=random}

@@ -13,8 +13,8 @@
 + write
 - Do you want to open the writer (y/n)? {topic=writer}
 
-+ zine
-- Do you want to look at magazines? (y/n)? {topic=writer}
++ (zine|magazine|mag|mags)
+- Do you want to look at magazines? (y/n)? {topic=zine}
 
 + tell me a joke
 - <call>getJoke</call>
@@ -24,9 +24,6 @@
 
 + who is the boss
 - The boss is <bot boss>.
-
-
-
 
 + google *{weight=10}
 - open: http://google.com/search?q=<star>

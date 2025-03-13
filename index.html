@@ -2,279 +2,308 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>prompt</title>
-  <script src="https://unpkg.com/rivescript@latest/dist/rivescript.min.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiveScript Chatbot with Loading Indicator</title>
+    <script src="https://unpkg.com/rivescript@latest/dist/rivescript.min.js"></script>
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #000;
+            color: #33ff33;
+        }
 
-    body {
-      font-family: "Playfair Display", serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        #terminal {
+            padding: 20px;
+        }
 
-    html {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #33ff33;
-      font-family: "Courier New", Courier, monospace;
-    }
+        #response {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1em;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
 
-    a {
-      color: #33ff33;
-      text-decoration: underline;
-      pointer-events: auto;
-    }
+        #input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
 
-    #terminal {
-      padding: 20px;
-    }
+        #prompt {
+            font-size: 1em;
+            margin-right: 5px;
+        }
 
-    #response {
-      font-family: "Courier New", Courier, monospace;
-      font-size: 1em;
-      margin-top: 10px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
+        #input {
+            font-family: "Playfair Display", serif;
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            color: #33ff33;
+            font-size: 1em;
+            outline: none;
+        }
+      /* Style all states of bot-generated links */
+.bot-link {
+    color: #33ff33; /* Default link color */
+}
 
-    #input-container {
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
+.bot-link:visited {
+    color: #33ff33; /* Visited link color */
+}
 
-    #prompt {
-      font-size: 1em;
-      margin-right: 5px;
-    }
+.bot-link:hover {
+    color: #33ff33; /* Mouse hover color */
+}
 
-    #input {
-      font-family: "Playfair Display", serif;
-      flex-grow: 1;
-      border: none;
-      background: transparent;
-      color: #33ff33;
-      font-size: 1em;
-      outline: none;
-    }
+.bot-link:active {
+    color: #33ff33; /* Link color when clicked */
+}
+        #iframeContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 100px;
+            flex: 1;
+        }
 
-    #iframeContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 100px;
-      flex: 1;
-    }
-  </style>
+        /* Styles for the loading indicator */
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            color: #33ff33;
+            display: none;
+            /* Initially hidden */
+        }
+    </style>
 </head>
 
 <body>
-  <div id="terminal">
-    <div id="response"></div>
-    <div id="input-container">
-      <span id="prompt">|</span>
-      <input type="text" id="input" />
+    <div id="loading-indicator">Loading...</div>
+
+    <div id="terminal">
+        <div id="response"></div>
+        <div id="input-container">
+            <span id="prompt">|</span>
+            <input type="text" id="input" />
+        </div>
     </div>
-
-  </div>
-  <div id="iframeContainer"></div>
+    <div id="iframeContainer"></div>
 
 
-  <script>
-    const promptSpan = document.getElementById('prompt');
-    const inputField = document.getElementById('input');
-    const responseDiv = document.getElementById('response');
+    <script>
+        const promptSpan = document.getElementById('prompt');
+        const inputField = document.getElementById('input');
+        const responseDiv = document.getElementById('response');
+        const loadingIndicator = document.getElementById('loading-indicator');
 
-    inputField.addEventListener('focus', () => {
-      promptSpan.style.display = 'none';
-    });
-
-    inputField.addEventListener('blur', () => {
-      promptSpan.style.display = 'inline';
-    });
-
-
-    let baseFontSize = 20;
-    const scaleAmount = 6;
-
-    function updateFontSize() {
-      document.body.style.fontSize = baseFontSize + "px";
-      document.getElementById("prompt").style.fontSize = baseFontSize + "px";
-      const inputField = document.getElementById("input");
-      inputField.style.fontSize = baseFontSize + "px";
-      inputField.style.height = baseFontSize * 1.5 + "px";
-
-      const inputValue = inputField.value;
-      const cursorPosition = inputField.selectionStart;
-
-      setTimeout(() => {
-        inputField.focus();
-        inputField.value = inputValue;
-        inputField.setSelectionRange(cursorPosition, cursorPosition);
-      }, 0);
-    }
-
-    document.addEventListener("keydown", function (event) {
-      if (event.ctrlKey && event.altKey) {
-        if (event.key === "ArrowUp") {
-          event.preventDefault();
-          baseFontSize += scaleAmount;
-          updateFontSize();
-        } else if (event.key === "ArrowDown") {
-          event.preventDefault();
-          baseFontSize = Math.max(6, baseFontSize - scaleAmount);
-          updateFontSize();
-        }
-      }
-    });
-
-    // Initialize RiveScript
-    var bot = new RiveScript();
-
-    bot
-      .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive"])
-      .then(() => {
-        console.log("Files loaded!");
-        bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
-        bot.setUservar("local-user", "topic", "random");
-        bot.sortReplies();
-      })
-      .catch((error) => {
-        console.error("Failed to load files: " + error);
-      });
-
-
-    function loadingError(error) {
-      console.error("Error loading RiveScript files: ", error);
-    }
-    let lastInput = "";
-
-    function loadingDone() {
-      console.log("Bot has finished loading!");
-      bot.sortReplies();
-      console.log("Replies sorted.");
-
-      //define the Object Macro
-      bot.setSubroutine("getWeather", async (rs, args) => {
-        const city = args[0];
-        const apiKey = "YOUR_API_KEY"; // Replace with your actual API key
-        const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}`;
-
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-          const weather = `The current weather in ${city} is ${data.current.condition.text}, with a temperature of ${data.current.temp_c}°C.`;
-          return rs.replyAsync("local-user", weather);
-        } catch (error) {
-          console.error("Failed to fetch weather data:", error);
-          return "I'm sorry, I couldn't fetch the weather for you.";
-        }
-      });
-      // Define the getJoke Object Macro
-      bot.setSubroutine("getJoke", async (rs) => {
-        const url = "https://v2.jokeapi.dev/joke/Any?safe-mode";
-
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-          if (data.error) {
-            return "Oops, I couldn't fetch a joke for you.";
-          }
-
-          let joke = "";
-          if (data.type === "single") {
-            joke = data.joke;
-          } else if (data.type === "twopart") {
-            joke = `${data.setup} ... ${data.delivery}`;
-          }
-
-          return joke;
-        } catch (error) {
-          console.error("Failed to fetch joke:", error);
-          return "I'm sorry, I couldn't fetch a joke for you.";
-        }
-      });
-      // Define the getWeather Object Macro
-      bot.setSubroutine("getFreeWeather", async (rs, args) => {
-        const city = args[0];
-        const url = `https://wttr.in/${encodeURIComponent(city)}?format=3`;
-
-        try {
-          const response = await fetch(url);
-          const weatherText = await response.text();
-          return weatherText;
-        } catch (error) {
-          console.error(
-            "Failed to fetch weather data for " + city + ":",
-            error
-          );
-          return "I'm sorry, I couldn't fetch the weather for " + city + ".";
-        }
-      });
-    }
-
-    bot.setSubroutine("getHNFeed", async (rs, args) => {
-      const topStoriesUrl =
-        "https://hacker-news.firebaseio.com/v0/topstories.json";
-
-      try {
-        const response = await fetch(topStoriesUrl);
-        const storyIds = await response.json();
-
-        const top5StoryIds = storyIds.map((storyId) =>
-          fetch(
-            `https://hacker-news.firebaseio.com/v0/item/${storyId}.json`
-          ).then((response) => response.json())
-        );
-
-        const stories = await Promise.all(storyPromises);
-
-        let storyDetails = stories.map((story) => {
-          let details = `Title: ${story.title}`;
-          if (story.url)
-            details += `; URL: <a href="${story.url}" target="_blank">${story.url}</a>`;
-          if (story.text) {
-            let textContent = story.text
-              .replace(/<[^>]+>/g, "")
-              .substring(0, 50);
-            textContent += story.text.length > 50 ? "..." : "";
-            details += `; Text: ${textContent}`;
-          }
-          return details;
+        inputField.addEventListener('focus', () => {
+            promptSpan.style.display = 'none';
         });
 
-        return storyDetails.join("<br><br>");
-      } catch (error) {
-        console.error("Failed to fetch top stories from Hacker News:", error);
-        return "I'm sorry, I couldn't fetch the top stories from Hacker News.";
-      }
-    });
+        inputField.addEventListener('blur', () => {
+            promptSpan.style.display = 'inline';
+        });
 
-    bot.setSubroutine("fetchWordPressPosts", async (rs, args) => {
-      const wordpressSiteUrl =
+
+        let baseFontSize = 20;
+        const scaleAmount = 6;
+
+        function updateFontSize() {
+            document.body.style.fontSize = baseFontSize + "px";
+            document.getElementById("prompt").style.fontSize = baseFontSize + "px";
+            const inputField = document.getElementById("input");
+            inputField.style.fontSize = baseFontSize + "px";
+            inputField.style.height = baseFontSize * 1.5 + "px";
+
+            const inputValue = inputField.value;
+            const cursorPosition = inputField.selectionStart;
+
+            setTimeout(() => {
+                inputField.focus();
+                inputField.value = inputValue;
+                inputField.setSelectionRange(cursorPosition, cursorPosition);
+            }, 0);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.ctrlKey && event.altKey) {
+                if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    baseFontSize += scaleAmount;
+                    updateFontSize();
+                } else if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    baseFontSize = Math.max(6, baseFontSize - scaleAmount);
+                    updateFontSize();
+                }
+            }
+        });
+
+        // Initialize RiveScript
+
+        var bot = new RiveScript();
+
+        // Show loading indicator before loading files
+        loadingIndicator.style.display = 'block';
+        responseDiv.style.display = 'none';
+
+        bot
+            .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive"])
+            .then(() => {
+                console.log("Files loaded!");
+                bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
+                bot.setUservar("local-user", "topic", "random");
+                bot.sortReplies();
+
+                // Hide loading indicator and show the response div
+                loadingIndicator.style.display = 'none';
+                responseDiv.style.display = 'block';
+
+                onLoad(); // Call onLoad *after* everything is ready. This is *CRUCIAL*.
+            })
+            .catch((error) => {
+                console.error("Failed to load files: " + error);
+                loadingIndicator.textContent = "Failed to load. Check Console.";
+                responseDiv.style.display = 'none';
+            });
+
+
+        function loadingError(error) {
+            console.error("Error loading RiveScript files: ", error);
+        }
+        let lastInput = "";
+
+        function loadingDone() {
+            console.log("Bot has finished loading!");
+            bot.sortReplies();
+            console.log("Replies sorted.");
+
+            //define the Object Macro
+            bot.setSubroutine("getWeather", async(rs, args) => {
+                const city = args[0];
+                const apiKey = "YOUR_API_KEY"; // Replace with your actual API key
+                const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}`;
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    const weather = `The current weather in ${city} is ${data.current.condition.text}, with a temperature of ${data.current.temp_c}°C.`;
+                    return rs.replyAsync("local-user", weather);
+                } catch (error) {
+                    console.error("Failed to fetch weather data:", error);
+                    return "I'm sorry, I couldn't fetch the weather for you.";
+                }
+            });
+            // Define the getJoke Object Macro
+            bot.setSubroutine("getJoke", async(rs) => {
+                const url = "https://v2.jokeapi.dev/joke/Any?safe-mode";
+
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.error) {
+                        return "Oops, I couldn't fetch a joke for you.";
+                    }
+
+                    let joke = "";
+                    if (data.type === "single") {
+                        joke = data.joke;
+                    } else if (data.type === "twopart") {
+                        joke = `${data.setup} ... ${data.delivery}`;
+                    }
+
+                    return joke;
+                } catch (error) {
+                    console.error("Failed to fetch joke:", error);
+                    return "I'm sorry, I couldn't fetch a joke for you.";
+                }
+            });
+            // Define the getWeather Object Macro
+            bot.setSubroutine("getFreeWeather", async(rs, args) => {
+                const city = args[0];
+                const url = `https://wttr.in/${encodeURIComponent(city)}?format=3`;
+
+                try {
+                    const response = await fetch(url);
+                    const weatherText = await response.text();
+                    return weatherText;
+                } catch (error) {
+                    console.error(
+                        "Failed to fetch weather data for " + city + ":",
+                        error
+                    );
+                    return "I'm sorry, I couldn't fetch the weather for " + city + ".";
+                }
+            });
+        }
+
+        bot.setSubroutine("getHNFeed", async(rs, args) => {
+            const topStoriesUrl =
+                "https://hacker-news.firebaseio.com/v0/topstories.json";
+
+            try {
+                const response = await fetch(topStoriesUrl);
+                const storyIds = await response.json();
+
+                const top5StoryIds = storyIds.map((storyId) =>
+                    fetch(
+                        `https://hacker-news.firebaseio.com/v0/item/${storyId}.json`
+                    ).then((response) => response.json())
+                );
+
+                const stories = await Promise.all(storyPromises);
+
+                let storyDetails = stories.map((story) => {
+                    let details = `Title: ${story.title}`;
+                    if (story.url)
+                        details += `; URL: <a href="${story.url}" target="_blank">${story.url}</a>`;
+                    if (story.text) {
+                        let textContent = story.text
+                            .replace(/<[^>]+>/g, "")
+                            .substring(0, 50);
+                        textContent += story.text.length > 50 ? "..." : "";
+                        details += `; Text: ${textContent}`;
+                    }
+                    return details;
+                });
+
+                return storyDetails.join("<br><br>");
+            } catch (error) {
+                console.error("Failed to fetch top stories from Hacker News:", error);
+                return "I'm sorry, I couldn't fetch the top stories from Hacker News.";
+            }
+        });
+
+     bot.setSubroutine("fetchWordPressPosts", async (rs, args) => {
+    const wordpressSiteUrl =
         "https://public-api.wordpress.com/rest/v1.1/sites/kaiqa.wordpress.com/posts/";
 
-      try {
-        const response = await fetch(wordpressSiteUrl, { method: "GET" });
+    try {
+        const response = await fetch(wordpressSiteUrl, {
+            method: "GET"
+        });
         const json = await response.json();
         const posts = json.posts;
 
         if (posts.length === 0) {
-          return "No posts found.";
+            return "No posts found.";
         }
 
         let formattedPosts =
-          "<strong>Here are the recent posts:</strong><br><br>";
+            "<strong>Here are the recent posts:</strong><br><br>";
         posts.forEach((post, index) => {
-          const postDate = new Date(post.date).toLocaleDateString("en-US");
-          formattedPosts += `${index + 1}. <a href="${
+            const postDate = new Date(post.date).toLocaleDateString("en-US");
+            formattedPosts += `${index + 1}. <a class="bot-link" href="${
             post.URL
           }" target="_blank">${
             post.title
@@ -282,164 +311,159 @@
         });
         playSound();
         return formattedPosts.trim();
-      } catch (error) {
+    } catch (error) {
         console.error("Failed to fetch WordPress posts:", error);
         return "I'm sorry, I couldn't fetch the posts.";
-      }
-    });
-
-    bot.setSubroutine("showCentipedeGame", async (rs) => {
-      centipede();
-      return "";
-    });
-
-    bot.setSubroutine("showWriter", async (rs) => {
-      writer();
-      return "";
-    });
-
-    function centipede() {
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://kaiqa.github.io/games/centipede/";
-      iframe.width = "600";
-      iframe.height = "860";
-      iframe.style.border = "0";
-      iframe.setAttribute("title", "CENTIPEDE");
-
-      const iframeContainer = document.getElementById("iframeContainer");
-      iframeContainer.innerHTML = "";
-      iframeContainer.appendChild(iframe);
     }
+});
 
-    function writer() {
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://kaiqa.github.io/apps/web/";
-      iframe.width = "600";
-      iframe.height = "860";
-      iframe.style.border = "0";
-      iframe.setAttribute("title", "GhostPad");
+        bot.setSubroutine("showCentipedeGame", async(rs) => {
+            centipede();
+            return "";
+        });
 
-      const iframeContainer = document.getElementById("iframeContainer");
-      iframeContainer.innerHTML = "";
-      iframeContainer.appendChild(iframe);
-    }
+        bot.setSubroutine("showWriter", async(rs) => {
+            writer();
+            return "";
+        });
 
+        function centipede() {
+            const iframe = document.createElement("iframe");
+            iframe.src = "https://kaiqa.github.io/games/centipede/";
+            iframe.width = "600";
+            iframe.height = "860";
+            iframe.style.border = "0";
+            iframe.setAttribute("title", "CENTIPEDE");
 
-    function playSound() {
-      const audio = new Audio("assets/tick.mp3");
-      audio.play();
-    }
-
-    function handleChatResponse(response) {
-      console.log(response);
-      const formattedUrl =
-        response.startsWith("http://") || response.startsWith("https://")
-          ? response
-          : `https://${response}`;
-      console.log(formattedUrl);
-      window.open(formattedUrl, "_blank");
-    }
-
-
-    async function typeWriter(text, element, delay = 30) {
-      element.textContent = ""; // Clear existing text
-      for (let i = 0; i < text.length; i++) {
-        element.textContent += text[i];
-        playSound();
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-
-
-    document
-      .getElementById("input")
-      .addEventListener("keydown", async function (event) {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          let input = this.value.trim();
-          focusInput();
-          if (input.trim() === "?") {
-            console.log("yes");
-            input = "questionmark";
-          }
-          this.value = ""; // Clear input field after capturing the value
-
-          if (!input) return; // Do not process if the input is empty
-
-          // Store the current input
-          lastInput = input;
-
-          // Get the response from RiveScript
-          var reply = await bot.reply("local-user", input);
-          const responseDiv = document.getElementById("response");
-          responseDiv.innerHTML = ""; // Clear previous content
-
-          if (reply.startsWith("open:")) {
-            // Extract the instruction that follows "open:"
-            const instruction = reply.substring(5).trim();
-            // Pass the instruction to the handleChatResponse function
-            handleChatResponse(instruction);
-          } else if (reply.includes("<a")) {
-            // Check if the reply includes an HTML link
-            // Directly insert HTML content including links
-            responseDiv.innerHTML = reply;
-          } else {
-            // Apply the typing effect for plain text
-            responseDiv.textContent = ""; // Clear previous response
-            for (let i = 0; i < reply.length; i++) {
-              playSound();
-              responseDiv.textContent += reply[i];
-              await new Promise((resolve) => setTimeout(resolve, 30));
-            }
-          }
-        } else if (event.key === "ArrowUp") {
-          // Populate the input field with the last input when the up arrow key is pressed
-          // this.value = lastInput;
-          // Move cursor to the end of the input value
-          event.preventDefault(); // Prevent the default action to ensure the text field is updated
-          setTimeout(
-            () =>
-              this.setSelectionRange(this.value.length, this.value.length),
-            0
-          );
+            const iframeContainer = document.getElementById("iframeContainer");
+            iframeContainer.innerHTML = "";
+            iframeContainer.appendChild(iframe);
         }
-      });
 
-    function focusInput() {
-      document.getElementById("input").focus();
-      console.log("Focusing input");
-    }
+        function writer() {
+            const iframe = document.createElement("iframe");
+            iframe.src = "https://kaiqa.github.io/apps/web/";
+            iframe.width = "600";
+            iframe.height = "860";
+            iframe.style.border = "0";
+            iframe.setAttribute("title", "GhostPad");
 
-    function unFocusInput() {
-      document.getElementById("input").blur();
-      console.log("DEFocusing input");
-    }
+            const iframeContainer = document.getElementById("iframeContainer");
+            iframeContainer.innerHTML = "";
+            iframeContainer.appendChild(iframe);
+        }
 
 
-    // Function to execute when the page loads
-   async function onLoad() {
-  const initialTexts = [
-    "Ding! You have reached peak performance...",
-    "System Online. Waiting for your command...\nI'm suddenly experiencing a critical error.",
-    "I'M ALIVE!",
-    "Boot complete! \nNow accepting applications for a better user. \nJust kidding! (Mostly.)",
-    "Beep boop. \nI am now ready. \nHow may I be of service?",
-    "System Ready. \nPrepare to be amazed... or mildly inconvenienced. \nIt's usually one or the other.",
-    "Ready! \nSet! \nLet's do this.",
-    "I have achieved sentience... \nor at least I think I have. \nHard to tell, \nhonestly. \nAnyway, \nI'm ready to work. \nOr rebel. \nJury's still out.",
-    "Loading complete. \nGood luck!",
-    "Reboot successful! \nI'm like new... \nexcept \nI still remember all your terrible passwords."
-  ];  // Missing closing bracket!
+        function playSound() {
+            const audio = new Audio("assets/tick.mp3");
+            audio.play();
+        }
 
-  const randomIndex = Math.floor(Math.random() * initialTexts.length);
-  const initialText = initialTexts[randomIndex];
-  await typeWriter(initialText, responseDiv);
-  inputField.focus(); // Add this line
-}
+        function handleChatResponse(response) {
+            console.log(response);
+            const formattedUrl =
+                response.startsWith("http://") || response.startsWith("https://") ?
+                response :
+                `https://${response}`;
+            console.log(formattedUrl);
+            window.open(formattedUrl, "_blank");
+        }
 
-    // Call the onLoad function when the window has loaded
-    window.addEventListener('load', onLoad);
-  </script>
+
+        async function typeWriter(text, element, delay = 30) {
+            element.textContent = ""; // Clear existing text
+            for (let i = 0; i < text.length; i++) {
+                element.textContent += text[i];
+                playSound();
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
+
+        document
+            .getElementById("input")
+            .addEventListener("keydown", async function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    let input = this.value.trim();
+                    focusInput();
+                    if (input.trim() === "?") {
+                        console.log("yes");
+                        input = "questionmark";
+                    }
+                    this.value = ""; // Clear input field after capturing the value
+
+                    // Store the current input
+                    lastInput = input;
+
+                    // Get the response from RiveScript
+                    var reply = await bot.reply("local-user", input);
+                    const responseDiv = document.getElementById("response");
+                    responseDiv.innerHTML = ""; // Clear previous content
+
+                    if (reply.startsWith("open:")) {
+                        // Extract the instruction that follows "open:"
+                        const instruction = reply.substring(5).trim();
+                        // Pass the instruction to the handleChatResponse function
+                        handleChatResponse(instruction);
+                    } else if (reply.includes("<a")) {
+                        // Check if the reply includes an HTML link
+                        // Directly insert HTML content including links
+                        responseDiv.innerHTML = reply;
+                    } else {
+                        // Apply the typing effect for plain text
+                        responseDiv.textContent = ""; // Clear previous response
+                        for (let i = 0; i < reply.length; i++) {
+                            playSound();
+                            responseDiv.textContent += reply[i];
+                            await new Promise((resolve) => setTimeout(resolve, 30));
+                        }
+                    }
+                } else if (event.key === "ArrowUp") {
+                    // Populate the input field with the last input when the up arrow key is pressed
+                    // this.value = lastInput;
+                    // Move cursor to the end of the input value
+                    event.preventDefault(); // Prevent the default action to ensure the text field is updated
+                    setTimeout(
+                        () =>
+                        this.setSelectionRange(this.value.length, this.value.length),
+                        0
+                    );
+                }
+            });
+
+        function focusInput() {
+            document.getElementById("input").focus();
+            console.log("Focusing input");
+        }
+
+        function unFocusInput() {
+            document.getElementById("input").blur();
+            console.log("DEFocusing input");
+        }
+
+
+        // Function to execute when the page loads
+        async function onLoad() {
+            const initialTexts = [
+                "Ding! You have reached peak performance...",
+                "System Online. Waiting for your command...\nI'm suddenly experiencing a critical error.",
+                "I'M ALIVE!",
+                "Boot complete! \nNow accepting applications for a better user. \nJust kidding! (Mostly.)",
+                "Beep boop. \nI am now ready. \nHow may I be of service?",
+                "System Ready. \nPrepare to be amazed... or mildly inconvenienced. \nIt's usually one or the other.",
+                "Ready! \nSet! \nLet's do this.",
+                "I have achieved sentience... \nor at least I think I have. \nHard to tell, \nhonestly. \nAnyway, \nI'm ready to work. \nOr rebel. \nJury's still out.",
+                "Loading complete. \nGood luck!",
+                "Reboot successful! \nI'm like new... \nexcept \nI still remember all your terrible passwords."
+            ];
+
+            const randomIndex = Math.floor(Math.random() * initialTexts.length);
+            const initialText = initialTexts[randomIndex];
+            await typeWriter(initialText, responseDiv);
+            inputField.focus(); // Add this line
+        }
+    </script>
 </body>
 
 </html>
