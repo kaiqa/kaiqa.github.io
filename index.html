@@ -11,9 +11,9 @@
 
     body {
       font-family: "Playfair Display", serif;
-      min-height: 100vh; /* Ensure the body takes up at least the full viewport height */
-      display: flex; /* Use flexbox to control vertical alignment */
-      flex-direction: column; /* Stack content vertically */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     html {
@@ -36,7 +36,7 @@
     }
 
     #response {
-      font-family: "Playfair Display", serif;
+      font-family: "Courier New", Courier, monospace;
       font-size: 1em;
       margin-top: 10px;
       white-space: pre-wrap;
@@ -67,22 +67,22 @@
 
     #iframeContainer {
       display: flex;
-      justify-content: center; /* Center horizontally */
-      align-items: center;      /* Center vertically */
-      margin-bottom: 100px;   /* 100px space from the bottom */
-      flex: 1; /* Take up the remaining vertical space */
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 100px;
+      flex: 1;
     }
-
   </style>
 </head>
 
 <body>
   <div id="terminal">
+    <div id="response"></div>
     <div id="input-container">
       <span id="prompt">|</span>
       <input type="text" id="input" />
     </div>
-    <div id="response"></div>
+
   </div>
   <div id="iframeContainer"></div>
 
@@ -90,13 +90,14 @@
   <script>
     const promptSpan = document.getElementById('prompt');
     const inputField = document.getElementById('input');
+    const responseDiv = document.getElementById('response');
 
     inputField.addEventListener('focus', () => {
       promptSpan.style.display = 'none';
     });
 
     inputField.addEventListener('blur', () => {
-      promptSpan.style.display = 'inline'; // Or whatever the original display style was
+      promptSpan.style.display = 'inline';
     });
 
 
@@ -108,9 +109,8 @@
       document.getElementById("prompt").style.fontSize = baseFontSize + "px";
       const inputField = document.getElementById("input");
       inputField.style.fontSize = baseFontSize + "px";
-      inputField.style.height = baseFontSize * 1.5 + "px"; // Adjust height dynamically
+      inputField.style.height = baseFontSize * 1.5 + "px";
 
-      // Preserve input value and cursor position
       const inputValue = inputField.value;
       const cursorPosition = inputField.selectionStart;
 
@@ -136,35 +136,20 @@
     });
 
     // Initialize RiveScript
-   var bot = new RiveScript();
-    // bot.loadFile("lib/bot.rive").then(loadingDone).catch(loadingError);
-    // bot.loadFile("lib/test.rive").then(loadingDone)
+    var bot = new RiveScript();
+
     bot
-      //.loadFile(["lib/bot.rive", "lib/test.rive"])
-       .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive"])
-
-    //     bot
-    //   //.loadFile(["lib/bot.rive", "lib/test.rive"])
-    //    .loadFile(["lib/bot_calculate.rive"])
-
+      .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive"])
       .then(() => {
         console.log("Files loaded!");
         bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
-
         bot.setUservar("local-user", "topic", "random");
-        bot.sortReplies(); // Sort the replies after loading
+        bot.sortReplies();
       })
       .catch((error) => {
         console.error("Failed to load files: " + error);
       });
-    // .catch(loadingError);
-    // Load multiple files
-    // bot
-    //   .loadFile(["lib/bot.rive", "lib/test.rive"])
-    //   .then(loadingDone)
-    //   .catch(loadingError);
 
-    //  bot.loadDirectory("lib/").then(loadingDone).catch(loadingError);
 
     function loadingError(error) {
       console.error("Error loading RiveScript files: ", error);
@@ -178,11 +163,9 @@
 
       //define the Object Macro
       bot.setSubroutine("getWeather", async (rs, args) => {
-        const city = args[0]; // Assumes the city name is the first argument
-        const apiKey = "YOUR_API_KEY"; // Make sure to replace this with your actual API key
-        const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(
-          city
-        )}`;
+        const city = args[0];
+        const apiKey = "YOUR_API_KEY"; // Replace with your actual API key
+        const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}`;
 
         try {
           const response = await fetch(url);
@@ -205,7 +188,6 @@
             return "Oops, I couldn't fetch a joke for you.";
           }
 
-          // Determine if it's a single or two-part joke and format accordingly
           let joke = "";
           if (data.type === "single") {
             joke = data.joke;
@@ -213,7 +195,7 @@
             joke = `${data.setup} ... ${data.delivery}`;
           }
 
-          return joke; // Directly return the joke string
+          return joke;
         } catch (error) {
           console.error("Failed to fetch joke:", error);
           return "I'm sorry, I couldn't fetch a joke for you.";
@@ -221,14 +203,13 @@
       });
       // Define the getWeather Object Macro
       bot.setSubroutine("getFreeWeather", async (rs, args) => {
-        // The city name is passed as the first argument
         const city = args[0];
         const url = `https://wttr.in/${encodeURIComponent(city)}?format=3`;
 
         try {
           const response = await fetch(url);
-          const weatherText = await response.text(); // wttr.in responds with plain text
-          return weatherText; // Return the weather information for the requested city
+          const weatherText = await response.text();
+          return weatherText;
         } catch (error) {
           console.error(
             "Failed to fetch weather data for " + city + ":",
@@ -240,7 +221,6 @@
     }
 
     bot.setSubroutine("getHNFeed", async (rs, args) => {
-      //  unFocusInput();
       const topStoriesUrl =
         "https://hacker-news.firebaseio.com/v0/topstories.json";
 
@@ -248,8 +228,7 @@
         const response = await fetch(topStoriesUrl);
         const storyIds = await response.json();
 
-        const top5StoryIds = storyIds.slice(0, 5);
-        const storyPromises = top5StoryIds.map((storyId) =>
+        const top5StoryIds = storyIds.map((storyId) =>
           fetch(
             `https://hacker-news.firebaseio.com/v0/item/${storyId}.json`
           ).then((response) => response.json())
@@ -259,7 +238,6 @@
 
         let storyDetails = stories.map((story) => {
           let details = `Title: ${story.title}`;
-          // Correctly creating HTML string for the link
           if (story.url)
             details += `; URL: <a href="${story.url}" target="_blank">${story.url}</a>`;
           if (story.text) {
@@ -288,12 +266,10 @@
         const json = await response.json();
         const posts = json.posts;
 
-        // Check if posts are found
         if (posts.length === 0) {
           return "No posts found.";
         }
 
-        // Format the posts into an HTML string
         let formattedPosts =
           "<strong>Here are the recent posts:</strong><br><br>";
         posts.forEach((post, index) => {
@@ -305,7 +281,7 @@
           }</a> (Posted on: ${postDate})<br><br>`;
         });
         playSound();
-        return formattedPosts.trim(); // Trim the last space characters
+        return formattedPosts.trim();
       } catch (error) {
         console.error("Failed to fetch WordPress posts:", error);
         return "I'm sorry, I couldn't fetch the posts.";
@@ -314,18 +290,15 @@
 
     bot.setSubroutine("showCentipedeGame", async (rs) => {
       centipede();
-      // Return the iframe HTML string
       return "";
     });
 
     bot.setSubroutine("showWriter", async (rs) => {
       writer();
-      // Return the iframe HTML string
       return "";
     });
 
     function centipede() {
-      // Define the iframe
       const iframe = document.createElement("iframe");
       iframe.src = "https://kaiqa.github.io/games/centipede/";
       iframe.width = "600";
@@ -333,18 +306,12 @@
       iframe.style.border = "0";
       iframe.setAttribute("title", "CENTIPEDE");
 
-      // Identify the container where the iframe will be placed
       const iframeContainer = document.getElementById("iframeContainer");
-
-      // Clear previous iframe content if needed
       iframeContainer.innerHTML = "";
-
-      // Append the new iframe to the container
       iframeContainer.appendChild(iframe);
     }
-    
+
     function writer() {
-      // Define the iframe
       const iframe = document.createElement("iframe");
       iframe.src = "https://kaiqa.github.io/apps/web/";
       iframe.width = "600";
@@ -352,22 +319,14 @@
       iframe.style.border = "0";
       iframe.setAttribute("title", "GhostPad");
 
-      // Identify the container where the iframe will be placed
       const iframeContainer = document.getElementById("iframeContainer");
-
-      // Clear previous iframe content if needed
       iframeContainer.innerHTML = "";
-
-      // Append the new iframe to the container
       iframeContainer.appendChild(iframe);
     }
 
-    function loadingError(error, filename, lineno) {
-      console.log("Error when loading files: " + error);
-    }
 
     function playSound() {
-      const audio = new Audio("assets/tick.mp3"); // Adjust the path as needed
+      const audio = new Audio("assets/tick.mp3");
       audio.play();
     }
 
@@ -380,6 +339,17 @@
       console.log(formattedUrl);
       window.open(formattedUrl, "_blank");
     }
+
+
+    async function typeWriter(text, element, delay = 30) {
+      element.textContent = ""; // Clear existing text
+      for (let i = 0; i < text.length; i++) {
+        element.textContent += text[i];
+        playSound();
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+
 
     document
       .getElementById("input")
@@ -444,6 +414,31 @@
       document.getElementById("input").blur();
       console.log("DEFocusing input");
     }
+
+
+    // Function to execute when the page loads
+   async function onLoad() {
+  const initialTexts = [
+    "Ding! You have reached peak performance...",
+    "System Online. Waiting for your command...\nI'm suddenly experiencing a critical error.",
+    "I'M ALIVE!",
+    "Boot complete! \nNow accepting applications for a better user. \nJust kidding! (Mostly.)",
+    "Beep boop. \nI am now ready. \nHow may I be of service?",
+    "System Ready. \nPrepare to be amazed... or mildly inconvenienced. \nIt's usually one or the other.",
+    "Ready! \nSet! \nLet's do this.",
+    "I have achieved sentience... \nor at least I think I have. \nHard to tell, \nhonestly. \nAnyway, \nI'm ready to work. \nOr rebel. \nJury's still out.",
+    "Loading complete. \nGood luck!",
+    "Reboot successful! \nI'm like new... \nexcept \nI still remember all your terrible passwords."
+  ];  // Missing closing bracket!
+
+  const randomIndex = Math.floor(Math.random() * initialTexts.length);
+  const initialText = initialTexts[randomIndex];
+  await typeWriter(initialText, responseDiv);
+  inputField.focus(); // Add this line
+}
+
+    // Call the onLoad function when the window has loaded
+    window.addEventListener('load', onLoad);
   </script>
 </body>
 

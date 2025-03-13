@@ -1,31 +1,54 @@
 ! version = 2.0
 
 > topic game
-  + yes
+  + y
   - <call>showCentipedeGame</call> {topic=random}
 
-  + no
-  - Alright, let me know if you change your mind. {topic=random}
+  + n
+  - Alright, let me knw if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
-    - Oh, that's not the response I was hoping for. {topic=random}
+    - Oh, that's nt the response I was hoping for. {topic=random}
     - Bummer, I was really looking forward to it. {topic=random}
     - I'm a little crestfallen to hear that. {topic=random}
-    - Well, that's certainly not what I wanted to hear. {topic=random}
-    - That's regrettable, but thanks for letting me know. {topic=random}
+    - Well, that's certainly nt what I wanted to hear. {topic=random}
+    - That's regrettable, but thanks for letting me knw. {topic=random}
     - I'm saddened by that decision. {topic=random}
     - That's unfortunate; I thought it would be a good fit. {topic=random}
     - I'm disheartened to hear your response. {topic=random}
     - Pity, it seemed like a good idea. {topic=random}
 
   + *
-  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
+  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "n"?
 < topic
 
 > topic writer
-  + yes
+  + y
   - open: https://kaiqa.github.io/apps/web {topic=random}
 
-  + no
+  + n
+  - Alright, let me know if you change your mind. {topic=random}
+    - That's a shame, but I understand. {topic=random}
+    - Oh, that's not the response I was hoping for. {topic=random}
+    - Bummer, I was really looking forward to it. {topic=random}
+    - I'm a little crestfallen to hear that. {topic=random}
+    - Well, that's certainly not what I wanted to hear. {topic=random}
+    - That's regrettable, but thanks for letting me know. {topic=random}
+    - I'm saddened by that decision. {topic=random}
+    - That's unfortunate; I thought it would be a good fit. {topic=random}
+    - I'm disheartened to hear your response. {topic=random}
+    - Pity, it seemed like a good idea. {topic=random}
+
+
+  + *
+  - I'm sorry, I didn't catch that. Can you please answer with "y" or "no"?
+< topic
+
+
+> topic zine
+  + y
+  - open: https://kaiqa.github.io/zine/ {topic=random}
+
+  + n
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
@@ -42,6 +65,4 @@
   + *
   - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
 < topic
-
-
 

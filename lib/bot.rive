@@ -8,10 +8,13 @@
 
 
 + play
-- Do you want to play Centipede (yes/no)? {topic=game}
+- Do you want to play Centipede (y/n)? {topic=game}
 
 + write
-- Do you want to open GhostPad (yes/no)? {topic=writer}
+- Do you want to open the writer (y/n)? {topic=writer}
+
++ zine
+- Do you want to look at magazines? (y/n)? {topic=writer}
 
 + tell me a joke
 - <call>getJoke</call>
@@ -19,22 +22,11 @@
 + what is the weather in *
 - <call>getFreeWeather "<star>"</call>
 
-+ how are you
-- {random}I'm great, how are you?|I'm good, you?|Good :) you?|Great! You?|I'm fine, thanks for asking!{/random}
-
-+ what is your name
-- You can call me <bot name>.
-- My name is <bot name>.
-
 + who is the boss
 - The boss is <bot boss>.
 
 
-+ who am i
-- You are <get user>.
 
-+ my name is *
-- <set user=<star>>It's nice to meet you, <get user>.
 
 + google *{weight=10}
 - open: http://google.com/search?q=<star>
@@ -61,19 +53,20 @@
 // The ^ command automatically extends the data from the previous line
 + tell me a poem
 - Little Miss Muffit sat on her tuffet,
-^ In a nonchalant sort of way.\n
+^ In a nnchalant sort of way.\n
 ^ With her force field around her,\n
 ^ The Spider, the bounder,\n
-^ Is not in the picture today
+^ Is nt in the picture today
 
 + [*] gam* [*]
-- do you want to play Centipede (yes/no){topic=game}
+- do you want to play Centipede (y/n){topic=game}
 
 + [*] writer* [*]
-- do you want to open the writer (yes/no){topic=writer}
+- do you want to open the writer (y/n){topic=writer}
+
 
 // Say you wanted the bot to be able to do floating-point math, but the
-// decimal place in the user's message normally gets stripped out...
+// decimal place in the user's message nrmally gets stripped out...
 + w * d *
 - <call>floating_point_divide</call>
 
@@ -83,6 +76,5 @@ setUservar(username, “origMessage”, message)
  setUservar(username, “origMessage”, message)
 let origMessage = await rs.getUservar(rs.currentUser(), “origMessage”);
 
-   
     return origMessage;
 < object
