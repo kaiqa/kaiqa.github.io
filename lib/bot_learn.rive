@@ -73,9 +73,8 @@ Author: Noah Petherbridge
 + {weight=100}when i say * you say *
 - <call>learn "<star1>" "{sentence}<star2>{/sentence}"</call>
 
-+ *
-- I don't know how to reply to that. Why not teach me?\n\n
-^ Just say: when I say <star> you say (what you want me to say)\n\n
++ learn
+- Why not teach me?\n
 ^ For example: when I say hello bot you say hello human.
 
 > object learn javascript
