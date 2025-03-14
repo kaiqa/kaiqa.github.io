@@ -67,7 +67,7 @@
 
 > topic meeting
   + y
-  - open: https://kaiqa.github.io/schedule/ {topic=random}
+  - open: https://kaiqa.github.io/schedule.html {topic=random}
 
   + n
   - Alright, let me know if you change your mind. {topic=random}
