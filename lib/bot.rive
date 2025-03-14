@@ -6,6 +6,8 @@
 - {ok}
 < begin
 
++ shop
+- {topic=shop}
 
 + play
 - Play Centipede (y/n)? {topic=game}

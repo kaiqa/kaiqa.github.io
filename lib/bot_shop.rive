@@ -1,0 +1,166 @@
+! version = 2.0
+
+> begin
+  + request
+  - <topic=shop>
+< begin
+
+// Main Shop Topic
+> topic shop
+
+  + (hello|hi|hey)
+  - <set shop_name=Friendly Bot> Welcome to <get shop_name>!
+
+  + (list|show) products
+  - <call>list_products_async</call>
+
+
+  + (show|list) categories
+  - Our available categories are: <call>list_categories_async</call>
+
+
+  + (show|list) products in (*)
+  - <call>list_products_by_category_async <star></call>
+ 
+
+  + show details about (*)
+  - <call>get_product_details_async <star></call>
+
+
+  + list details about (*)
+  - <call>get_product_details_async <star></call>
+
+
+  + list details about (*)
+  - <call>get_product_details_async <star></call>
+
+  + buy (*)
+  - <call>order_product</call>
+.
+
+  + (bye|exit)
+  - You're welcome! Have a great day!{topic=random}
+
+! local concat = newline
+  + *
+  - Something went wrong. Try:
+  ^  list products
+  ^  show categories
+  ^  show products in [category]
+  ^  show details about [product name]
+  ^  buy [product name]
+  ^  help
+  ^  exit
+  ^  bye
+
+! local concat = newline
+  + help
+  - Here are the commands you can use:
+  ^  list products
+  ^  show categories
+  ^  show products in [category]
+  ^  show details about [product name]
+  ^  buy [product name]
+  ^  help
+  ^  exit
+  ^  bye
+
+< topic
+
+> object get_product_details_async javascript
+  // Args: product name
+  const productName = args[0].toLowerCase();
+
+  return new Promise(resolve => {
+      // Simulate fetching data asynchronously (replace with your actual async call)
+      setTimeout(() => {
+          const products = [
+              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
+              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
+              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+          ];
+
+          const product = products.find(p => p.name.toLowerCase() === productName);
+
+          if (product) {
+              const details = `\n${product.name}\n\nPrice: $${product.price}\nCategory: ${product.category}\nDetails: ${product.details}`;
+              resolve(details);
+          } else {
+              resolve(`Product '${args[0]}' not found.`);
+          }
+      }, 500); // Simulate a 500ms delay
+  });
+< object
+
+> object list_products_by_category_async javascript
+  // Args: category name
+  const categoryName = args[0].toLowerCase();
+
+  return new Promise(resolve => {
+      // Simulate fetching data asynchronously (replace with your actual async call)
+      setTimeout(() => {
+          const products = [
+              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
+              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
+              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+          ];
+
+          const filteredProducts = products.filter(p => p.category.toLowerCase() === categoryName);
+
+          let list = `Products in category '${args[0]}':\n`;
+          if (filteredProducts.length > 0) {
+              for (let i = 0; i < filteredProducts.length; i++) {
+                  list += filteredProducts[i].name + "\n";
+              }
+          } else {
+              list = `No products found in category '${args[0]}'.`;
+          }
+          resolve(list);
+      }, 500); // Simulate a 500ms delay
+  });
+< object
+
+> object list_categories_async javascript
+  return new Promise(resolve => {
+      // Simulate fetching data asynchronously (replace with your actual async call)
+      setTimeout(() => {
+          const products = [
+              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
+              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
+              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+          ];
+
+          const categories = [...new Set(products.map(p => p.category))]; // Get unique categories
+
+          let list = "Available categories:\n";
+          for (let i = 0; i < categories.length; i++) {
+              list += categories[i] + "\n";
+          }
+          resolve(list);
+      }, 500); // Simulate a 500ms delay
+  });
+< object
+
+> object list_products_async javascript
+  return new Promise(resolve => {
+      // Simulate fetching data asynchronously (replace with your actual async call)
+      setTimeout(() => {
+          const products = [
+              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
+              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
+              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+          ];
+
+          let list = "Here are the available products:\n";
+          for (let i = 0; i < products.length; i++) {
+              list += products[i].name + "\n";
+          }
+          resolve(list); // Resolve the promise with the product list
+      }, 500); // Simulate a 500ms delay
+  });
+< object
+
+> object order_product javascript
+  // This object macro now relies on products loaded externally.
+  return "Order product functionality needs external implementation.";
+< object

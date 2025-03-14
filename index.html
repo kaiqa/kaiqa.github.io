@@ -158,7 +158,7 @@
         responseDiv.style.display = 'none';
 
         bot
-            .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive"])
+            .loadFile(["lib/bot.rive", "lib/bot_admin_topic.rive", "lib/bot_api.rive", "lib/bot_topics.rive", "lib/bot_rand.rive", "lib/bot_learn.rive", "lib/bot_calculate.rive", "lib/bot_shop.rive"])
             .then(() => {
                 console.log("Files loaded!");
                 bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
