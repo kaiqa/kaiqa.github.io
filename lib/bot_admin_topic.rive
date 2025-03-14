@@ -1,18 +1,28 @@
 ! version = 2.0
 
+> begin
+  + request
+  - <set current_path=/>{ok}
+< begin
+
+
 > topic admin
 
 + n
   - Alright, let me know if you change your mind. {topic=random}
 
-+ (y|administrator|admin|sudo)
++ y
   - Authenticating..
   - Accessing system.
+  - <set current_path=/home>
+  - <topic=admin>
+  - Access granted.
 
 + (ls|dir)
-  - ^ boot/  dev/  etc/  home/  lib/  media/  mnt/  opt/  proc/  root/  run/  sbin/  srv/  tmp/  usr/  var/
-  * <get current_path> == /dev => null  console  random  urandom  tty  sda  sdb  sdc
-  * <get current_path> == /etc => passwd  shadow  group  hosts  resolv.conf  fstab
+  - <get current_path>
+  * <get current_path> == / => console random urandom tty sda sdb sdc
+  * <get current_path> == /dev => console random urandom tty sda sdb sdc
+  * <get current_path> == /etc => passwd shadow group hosts resolv.conf fstab
   * <get current_path> == /home => user/  guest/
   * <get current_path> == /lib => systemd/  modules/  firmware/
   * <get current_path> == /media => usb/  cdrom/
@@ -32,9 +42,9 @@
 //   * <get current_path> != / => <set current_path=<explode "/" <get current_path> pop join "/">> Changing directory up one level...
 
 + cd *
-  * <star> == ".." => <set current_path=<explode "/" <get current_path> pop join "/">> Changing directory up one level...
+//  * <star> == ".." => <set current_path=<explode "/" <get current_path> pop join "/">> Changing directory up one level...
   * <star> == "root" => Access Denied: Insufficient privileges.
-  * <star> != ".." => <set current_path=<get current_path>/<star>> Changing directory to <get current_path>...
+  * <star> != ".." => <set current_path=/<star>> Changing directory...
 
 + cat *
   - Reading file <star>...

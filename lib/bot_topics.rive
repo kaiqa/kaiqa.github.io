@@ -21,10 +21,11 @@
   - I'm sorry, I didn't catch that. Can you please answer with "yes" or "n"?
 < topic
 
+// - open: https://kaiqa.github.io/apps/web {topic=random}
+
 > topic writer
   + y
   - open: https://kaiqa.github.io/apps/web {topic=random}
-
   + n
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
