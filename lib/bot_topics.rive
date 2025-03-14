@@ -65,3 +65,25 @@
   - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
 < topic
 
+> topic meeting
+  + y
+  - open: https://kaiqa.github.io/schedule/ {topic=random}
+
+  + n
+  - Alright, let me know if you change your mind. {topic=random}
+    - That's a shame, but I understand. {topic=random}
+    - Oh, that's not the response I was hoping for. {topic=random}
+    - Bummer, I was really looking forward to it. {topic=random}
+    - I'm a little crestfallen to hear that. {topic=random}
+    - Well, that's certainly not what I wanted to hear. {topic=random}
+    - That's regrettable, but thanks for letting me know. {topic=random}
+    - I'm saddened by that decision. {topic=random}
+    - That's unfortunate; I thought it would be a good fit. {topic=random}
+    - I'm disheartened to hear your response. {topic=random}
+    - Pity, it seemed like a good idea. {topic=random}
+
+
+  + *
+  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
+< topic
+

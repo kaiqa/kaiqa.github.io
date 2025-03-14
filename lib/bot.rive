@@ -61,6 +61,8 @@
 + [*] writer* [*]
 - do you want to open the writer (y/n){topic=writer}
 
++ [*] (schedule|meeting|meet|call) [*]
+- do you want to schedule a meeting? (y/n){topic=meeting}
 
 // Say you wanted the bot to be able to do floating-point math, but the
 // decimal place in the user's message nrmally gets stripped out...
