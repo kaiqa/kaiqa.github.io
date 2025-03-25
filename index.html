@@ -50,6 +50,16 @@
             outline: none;
         }
 
+         #button-container {
+            display: inline-flex;
+            margin-top: 50px;
+            border: none;
+            width: 10px;
+            border: none;    
+            background: transparent;
+        }
+
+
         /* Style all states of bot-generated links */
         .bot-link {
             color: #33ff33;
@@ -110,7 +120,7 @@
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            margin-left: 10px;
+            margin-left: 50%;
         }
 
         #permission-button {
@@ -137,10 +147,13 @@
         <div id="input-container">
             <span id="prompt">|</span>
             <input type="text" id="input" />
+        </div>
+    <div id="button-container">
             <button id="start-button" disabled>Start Talking</button>
             <button id="permission-button">Request Microphone</button>
             <button id="mute-button">Mute</button>  <!-- Mute button -->
         </div>
+
         <audio id="localAudio" style="display:none;"></audio>
         <!-- Added for the audio stream -->
     </div>
