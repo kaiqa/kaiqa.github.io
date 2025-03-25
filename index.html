@@ -151,7 +151,7 @@
     <div id="button-container">
             <button id="start-button" disabled>Start Talking</button>
             <button id="permission-button">Request Microphone</button>
-            <button id="mute-button">Mute</button>  <!-- Mute button -->
+           <!-- <button id="mute-button">Mute</button>   Mute button -->
         </div>
 
         <audio id="localAudio" style="display:none;"></audio>
@@ -818,30 +818,27 @@ function muteMicrophoneInput(shouldMute) {
             muteMicrophoneInput(false); // kai UNMute when speech recognition stops
         }
 
-         // Function to mute or unmute the local audio
-        function muteLocalAudio(shouldMute) {
-            const localAudio = document.getElementById('localAudio');
-            if (localAudio) {
-                localAudio.muted = shouldMute;
-                console.log(`Local audio muted: ${shouldMute}`);
+     // Function to mute or unmute the local audio
+      function muteLocalAudio(shouldMute) {
+          const localAudio = document.getElementById('localAudio');
+          if (localAudio) {
+              localAudio.muted = shouldMute;
+              console.log(`Local audio muted: ${shouldMute}`);
 
 
-            }
-        }
+          }
+      }
+function muteMicrophoneInput(shouldMute) {
+          if (localStream) {
+              localStream.getAudioTracks().forEach(track => {
+                  track.enabled = !shouldMute; // Enable/disable the track
+                  console.log(`Microphone track enabled: ${!shouldMute}`);
+              });
 
-          function muteMicrophoneInput(shouldMute) {
-            if (localStream) {
-                localStream.getAudioTracks().forEach(track => {
-                    track.enabled = !shouldMute; // Enable/disable the track
-                    console.log(`Microphone track enabled: ${!shouldMute}`);
-                });
-                isMuted = shouldMute;
-                muteButton.textContent = shouldMute ? 'Unmute' : 'Mute'; // Update the button text based on the mute state
-            } else {
-                console.warn("localStream not found!");
-            }
-        }
-
+          } else {
+              console.warn("localStream not found!");
+          }
+      }
 
         function resetSilenceTimeout() {
             clearTimeout(timeoutId);
