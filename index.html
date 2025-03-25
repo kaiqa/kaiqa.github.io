@@ -139,6 +139,7 @@
             <input type="text" id="input" />
             <button id="start-button" disabled>Start Talking</button>
             <button id="permission-button">Request Microphone</button>
+            <button id="mute-button">Mute</button>  <!-- Mute button -->
         </div>
         <audio id="localAudio" style="display:none;"></audio>
         <!-- Added for the audio stream -->
@@ -158,6 +159,9 @@
         const loadingIndicator = document.getElementById('loading-indicator');
         const startButton = document.getElementById('start-button');
         const permissionButton = document.getElementById('permission-button');
+        const muteButton = document.getElementById('mute-button'); // Get the mute button
+        let isMuted = false; // Flag to track mute state. Start muted.
+        let localStream = null; // Store the microphone stream
 
         inputField.addEventListener('focus', () => {
             promptSpan.style.display = 'none';
@@ -202,6 +206,7 @@
 
         // Initialize RiveScript
         var bot = new RiveScript();
+        let riveScriptLoaded = false; // Add this line here
 
         // Show loading indicator before loading files
         loadingIndicator.style.display = 'block';
@@ -214,6 +219,8 @@
                 bot.setUservar("local-user", "topic", "initial"); // Force the user's topic to 'initial'
                 bot.setUservar("local-user", "topic", "random");
                 bot.sortReplies();
+                riveScriptLoaded = true; // And here
+
 
                 // Hide loading indicator and show the response div
                 loadingIndicator.style.display = 'none';
@@ -229,14 +236,16 @@
 
 
         function loadingError(error) {
-            console.error("Error loading RiveScript files: ", error);
+            console.error("Error loading RiveScript files:", error);
         }
         let lastInput = "";
+
 
         function loadingDone() {
             console.log("Bot has finished loading!");
             bot.sortReplies();
             console.log("Replies sorted.");
+
 
             //define the Object Macro
             bot.setSubroutine("getWeather", async(rs, args) => {
@@ -405,9 +414,11 @@
 
 
         function playSound() {
-            const audio = new Audio("assets/tick.mp3");
-            audio.volume = 0.3;
-            audio.play();
+            if (!isMuted) { // Only play sound if not muted
+                const audio = new Audio("assets/tick.mp3");
+                audio.volume = 0.3;
+                audio.play();
+            }
         }
 
         function handleChatResponse(response) {
@@ -457,7 +468,7 @@ async function speak(text) {
         const synth = window.speechSynthesis;
         synth.cancel(); // Stop any ongoing speech
 
-        const speechRate = 0.9;  // Desired speech rate
+        const speechRate = 0.9; // Desired speech rate
         const voiceName = "Serena"; // Desired voice name
         const fallbackVoiceName = "Martha"; // Example fallback voice
 
@@ -489,12 +500,22 @@ async function speak(text) {
                 console.warn(`Fallback voice "${fallbackVoiceName}" also not found.  Using default voice.`);
             }
         }
+
+        // Mute the microphone BEFORE speaking
+        muteMicrophoneInput(true);
+
+        speechUtterance.onend = () => {
+            // Unmute the microphone AFTER speaking
+            muteMicrophoneInput(false);
+        };
+
         speechUtterance.rate = speechRate; // Set speech rate *after* setting voice
         synth.speak(speechUtterance);
     } else {
         console.error("Text-to-speech is not supported in this browser.");
     }
 }
+
 
         async function typeWriter(text, element, delay = 30) {
             element.textContent = ""; // Clear existing text
@@ -522,40 +543,35 @@ async function speak(text) {
                     // Store the current input
                     lastInput = input;
 
-                    // Get the response from RiveScript
-                    var reply = await bot.reply("local-user", input);
-                    const responseDiv = document.getElementById("response");
-                   // responseDiv.innerHTML = ""; // Clear previous content  Removed
-                    await typeWriter(reply, responseDiv); // Use typeWriter now here
+                    if (riveScriptLoaded) { // Only get reply if riveScript has loaded
+                        // Get the response from RiveScript
+                        var reply = await bot.reply("local-user", input);
+                        const responseDiv = document.getElementById("response");
 
-                    //const voiceInput = document.getElementById('voice');
-                   // const voiceName = voiceInput.value.trim(); // Get the desired voice name
+                        await typeWriter(reply, responseDiv); // Use typeWriter now here
 
-                    if (reply.startsWith("open:")) {
-                        // Extract the instruction that follows "open:"
-                        const instruction = reply.substring(5).trim();
-                        // Pass the instruction to the handleChatResponse function
-                        handleChatResponse(instruction);
-                    } else if (reply.includes("<a")) {
-                        // Check if the reply includes an HTML link
-                        // Directly insert HTML content including links
-                       // responseDiv.innerHTML = reply;  Removed
-                        speak(reply); // Speak out the reply with the specified voice
-                       // playSound(); //ADD THIS. CALL IT ON EACH REPLY
+                        // Call speak() only when not muted
+                        if (!isMuted) {
+                            speak(reply);
+
+                        }
+
+
+
+                        if (reply.startsWith("open:")) {
+                            // Extract the instruction that follows "open:"
+                            const instruction = reply.substring(5).trim();
+                            // Pass the instruction to the handleChatResponse function
+                            handleChatResponse(instruction);
+                        }
+
                     } else {
-                        // Apply the typing effect for plain text
-                       // responseDiv.textContent = ""; // Clear previous response removed
-
-                       //     playSound(); //REMOVE THIS ALSO
-                           // element.textContent += text[i];
-                           //  await new Promise(resolve => setTimeout(resolve, delay));
-                       //speak(reply); // Speak out the reply with the specified voice
-                      //   playSound(); // AND ADD IT HERE
+                        console.warn("RiveScript bot not loaded yet.  Please wait.");
+                        responseDiv.textContent = "Please wait for the bot to load...";
                     }
-                    speak(reply); //Added here to speak text
                 } else if (event.key === "ArrowUp") {
-                  //Populate the input field with the last input when the up arrow key is pressed
-                   this.value = lastInput;
+                    //Populate the input field with the last input when the up arrow key is pressed
+                    this.value = lastInput;
                     // Move cursor to the end of the input value
                     event.preventDefault(); // Prevent the default action to ensure the text field is updated
                     setTimeout(
@@ -595,12 +611,17 @@ async function getLocalStream() {
         });
         console.log("Microphone access granted", stream);
         inputField.value = "Microphone access granted! Check console."; //Simple check
-        window.localStream = stream;
+        localStream = stream; // Store the stream
 
         const localAudio = document.getElementById('localAudio');
         if (localAudio) {
             localAudio.srcObject = stream;
             localAudio.autoplay = true;
+
+            // Mute the local audio element output.
+             localAudio.muted = true; // Ensure it starts muted
+
+
         } else {
             console.warn("localAudio element not found!");
         }
@@ -622,6 +643,20 @@ async function getLocalStream() {
         inputField.value = `Error accessing microphone: ${err}`;
     }
 }
+
+
+function muteMicrophoneInput(shouldMute) {
+    if (localStream) {
+        localStream.getAudioTracks().forEach(track => {
+            track.enabled = !shouldMute; // Enable/disable the track
+            console.log(`Microphone track enabled: ${!shouldMute}`);
+        });
+    }
+    else{
+         console.warn("localStream not found!");
+    }
+}
+
         // Function to execute when the page loads
         async function onLoad() {
 
@@ -671,7 +706,10 @@ async function getLocalStream() {
             finalTranscript = '';
             inputField.value = '';
             inputField.disabled = true;
-            startButton.textContent = 'Listening...';
+
+            startButton.textContent = 'Listening and Unmuted...'; // CHANGE 1: Update Start Button Text
+
+            muteMicrophoneInput(false); //Unmute when speech recognition starts
 
             recognition.onstart = () => {
                 console.log('Speech recognition started');
@@ -735,7 +773,7 @@ async function getLocalStream() {
             recognition.onend = () => {
                 console.log('Speech recognition ended');
                 stopSpeechRecognition();
-                 console,log("my input: " + inputField.value)
+                 console.log("my input: " + inputField.value)
                 processFinalTranscript();
             };
 
@@ -745,7 +783,7 @@ async function getLocalStream() {
         }
     }
 
-        function stopSpeechRecognition() {
+       function stopSpeechRecognition() {
             if (recognition) {
                 recognition.stop();
                 recognition.onstart = null;
@@ -755,61 +793,101 @@ async function getLocalStream() {
                 recognition = null; // Release the recognition object
             }
             inputField.disabled = false;
-            startButton.textContent = 'Start Talking';
+            // CHANGE 2: Update the Start Button Text.
+            startButton.textContent = 'Start Talking and Muted';
+
+            muteMicrophoneInput(false); // kai UNMute when speech recognition stops
         }
+
+         // Function to mute or unmute the local audio
+        function muteLocalAudio(shouldMute) {
+            const localAudio = document.getElementById('localAudio');
+            if (localAudio) {
+                localAudio.muted = shouldMute;
+                console.log(`Local audio muted: ${shouldMute}`);
+
+
+            }
+        }
+
+          function muteMicrophoneInput(shouldMute) {
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = !shouldMute; // Enable/disable the track
+                    console.log(`Microphone track enabled: ${!shouldMute}`);
+                });
+                isMuted = shouldMute;
+                muteButton.textContent = shouldMute ? 'Unmute' : 'Mute'; // Update the button text based on the mute state
+            } else {
+                console.warn("localStream not found!");
+            }
+        }
+
+
 
         function resetSilenceTimeout() {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 console.log('Silence detected. Sending to bot.');
                 stopSpeechRecognition();
-                 console.log("my input after silince: " + inputField.value)
+                 console.log("my input: " + inputField.value)
                  finalTranscript = inputField.value;
                 processFinalTranscript();
             }, silenceTimeout);
         }
 
         async function processFinalTranscript() {
-            if (finalTranscript.trim()) {
-                let input = finalTranscript.trim();
-                inputField.value = input; // Make sure the input field has the final transcript
-                console.log(input);
-                
-                finalTranscript = ''; // Reset for next time
-                 try {
+          if (finalTranscript.trim()) {
+            let input = finalTranscript.trim();
+            inputField.value = input; // Make sure the input field has the final transcript
+            console.log(input);
+
+            finalTranscript = ''; // Reset for next time
+            if (riveScriptLoaded) {
+              try {
                 // Get the response from RiveScript
                 var reply = await bot.reply("local-user", input);
                 const responseDiv = document.getElementById("response");
+
                 await typeWriter(reply, responseDiv); // Use typeWriter now here
 
-                if (reply.startsWith("open:")) {
-                    // Extract the instruction that follows "open:"
-                    const instruction = reply.substring(5).trim();
-                    // Pass the instruction to the handleChatResponse function
-                    handleChatResponse(instruction);
-                } else if (reply.includes("<a")) {
-                    // Check if the reply includes an HTML link
-                    // Directly insert HTML content including links
-                    speak(reply); // Speak out the reply with the specified voice
-                }
-                speak(reply); //Added here to speak text
-            } catch (error) {
-                console.error("Error processing final transcript:", error);
-            }
+                // Call speak() only when not muted
+                if (!isMuted) {
+                  speak(reply);
 
+                }
+
+              } catch (error) {
+                console.error("Error processing final transcript:", error);
+              }
             } else {
-                console.log('No final transcript to process.');
+              console.warn("RiveScript bot not loaded yet.  Please wait.");
+              responseDiv.textContent = "Please wait for the bot to load...";
             }
+          } else {
+            console.log('No final transcript to process.');
+          }
         }
 
         permissionButton.addEventListener('click', getLocalStream);
         startButton.addEventListener('click', () => {
-             if (startButton.textContent === 'Start Talking') {
+             if (startButton.textContent === 'Start Talking and Muted') {
                 startSpeechRecognition();
             } else {
                 stopSpeechRecognition();
             }
         });
+
+        // Mute button functionality
+        muteButton.addEventListener('click', () => {
+        isMuted = !isMuted; // Toggle mute state
+        muteButton.textContent = isMuted ? 'Unmute' : 'Mute'; // Update button text
+        muteMicrophoneInput(isMuted); // Now use the correct muting function
+
+    });
+
+        // Initialize with the microphone muted
+         muteMicrophoneInput(true);
     </script>
 </body>
 
