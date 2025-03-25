@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiveScript Chatbot with Realtime Speech</title>
+    <title>RiveScript Chatbot with Loading Indicator</title>
     <script src="https://kaiqa.github.io/lib/rivescript.min.js"></script>
     <style>
         body {
@@ -93,37 +93,8 @@
 
         .speech-controls {
             margin-top: 10px;
-            display: none;
-            /* Hide the speech controls */
+            display: none; /* Hide the speech controls */
             /* You can also use visibility: hidden; if you want the space to be preserved */
-        }
-
-        #start-button {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
-
-        #permission-button {
-            background-color: #008CBA; /* Blue */
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 10px;
         }
     </style>
 </head>
@@ -136,10 +107,7 @@
         <div id="input-container">
             <span id="prompt">|</span>
             <input type="text" id="input" />
-            <button id="start-button" disabled>Start Talking</button>
-            <button id="permission-button">Request Microphone</button>
         </div>
-        <audio id="localAudio" style="display:none;"></audio> <!-- Added for the audio stream -->
     </div>
 
     <!-- Add the speed control here, before the iframeContainer or wherever you want it -->
@@ -157,8 +125,6 @@
         const inputField = document.getElementById('input');
         const responseDiv = document.getElementById('response');
         const loadingIndicator = document.getElementById('loading-indicator');
-        const startButton = document.getElementById('start-button');
-        const permissionButton = document.getElementById('permission-button');
 
         inputField.addEventListener('focus', () => {
             promptSpan.style.display = 'none';
@@ -301,10 +267,6 @@
             });
         }
 
-
-
-
-        
         bot.setSubroutine("getHNFeed", async(rs, args) => {
             const topStoriesUrl =
                 "https://hacker-news.firebaseio.com/v0/topstories.json";
@@ -585,40 +547,6 @@ async function speak(text) {
             document.getElementById("input").blur();
             console.log("DEFocusing input");
         }
-async function getLocalStream() {
-    if (!navigator.mediaDevices) {
-        console.error("navigator.mediaDevices is not available in this browser.");
-        inputField.value = "Microphone access is not supported in this browser.";
-        return; // Exit the function
-    }
-
-    try {
-        // ... your existing code
-    } catch (err) {
-        // ... your existing error handling
-    }
-}
-        // // Get Local Stream - Adapted from the example
-        // async function getLocalStream() {
-        //     try {
-        //         const stream = await navigator.mediaDevices.getUserMedia({
-        //             video: false,
-        //             audio: true
-        //         });
-        //         window.localStream = stream; // Store the stream globally (if needed)
-        //         const localAudio = document.getElementById('localAudio'); // Get the audio element
-        //         localAudio.srcObject = stream; // Set the stream as the source
-        //         localAudio.autoplay = true; // Start playing (inaudibly)
-        //         console.log('Microphone permission granted.');
-        //         permissionButton.disabled = true;
-        //         permissionButton.textContent = 'Microphone Access Granted';
-        //         startButton.disabled = false; // Enable the start button
-
-        //     } catch (err) {
-        //         console.error(`You got an error: ${err}`);
-        //         inputField.value = 'Microphone access denied or could not be obtained.';
-        //     }
-        // }
 
 
         // Function to execute when the page loads
@@ -646,119 +574,6 @@ async function getLocalStream() {
            // speak(initialText, voiceName); // Speak out the initial text
             inputField.focus(); // Add this line
         }
-
-        // Speech Recognition Logic
-        let recognition;
-        let finalTranscript = '';
-        let timeoutId;
-        const silenceTimeout = 1500; // Adjust this value (milliseconds) - time after speech stops being detected
-
-
-        function startSpeechRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                recognition = recognition || new(webkitSpeechRecognition || SpeechRecognition)();
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'en-US';  // Adjust language as needed
-
-                finalTranscript = '';
-                inputField.value = '';
-                inputField.disabled = true; // Disable input while listening
-                startButton.textContent = 'Listening...';
-
-                recognition.onstart = () => {
-                    console.log('Speech recognition started');
-                };
-
-                recognition.onresult = (event) => {
-                    let interimTranscript = '';
-                    for (let i = event.resultIndex; i < event.results.length; ++i) {
-                        if (event.results[i].isFinal) {
-                            finalTranscript += event.results[i][0].transcript;
-                        } else {
-                            interimTranscript += event.results[i][0].transcript;
-                        }
-                    }
-                    inputField.value = finalTranscript + interimTranscript;
-
-                    // Reset the timeout timer
-                    resetSilenceTimeout();
-                };
-
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error', event.error);
-                    stopSpeechRecognition();
-                    inputField.value = 'Error occurred. Please try again.';
-                };
-
-                recognition.onend = () => {
-                    console.log('Speech recognition ended');
-                    stopSpeechRecognition();
-                };
-
-                recognition.start();
-            } else {
-                alert('Speech recognition is not supported in this browser.');
-            }
-        }
-
-        function stopSpeechRecognition() {
-            if (recognition) {
-                recognition.stop();
-                recognition.onstart = null;
-                recognition.onresult = null;
-                recognition.onerror = null;
-                recognition.onend = null;
-                recognition = null; // Release the recognition object
-            }
-            inputField.disabled = false;
-            startButton.textContent = 'Start Talking';
-        }
-
-        function resetSilenceTimeout() {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                console.log('Silence detected. Sending to bot.');
-                stopSpeechRecognition();
-                processFinalTranscript();
-            }, silenceTimeout);
-        }
-
-        async function processFinalTranscript() {
-            if (finalTranscript.trim()) {
-                let input = finalTranscript.trim();
-                inputField.value = input; // Make sure the input field has the final transcript
-                finalTranscript = ''; // Reset for next time
-                // Get the response from RiveScript
-                var reply = await bot.reply("local-user", input);
-                const responseDiv = document.getElementById("response");
-                await typeWriter(reply, responseDiv); // Use typeWriter now here
-
-                if (reply.startsWith("open:")) {
-                    // Extract the instruction that follows "open:"
-                    const instruction = reply.substring(5).trim();
-                    // Pass the instruction to the handleChatResponse function
-                    handleChatResponse(instruction);
-                } else if (reply.includes("<a")) {
-                    // Check if the reply includes an HTML link
-                    // Directly insert HTML content including links
-                    speak(reply); // Speak out the reply with the specified voice
-                }
-                speak(reply); //Added here to speak text
-            } else {
-                console.log('No final transcript to process.');
-            }
-        }
-
-        startButton.addEventListener('click', () => {
-            if (startButton.textContent === 'Start Talking') {
-                startSpeechRecognition();
-            } else {
-                stopSpeechRecognition();
-            }
-        });
-
-        permissionButton.addEventListener('click', getLocalStream);
     </script>
 </body>
 
