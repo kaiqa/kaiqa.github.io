@@ -562,7 +562,11 @@ async function speak(text) {
                         const responseDiv = document.getElementById("response");
 
                         await typeWriter(reply, responseDiv); // Use typeWriter now here
-
+if (reply.startsWith("OPEN:")) {
+    const url = reply.substring(5).trim();
+    window.open(url, "_blank");
+    return; // Prevent further processing of the reply
+}
                         // Call speak() only when not muted
                         if (!isMuted) {
                             speak(reply);
@@ -643,6 +647,8 @@ async function getLocalStream() {
         if (permissionButton) {
             permissionButton.disabled = true;
             permissionButton.textContent = 'Microphone Access Granted';
+             console.log('Microphone permission granted.');
+             permissionButton.style.display = 'none'; 
         }
         if (startButton) {
             startButton.disabled = false;
@@ -835,7 +841,6 @@ function muteMicrophoneInput(shouldMute) {
                 console.warn("localStream not found!");
             }
         }
-
 
 
         function resetSilenceTimeout() {

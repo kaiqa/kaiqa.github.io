@@ -6,20 +6,25 @@
 - {ok}
 < begin
 
-+ shop
-- {topic=shop}
++ *shop*
+- {topic=shop} Hello customer
 
 + play
-- Play Centipede (y/n)? {topic=game}
+- Play Centipede (Yes/No)? {topic=game}
 
  + write
- - Open writer (y/n)? {topic=writer}
+ - Open writer (Yes/No)? {topic=writer}
 
-+ (zine|magazine|mag|mags)
-- Read magazines? (y/n)? {topic=zine}
++ (zine|magazines|mag|mags|magazine)
+- Read magazines? (Yes/No)? {topic=zine}
+
+
++ (something to read|like a magazine)
+- Read magazines? (Yes/No)? {topic=zine}
+
 
  + [*] (schedule|meeting|meet|call) [*]
- - Schedule a meeting? (y/n){topic=meeting}
+ - Schedule a meeting? (Yes/No){topic=meeting}
 
 + tell me a joke
 - <call>getJoke</call>
@@ -61,13 +66,13 @@
 ^ Is nt in the picture today
 
 // + [*] gam* [*]
-// - Play Centipede? (y/n){topic=game}
+// - Play Centipede? (Yes/No){topic=game}
 
 // + [*] writer* [*]
-// - Open the writer? (y/n){topic=writer}
+// - Open the writer? (Yes/No){topic=writer}
 
 // + [*] (schedule|meeting|meet|call) [*]
-// - Schedule a meeting? (y/n){topic=meeting}
+// - Schedule a meeting? (Yes/No){topic=meeting}
 
 // Say you wanted the bot to be able to do floating-point math, but the
 // decimal place in the user's message nrmally gets stripped out...

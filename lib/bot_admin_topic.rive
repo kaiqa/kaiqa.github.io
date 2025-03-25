@@ -8,10 +8,10 @@
 
 > topic admin
 
-+ n
++ no
   - Alright, let me know if you change your mind. {topic=random}
 
-+ y
++ yes
   - Authenticating..
   - Accessing system.
   - <set current_path=/home>
@@ -108,4 +108,4 @@
 < topic
 
 + login*|sudo|admin
-- (y/n)? {topic=admin}
+- (Yes/No)? {topic=admin}

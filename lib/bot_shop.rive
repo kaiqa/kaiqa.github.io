@@ -2,7 +2,7 @@
 
 > begin
   + request
-  - <topic=shop>
+  - <topic=shop> Welcome
 < begin
 
 // Main Shop Topic

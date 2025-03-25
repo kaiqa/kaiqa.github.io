@@ -1,10 +1,10 @@
 ! version = 2.0
 
 > topic game
-  + y
+  + yes
   - <call>showCentipedeGame</call> {topic=random}
 
-  + n
+  + no
   - Alright, let me knw if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's nt the response I was hoping for. {topic=random}
@@ -18,15 +18,15 @@
     - Pity, it seemed like a good idea. {topic=random}
 
   + *
-  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "n"?
+  - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
 < topic
 
 // - open: https://kaiqa.github.io/apps/web {topic=random}
 
 > topic writer
-  + y
+  + yes
   - open: https://kaiqa.github.io/apps/web {topic=random}
-  + n
+  + no
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
@@ -45,10 +45,10 @@
 < topic
 
 > topic zine
-  + y
+  + yes
   - open: https://kaiqa.github.io/zine/ {topic=random}
 
-  + n
+  + no
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
@@ -67,10 +67,10 @@
 < topic
 
 > topic meeting
-  + y
+  + yes
   - open: https://kaiqa.github.io/schedule.html {topic=random}
 
-  + n
+  + no
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
