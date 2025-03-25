@@ -44,25 +44,25 @@
 ! local concat = newline
   + *
   - Something went wrong. Try:
-  ^  list products
-  ^  show categories
+  ^  list products or
+  ^  show categories or
   ^  show products in [category]
-  ^  show details about [product name]
-  ^  buy [product name]
-  ^  help
-  ^  exit
+  ^  You can show details about [product name]
+  ^  or buy [product name]
+  ^  and help,
+  ^  exit,
   ^  bye
 
 ! local concat = newline
   + help
   - Here are the commands you can use:
-  ^  list products
-  ^  show categories
+  ^  list products or
+  ^  show categories or
   ^  show products in [category]
-  ^  show details about [product name]
-  ^  buy [product name]
-  ^  help
-  ^  exit
+  ^  You can show details about [product name]
+  ^  or buy [product name]
+  ^  and help,
+  ^  exit,
   ^  bye
 
 < topic
