@@ -26,10 +26,10 @@
   + what are (*)
   - <call>get_product_details_async <star></call>
 
-  + buy (*)
+  + [*]buy (*)
   - <call>order_product</call>
   
-  + help *
+  + [*]help *
   - Do you want to leave the shop? you can say exit.
   - Do you want to leave the shop? you can say bye.
 

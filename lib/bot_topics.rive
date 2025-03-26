@@ -1,13 +1,13 @@
 ! version = 2.0
 
 > topic game
-  + yes
+  + [*]yes[*]
   - <call>showCentipedeGame</call> {topic=random}
 
-  + no
-  - Alright, let me knw if you change your mind. {topic=random}
+  + [*]no[*]
+  - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
-    - Oh, that's nt the response I was hoping for. {topic=random}
+    - Oh, that's not the response I was hoping for. {topic=random}
     - Bummer, I was really looking forward to it. {topic=random}
     - I'm a little crestfallen to hear that. {topic=random}
     - Well, that's certainly nt what I wanted to hear. {topic=random}
@@ -17,6 +17,7 @@
     - I'm disheartened to hear your response. {topic=random}
     - Pity, it seemed like a good idea. {topic=random}
 
+ 
   + *
   - I'm sorry, I didn't catch that. Can you please answer with "yes" or "no"?
 < topic
@@ -24,9 +25,9 @@
 // - open: https://kaiqa.github.io/apps/web {topic=random}
 
 > topic writer
-  + yes
+  + [*]yes[*]
   - open: https://kaiqa.github.io/apps/web {topic=random}
-  + no
+  + [*]no[*]
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
@@ -45,10 +46,10 @@
 < topic
 
 > topic zine
-  + yes
+  + [*]yes[*]
   - open: https://kaiqa.github.io/zine/ {topic=random}
 
-  + no
+  + [*]no[*]
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}
@@ -67,10 +68,10 @@
 < topic
 
 > topic meeting
-  + yes
+  + [*]yes[*]
   - open: https://kaiqa.github.io/schedule.html {topic=random}
 
-  + no
+  + [*]no[*]
   - Alright, let me know if you change your mind. {topic=random}
     - That's a shame, but I understand. {topic=random}
     - Oh, that's not the response I was hoping for. {topic=random}

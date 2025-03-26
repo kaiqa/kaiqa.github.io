@@ -21,7 +21,6 @@
 + [*] (to read|like a magazine)[*] 
 - Read magazines? (Yes/No)? {topic=zine}
 
-
  + [*] (schedule|meeting|meet|call) [*]
  - Schedule a meeting? (Yes/No){topic=meeting}
 
