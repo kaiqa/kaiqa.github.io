@@ -6,7 +6,7 @@
 - {ok}
 < begin
 
-+ *shop*
++ shop
 - {topic=shop} Hello customer
 
 + play
