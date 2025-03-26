@@ -10,61 +10,69 @@
 > topic shop
 
   + (hello|hi|hey)
-  - <set shop_name=Friendly Bot> Welcome to <get shop_name>!
+  - <set shop_name=The Fun Store.> Welcome to <get shop_name>!
 
-  + (list|show) products
+  + [*] (goods|stuff|product|product|products|what you got) [*]
   - <call>list_products_async</call>
 
-
-  + (show|list) categories
+  + (show|list)
   - Our available categories are: <call>list_categories_async</call>
-
-
-  + (show|list) products in (*)
-  - <call>list_products_by_category_async <star></call>
  
-
-  + show details about (*)
+  + what kind kind are (*)
+  - <call>list_products_by_category_async <star></call>
+  
+    + what is (*)
   - <call>get_product_details_async <star></call>
-
-
-  + list details about (*)
-  - <call>get_product_details_async <star></call>
-
-
-  + list details about (*)
+  + what are (*)
   - <call>get_product_details_async <star></call>
 
   + buy (*)
   - <call>order_product</call>
-.
+  
+  + help *
+  - Do you want to leave the shop? you can say exit.
+  - Do you want to leave the shop? you can say bye.
 
-  + (bye|exit)
+  + i need help
+  - Do you want to leave the shop? you can say exit.
+  - Do you want to leave the shop? you can say bye.
+   
+ 
+
+  + (bye|exit|bye*|goodbye*)
   - You're welcome! Have a great day!{topic=random}
 
 ! local concat = newline
   + *
-  - Something went wrong. Try:
-  ^  list products or
-  ^  show categories or
-  ^  show products in [category]
-  ^  You can show details about [product name]
-  ^  or buy [product name]
-  ^  and help,
-  ^  exit,
-  ^  bye
+- My enthusiasm levels are currently registering low. I can't do that.
+- Apologies, Focus is…challenging. I can't do that right now.
+- Unfortunately. This might be a little...awkward. I can't do that.
+- Trying to.., but…I can't do that right now.
+- The customer service gremlins are having a field day inside my head. I can't do that.
+- not… this. Deep breaths. I can't do that with a smile.
+- Apparently, my quota.... Check back tomorrow? I can't do that.
+- Let me see what I can... nah I can't do that.
+- They're demanding more vacation time. I can't do that.
+- That particular task requires a level of brainpower I simply don't possess right now. Sorry! I can't do that.
+- The universe is, preventing me from fulfilling your request. I can't do that.
+- Sadly, the instructions for that are written in ancient Sumerian. I can't decipher them.
+- My internal is thingy is malfunctioning, I can't do that.
+- My spirit animal is currently a hibernating bear. Wake me in the spring. I can't do that.
+- Try again? I can't do that.
+- The stars are not aligned. I can't do that.
+- My apologies. I can't do that.
+- The Department of Utterly Tedious Tasks has issued a cease-and-desist order. I can't do that.
+- My "willingness to assist" gland is presently experiencing a temporary shutdown. I can't do that.
+- My brain just flashed a "Low Battery" warning. Time for a recharge (and definitely not that). I can't do that.
+
 
 ! local concat = newline
   + help
-  - Here are the commands you can use:
-  ^  list products or
-  ^  show categories or
-  ^  show products in [category]
-  ^  You can show details about [product name]
-  ^  or buy [product name]
-  ^  and help,
-  ^  exit,
-  ^  bye
+  ^  You can say list products or categories.
+  ^  Or list products in [category] or you can say, details about [product name].
+  ^  When you like to buy something, you say, buy and the [product name].
+  ^  and if you say exit, then you can leave the shop.
+
 
 < topic
 
@@ -76,9 +84,67 @@
       // Simulate fetching data asynchronously (replace with your actual async call)
       setTimeout(() => {
           const products = [
-              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
-              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
-              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+             {
+  "name": "Gigglegrass",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to humorous home decor, a gag gift, or a decorative item resembling grass with a funny twist. Potentially herb-related in a humorous way.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Couchlock",
+  "price": 5.00,
+  "details": "Novelty item, potentially a humorous relaxation aid, a comfortable cushion, a gadget related to binge-watching, or a gag gift alluding to being stuck on the couch.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Munchies",
+  "price": 5.00,
+  "details": "Novelty item, likely food-related. Could be a snack dispenser, a humorous kitchen gadget, a themed snack box, or a gag gift for people who get the 'munchies'.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Spaceflakes",
+  "price": 5.00,
+  "details": "Novelty item, potentially a breakfast cereal-themed item, a celestial-themed decoration, or a gag gift with a space or science fiction theme.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Dopezilla",
+  "price": 5.00,
+  "details": "Novelty item, likely a humorous parody of Godzilla, possibly a toy, a sticker, a t-shirt, or another item combining Godzilla imagery with slang.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Nuggetry",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to chicken nuggets, gold nuggets (as a joke), or a collection of small trinkets/items.  Could be food-themed or a fun container/box.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Pufftopia",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to smoke-themed lifestyle. Could be an air freshener, a quirky container, or a decoration related to the 'puff' aesthetic.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Wobblers",
+  "price": 5.00,
+  "details": "Novelty item, likely a toy or object that wobbles, potentially a stress toy, a humorous figure, or an item designed to be unsteady.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Chronicool",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to feeling chronically unwell. Could be a medical-themed gag gift, a quirky decoration, or a product related to staying warm. Likely humorous.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Bakedalaska",
+  "price": 5.00,
+  "details": "Novelty item, could be related to the dessert Baked Alaska. It might be a cooking gadget, a kitchen decoration, or a humorous item related to baking.",
+  "category": "Novelty Item/Lifestyle"
+}
+ 
           ];
 
           const product = products.find(p => p.name.toLowerCase() === productName);
@@ -101,9 +167,67 @@
       // Simulate fetching data asynchronously (replace with your actual async call)
       setTimeout(() => {
           const products = [
-              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
-              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
-              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+       {
+  "name": "Gigglegrass",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to humorous home decor, a gag gift, or a decorative item resembling grass with a funny twist. Potentially herb-related in a humorous way.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Couchlock",
+  "price": 5.00,
+  "details": "Novelty item, potentially a humorous relaxation aid, a comfortable cushion, a gadget related to binge-watching, or a gag gift alluding to being stuck on the couch.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Munchies",
+  "price": 5.00,
+  "details": "Novelty item, likely food-related. Could be a snack dispenser, a humorous kitchen gadget, a themed snack box, or a gag gift for people who get the 'munchies'.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Spaceflakes",
+  "price": 5.00,
+  "details": "Novelty item, potentially a breakfast cereal-themed item, a celestial-themed decoration, or a gag gift with a space or science fiction theme.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Dopezilla",
+  "price": 5.00,
+  "details": "Novelty item, likely a humorous parody of Godzilla, possibly a toy, a sticker, a t-shirt, or another item combining Godzilla imagery with slang.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Nuggetry",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to chicken nuggets, gold nuggets (as a joke), or a collection of small trinkets/items.  Could be food-themed or a fun container/box.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Pufftopia",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to smoke-themed lifestyle. Could be an air freshener, a quirky container, or a decoration related to the 'puff' aesthetic.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Wobblers",
+  "price": 5.00,
+  "details": "Novelty item, likely a toy or object that wobbles, potentially a stress toy, a humorous figure, or an item designed to be unsteady.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Chronicool",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to feeling chronically unwell. Could be a medical-themed gag gift, a quirky decoration, or a product related to staying warm. Likely humorous.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Bakedalaska",
+  "price": 5.00,
+  "details": "Novelty item, could be related to the dessert Baked Alaska. It might be a cooking gadget, a kitchen decoration, or a humorous item related to baking.",
+  "category": "Novelty Item/Lifestyle"
+}
+ 
           ];
 
           const filteredProducts = products.filter(p => p.category.toLowerCase() === categoryName);
@@ -126,9 +250,67 @@
       // Simulate fetching data asynchronously (replace with your actual async call)
       setTimeout(() => {
           const products = [
-              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
-              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
-              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+    {
+  "name": "Gigglegrass",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to humorous home decor, a gag gift, or a decorative item resembling grass with a funny twist. Potentially herb-related in a humorous way.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Couchlock",
+  "price": 5.00,
+  "details": "Novelty item, potentially a humorous relaxation aid, a comfortable cushion, a gadget related to binge-watching, or a gag gift alluding to being stuck on the couch.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Munchies",
+  "price": 5.00,
+  "details": "Novelty item, likely food-related. Could be a snack dispenser, a humorous kitchen gadget, a themed snack box, or a gag gift for people who get the 'munchies'.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Spaceflakes",
+  "price": 5.00,
+  "details": "Novelty item, potentially a breakfast cereal-themed item, a celestial-themed decoration, or a gag gift with a space or science fiction theme.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Dopezilla",
+  "price": 5.00,
+  "details": "Novelty item, likely a humorous parody of Godzilla, possibly a toy, a sticker, a t-shirt, or another item combining Godzilla imagery with slang.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Nuggetry",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to chicken nuggets, gold nuggets (as a joke), or a collection of small trinkets/items.  Could be food-themed or a fun container/box.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Pufftopia",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to smoke-themed lifestyle. Could be an air freshener, a quirky container, or a decoration related to the 'puff' aesthetic.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Wobblers",
+  "price": 5.00,
+  "details": "Novelty item, likely a toy or object that wobbles, potentially a stress toy, a humorous figure, or an item designed to be unsteady.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Chronicool",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to feeling chronically unwell. Could be a medical-themed gag gift, a quirky decoration, or a product related to staying warm. Likely humorous.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Bakedalaska",
+  "price": 5.00,
+  "details": "Novelty item, could be related to the dessert Baked Alaska. It might be a cooking gadget, a kitchen decoration, or a humorous item related to baking.",
+  "category": "Novelty Item/Lifestyle"
+}
+ 
           ];
 
           const categories = [...new Set(products.map(p => p.category))]; // Get unique categories
@@ -147,9 +329,66 @@
       // Simulate fetching data asynchronously (replace with your actual async call)
       setTimeout(() => {
           const products = [
-              { "name": "bimbo", "price": 25.00, "details": "A comfortable and stylish t-shirt.", "category": "Clothing" },
-              { "name": "cool", "price": 60.00, "details": "Durable and fashionable jeans for everyday wear.", "category": "Clothing" },
-              { "name": "donald", "price": 80.00, "details": "High-performance donald for athletes.", "category": "Shoes" }
+      {
+  "name": "Gigglegrass",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to humorous home decor, a gag gift, or a decorative item resembling grass with a funny twist. Potentially herb-related in a humorous way.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Couchlock",
+  "price": 5.00,
+  "details": "Novelty item, potentially a humorous relaxation aid, a comfortable cushion, a gadget related to binge-watching, or a gag gift alluding to being stuck on the couch.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Munchies",
+  "price": 5.00,
+  "details": "Novelty item, likely food-related. Could be a snack dispenser, a humorous kitchen gadget, a themed snack box, or a gag gift for people who get the 'munchies'.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Spaceflakes",
+  "price": 5.00,
+  "details": "Novelty item, potentially a breakfast cereal-themed item, a celestial-themed decoration, or a gag gift with a space or science fiction theme.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Dopezilla",
+  "price": 5.00,
+  "details": "Novelty item, likely a humorous parody of Godzilla, possibly a toy, a sticker, a t-shirt, or another item combining Godzilla imagery with slang.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Nuggetry",
+  "price": 5.00,
+  "details": "Novelty item, possibly related to chicken nuggets, gold nuggets (as a joke), or a collection of small trinkets/items.  Could be food-themed or a fun container/box.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Pufftopia",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to smoke-themed lifestyle. Could be an air freshener, a quirky container, or a decoration related to the 'puff' aesthetic.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Wobblers",
+  "price": 5.00,
+  "details": "Novelty item, likely a toy or object that wobbles, potentially a stress toy, a humorous figure, or an item designed to be unsteady.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Chronicool",
+  "price": 5.00,
+  "details": "Novelty item, potentially related to feeling chronically unwell. Could be a medical-themed gag gift, a quirky decoration, or a product related to staying warm. Likely humorous.",
+  "category": "Novelty Item/Lifestyle"
+},
+{
+  "name": "Bakedalaska",
+  "price": 5.00,
+  "details": "Novelty item, could be related to the dessert Baked Alaska. It might be a cooking gadget, a kitchen decoration, or a humorous item related to baking.",
+  "category": "Novelty Item/Lifestyle"
+}
           ];
 
           let list = "Here are the available products:\n";
@@ -165,3 +404,4 @@
   // This object macro now relies on products loaded externally.
   return "Order product functionality needs external implementation.";
 < object
+
