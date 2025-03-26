@@ -6,20 +6,19 @@
 - {ok}
 < begin
 
-+ shop
++ [*] (shop|shopping) [*]
 - {topic=shop} Hello customer
 
-+ play
++ [*] (play|centipede|games) [*]
 - Play Centipede (Yes/No)? {topic=game}
 
- + write
- - Open writer (Yes/No)? {topic=writer}
+ + [*] (writer|write|ghost pad) [*]
+- Open the writer? (Yes/No){topic=writer}
 
-+ (zine|magazines|mag|mags|magazine)
++ [*] (zine|magazines|mag|mags|magazine)[*] 
 - Read magazines? (Yes/No)? {topic=zine}
 
-
-+ (something to read|like a magazine)
++ [*] (to read|like a magazine)[*] 
 - Read magazines? (Yes/No)? {topic=zine}
 
 
@@ -35,10 +34,10 @@
 + who is the boss
 - The boss is <bot boss>.
 
-+ google *{weight=10}
++ search for *
 - open: http://google.com/search?q=<star>
 
-+ youtube *
++ search for video about *
 - open: https://www.youtube.com/results?search_query=<star>
 
 
@@ -48,14 +47,12 @@
 ! local concat = newline
 + help
 - Here are the commands you can use:
-^  g yoursearchterm
-^  y yoursearchterm
+^  search for video about yoursearchterm
+^  search for yoursearchterm
 ^  play = centipede
 ^  hn = hacker news feed
 ^  articles = posts
 ^  what is the weather in ...
-^  tell me a joke
-^  tell me a poem
 
 // The ^ command automatically extends the data from the previous line
 + tell me a poem
@@ -68,8 +65,7 @@
 // + [*] gam* [*]
 // - Play Centipede? (Yes/No){topic=game}
 
-// + [*] writer* [*]
-// - Open the writer? (Yes/No){topic=writer}
+
 
 // + [*] (schedule|meeting|meet|call) [*]
 // - Schedule a meeting? (Yes/No){topic=meeting}

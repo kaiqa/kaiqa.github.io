@@ -372,16 +372,25 @@
                 }
 
                 let formattedPosts =
-                    "<strong>Here are the recent posts:</strong><br><br>";
+                    "Here are the recent posts ";
                 posts.forEach((post, index) => {
-                    const postDate = new Date(post.date).toLocaleDateString("en-US");
-                    formattedPosts += `${index + 1}. <a class="bot-link" href="${
-            post.URL
-          }" target="_blank">${
-            post.title
-          }</a> (Posted on: ${postDate})<br><br>`;
+                    // const postDate = new Date(post.date).toLocaleDateString("en-US");
+                    formattedPosts += `${index + 1}. "${post.title} `;
                 });
-                playSound();
+
+        //                 let formattedPosts =
+        //             "Here are the recent posts";
+        //         posts.forEach((post, index) => {
+        //             const postDate = new Date(post.date).toLocaleDateString("en-US");
+        //             formattedPosts += `${index + 1}. <a class="bot-link" href="${
+        //     post.URL
+        //   }" target="_blank">${
+        //     post.title
+        //   }</a> (Posted on: ${postDate})<br><br>`;
+        //         });
+
+
+             //   playSound();
                 return formattedPosts.trim();
             } catch (error) {
                 console.error("Failed to fetch WordPress posts:", error);
@@ -424,7 +433,6 @@
             iframeContainer.innerHTML = "";
             iframeContainer.appendChild(iframe);
         }
-
 
         function playSound() {
             if (!isMuted) { // Only play sound if not muted
@@ -477,6 +485,14 @@
         }
 
 async function speak(text) {
+    console.log("I am here with speak: " + text);
+    if (text.startsWith("open:")) {
+           console.log("the text starts with: " + text);
+    const url = text.substring(5).trim();
+    console.log("I am here with url: " + url);
+    window.open(url, "_blank");
+    return; // Prevent further processing of the reply
+}
     if ('speechSynthesis' in window) {
         const synth = window.speechSynthesis;
         synth.cancel(); // Stop any ongoing speech
@@ -524,17 +540,18 @@ async function speak(text) {
 
         speechUtterance.rate = speechRate; // Set speech rate *after* setting voice
         synth.speak(speechUtterance);
+
     } else {
         console.error("Text-to-speech is not supported in this browser.");
     }
 }
 
 
-        async function typeWriter(text, element, delay = 30) {
+        async function typeWriter(text, element, delay = 10) {
             element.textContent = ""; // Clear existing text
             for (let i = 0; i < text.length; i++) {
                 element.textContent += text[i];
-                playSound();
+             //   playSound();
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
@@ -559,28 +576,28 @@ async function speak(text) {
                     if (riveScriptLoaded) { // Only get reply if riveScript has loaded
                         // Get the response from RiveScript
                         var reply = await bot.reply("local-user", input);
-                        const responseDiv = document.getElementById("response");
-
-                        await typeWriter(reply, responseDiv); // Use typeWriter now here
-if (reply.startsWith("OPEN:")) {
-    const url = reply.substring(5).trim();
-    window.open(url, "_blank");
-    return; // Prevent further processing of the reply
-}
-                        // Call speak() only when not muted
-                        if (!isMuted) {
-                            speak(reply);
-
-                        }
-
-
-
+                        console.log("trying to open tab");
                         if (reply.startsWith("open:")) {
                             // Extract the instruction that follows "open:"
                             const instruction = reply.substring(5).trim();
                             // Pass the instruction to the handleChatResponse function
                             handleChatResponse(instruction);
                         }
+
+                        const responseDiv = document.getElementById("response");
+
+                        await typeWriter(reply, responseDiv); // Use typeWriter now here
+// if (reply.startsWith("OPEN:")) {
+//     const url = reply.substring(5).trim();
+//     window.open(url, "_blank");
+//     return; // Prevent further processing of the reply
+// }
+                        // Call speak() only when not muted
+                        if (!isMuted) {
+                            speak(reply);
+                        }
+
+                       
 
                     } else {
                         console.warn("RiveScript bot not loaded yet.  Please wait.");
@@ -708,7 +725,7 @@ function muteMicrophoneInput(shouldMute) {
         let timeoutId;
         const silenceTimeout = 500; // Adjust this value (milliseconds) - time after speech stops being detected
         let retryCount = 0;
-        const maxRetries = 3; //Adjust as necessary
+        const maxRetries = 2; //Adjust as necessary
 
 
         function startSpeechRecognition() {
@@ -726,7 +743,7 @@ function muteMicrophoneInput(shouldMute) {
             inputField.value = '';
             inputField.disabled = true;
 
-            startButton.textContent = 'Listening and Unmuted...'; // CHANGE 1: Update Start Button Text
+            startButton.textContent = 'Listening..'; // CHANGE 1: Update Start Button Text
 
             muteMicrophoneInput(false); //Unmute when speech recognition starts
 
@@ -813,7 +830,7 @@ function muteMicrophoneInput(shouldMute) {
             }
             inputField.disabled = false;
             // CHANGE 2: Update the Start Button Text.
-            startButton.textContent = 'Start Talking and Muted';
+            startButton.textContent = 'Talk';
 
             muteMicrophoneInput(false); // kai UNMute when speech recognition stops
         }
@@ -886,7 +903,7 @@ function muteMicrophoneInput(shouldMute) {
 
         permissionButton.addEventListener('click', getLocalStream);
         startButton.addEventListener('click', () => {
-             if (startButton.textContent === 'Start Talking and Muted') {
+             if (startButton.textContent === 'Talk') {
                 startSpeechRecognition();
             } else {
                 stopSpeechRecognition();
