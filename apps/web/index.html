@@ -24,7 +24,7 @@
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="GhostPad">
+  <meta name="apple-mobile-web-app-title" content="Ghostpad">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -117,18 +117,23 @@
 
   <div id="main-content">
     <!-- Your main content goes here -->
+
   </div>
 
   <script src="flutter_bootstrap.js" async></script>
+    <script src="https://kaiqa.github.io/lib/rivescript.min.js"></script>
+    <script src="https://kaiqa.github.io/lib/esheep.min.js"></script>
 
   <footer id="myFooter">
   <a href="https://kaiqa.wordpress.com/ghostpad/">
-          <img src="icons/downloadSpeechBubble.png" alt="GhostPad">
+          <img src="icons/downloadSpeechBubble.png" alt="Ghostpad">
   </footer>
 
 
 
   <script>
+    var gSheepBlue = new eSheep();
+    gSheepBlue.Start("https://kaiqa.github.io/lib/bbunny-animations.xml");
     setTimeout(function() {
       document.getElementById("myFooter").style.display = "none";
     }, 5000); // 5000 milliseconds = 5 seconds
