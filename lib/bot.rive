@@ -2,9 +2,12 @@
 
 > begin
 + request
-* <get topic> == undefined => {topic=random}
-- {ok}
+* <get topic> == undefined => {topic=random}{ok}
 < begin
+
+
++ show me
+- https://kaiqa.wordpress.com/wp-content/uploads/2024/09/cropped-smtype.png
 
 + [*] (shop|shopping) [*]
 - {topic=shop} Hello customer

@@ -139,6 +139,15 @@
             border-radius: 5px;
             margin-left: 10px;
         }
+
+        .image-container {
+            margin-top: 10px;
+        }
+
+        .image-container img {
+            max-width: 200px; /* Adjust as needed */
+            max-height: 200px; /* Adjust as needed */
+        }
     </style>
 </head>
 
@@ -497,24 +506,29 @@ gSheepBlue.Start("https://kaiqa.github.io/lib/bbunny-animations.xml");
             }
         }
 
+        
 async function speak(text) {
     console.log("I am here with speak: " + text);
     if (text.startsWith("open:")) {
-           console.log("the text starts with: " + text);
-    const url = text.substring(5).trim();
-    console.log("I am here with url: " + url);
-    window.open(url, "_blank");
-    return; // Prevent further processing of the reply
-}
+        console.log("the text starts with: " + text);
+        const url = text.substring(5).trim();
+        console.log("I am here with url: " + url);
+        window.open(url, "_blank");
+        return; // Prevent further processing of the reply
+    }
     if ('speechSynthesis' in window) {
         const synth = window.speechSynthesis;
         synth.cancel(); // Stop any ongoing speech
+
+        // *** NEW: Remove image URLs from the text ***
+        const imageUrlRegex = /\bhttps?:\/\/\S+(?:png|jpg|jpeg|gif)\b/gi;  // Matches URLs with image extensions
+        const textWithoutImages = text.replace(imageUrlRegex, '').trim(); // Remove image URLs
 
         const speechRate = 0.9; // Desired speech rate
         const voiceName = "Serena"; // Desired voice name
         const fallbackVoiceName = "Martha"; // Example fallback voice
 
-        speechUtterance = new SpeechSynthesisUtterance(text);
+        speechUtterance = new SpeechSynthesisUtterance(textWithoutImages); // Use the filtered text
         speechUtterance.lang = 'en-GB'; // Force language to en-GB for Serena
 
         // Ensure voices are loaded *before* trying to find them
@@ -559,77 +573,103 @@ async function speak(text) {
     }
 }
 
-
         async function typeWriter(text, element, delay = 10) {
-            element.textContent = ""; // Clear existing text
-            for (let i = 0; i < text.length; i++) {
-                element.textContent += text[i];
-             //   playSound();
-                await new Promise(resolve => setTimeout(resolve, delay));
+    element.innerHTML = "";  // Clear existing content using innerHTML (safer for HTML)
+
+    const textAndImageContainer = document.createElement('div');
+
+    let currentText = "";  // Accumulate text to add as a text node
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        // Regex to match image URLs
+        const imageUrlRegex = /\.(jpeg|jpg|gif|png)\b/i; // Word boundary (\b)
+
+        if (text.substring(i).match(imageUrlRegex)) {
+            // Extract image URL
+            let imageUrlEnd = i;
+            while (imageUrlEnd < text.length && !/\s/.test(text[imageUrlEnd])) {  // Match until whitespace
+                imageUrlEnd++;
             }
+            const imageUrl = text.substring(i, imageUrlEnd);
+            i = imageUrlEnd - 1;  // Advance the index
+
+            // Append any accumulated text *before* the image
+            if (currentText) {
+                textAndImageContainer.appendChild(document.createTextNode(currentText));  // Proper text node
+                currentText = "";  // Reset
+            }
+
+            // Create and append the image
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.classList.add('bot-image');
+            textAndImageContainer.appendChild(img);
+
+            await new Promise(resolve => setTimeout(resolve, delay)); // Delay after the image
+
+        } else {
+            currentText += char; // Accumulate text
+
         }
+      await new Promise(resolve => setTimeout(resolve, delay)); //text delay
+    }
+
+    // Append any remaining accumulated text
+    if (currentText) {
+        textAndImageContainer.appendChild(document.createTextNode(currentText)); // Proper text node
+    }
+
+    element.appendChild(textAndImageContainer);
+}
 
 
-        document
-            .getElementById("input")
-            .addEventListener("keydown", async function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    let input = this.value.trim();
-                    focusInput();
-                    if (input.trim() === "?") {
-                        console.log("yes");
-                        input = "questionmark";
+document
+    .getElementById("input")
+    .addEventListener("keydown", async function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            let input = this.value.trim();
+            focusInput();
+            if (input.trim() === "?") {
+                console.log("yes");
+                input = "questionmark";
+            }
+            this.value = "";
+
+            lastInput = input;
+
+            if (riveScriptLoaded) {
+                var reply = await bot.reply("local-user", input);
+
+                // *** NEW CODE: Handle opening URLs separately ***
+                if (reply.startsWith("open:")) {
+                    const url = reply.substring(5).trim();
+                    handleChatResponse(url); // OPEN THE URL
+                } else {
+                    // *** UPDATED CODE: Display Images and Text ***
+                    const responseDiv = document.getElementById("response");
+                    await typeWriter(reply, responseDiv);
+                    
+                    if (!isMuted) {
+                      speak(reply);
                     }
-                    this.value = ""; // Clear input field after capturing the value
-
-                    // Store the current input
-                    lastInput = input;
-
-                    if (riveScriptLoaded) { // Only get reply if riveScript has loaded
-                        // Get the response from RiveScript
-                        var reply = await bot.reply("local-user", input);
-                        console.log("trying to open tab");
-                        if (reply.startsWith("open:")) {
-                            // Extract the instruction that follows "open:"
-                            const instruction = reply.substring(5).trim();
-                            // Pass the instruction to the handleChatResponse function
-                            handleChatResponse(instruction);
-                        }
-
-                        const responseDiv = document.getElementById("response");
-
-                        await typeWriter(reply, responseDiv); // Use typeWriter now here
-// if (reply.startsWith("OPEN:")) {
-//     const url = reply.substring(5).trim();
-//     window.open(url, "_blank");
-//     return; // Prevent further processing of the reply
-// }
-                        // Call speak() only when not muted
-                        if (!isMuted) {
-                            speak(reply);
-                        }
-
-                       
-
-                    } else {
-                        console.warn("RiveScript bot not loaded yet.  Please wait.");
-                        responseDiv.textContent = "Please wait for the bot to load...";
-                    }
-                } else if (event.key === "ArrowUp") {
-                    //Populate the input field with the last input when the up arrow key is pressed
-                    this.value = lastInput;
-                    // Move cursor to the end of the input value
-                    event.preventDefault(); // Prevent the default action to ensure the text field is updated
-                    setTimeout(
-                        () =>
-                        this.setSelectionRange(this.value.length, this.value.length),
-                        0
-                    );
-
                 }
-            });
-
+            } else {
+                console.warn("RiveScript bot not loaded yet.  Please wait.");
+                responseDiv.textContent = "Please wait for the bot to load...";
+            }
+        } else if (event.key === "ArrowUp") {
+            this.value = lastInput;
+            event.preventDefault();
+            setTimeout(
+                () =>
+                this.setSelectionRange(this.value.length, this.value.length),
+                0
+            );
+        }
+    });
 
         function focusInput() {
             document.getElementById("input").focus();
