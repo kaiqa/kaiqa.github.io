@@ -2,7 +2,8 @@
 
 > begin
 + request
-* <get topic> == undefined => {topic=random}{ok}
+* <get topic> == undefined => {topic=random}
+- {ok}
 < begin
 
 
