@@ -10,32 +10,43 @@
       text-align: center;
       color: white;
       font-size: 18px;
-    }
+          }
 
     h1 {
       font-size: 36px;
-     
+    }
+
+    #gameContainer {
+      width: 90%; /* Base width for the game */
+      margin: 0 auto;
+      transform-origin: top center; /* Ensure scaling happens from the top center */
     }
 
     #gameArea {
- 
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       color: black;
     }
+    
+    #topCardContainer {
+      display: flex;
+      justify-content: center;
+      margin: 2px 0;
+      background-color: #28a745;
+    }
 
     .card {
       width: 392px;
       height: 577px;
-      margin: 5px;
-      border-radius: 10px;
+      margin: 1px;
+      border-radius: 1px;
       transition: transform 0.3s ease;
       cursor: pointer;
       display: inline-block;
       background-image: url('Full-Deck-Of-Ornate-Playing-Cards.svg');
       background-repeat: no-repeat;
-    }
+          }
 
     .card:hover {
       transform: scale(1.1);
@@ -48,25 +59,33 @@
     .invalid {
       opacity: 0.4;
     }
+    /* Specific styles for computer's cards */
+  #computerHand .card {
+    width: 80px; /* Smaller width for computer cards */
+    height: 120px; /* Smaller height for computer cards */
+    background-image: url('images/cards/backside.svg'); /* Ensure the back of the card is displayed */
+    background-size: contain;
+    background-position: center;
+  }
 
     #playerHand, #computerHand {
       font-weight: bold;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      color: white; 
+      color: white;
       font-size: 50px;
       background: #28a745;
-    }
+          }
 
     #drawCardButton {
       padding: 15px 30px;
-      font-size: 20px;
+      font-size: 60px;
       background: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
-      margin: 10px;
+      margin: 1px;
       cursor: pointer;
     }
 
@@ -74,12 +93,11 @@
       background: #0056b3;
     }
 
-    #topCardContainer {
-      display: flex;
-      justify-content: center;
-      
+    #message {
+      font-size: 24px;
+      color: #fff;
       background: #28a745;
-    }
+      }
 
     #topCard {
       width: 392px;
@@ -101,14 +119,16 @@
 </head>
 <body>
   <h1>Mau Mau (Klassisches Design)</h1>
-  <div id="gameArea">
-    <div id="computerHand">Computer Hand: (0 Karten)</div>
-    <div id="message"></div>
-    <div id="topCardContainer">
-      <div id="topCard" class="card"></div>
+  <div id="gameContainer">
+    <div id="gameArea">
+      <div id="computerHand">Computer Hand: (0 Karten)</div>
+      <div id="message"></div>
+      <div id="topCardContainer">
+        <div id="topCard" class="card"></div>
+      </div>
+      <div id="playerHand">Deine Karten:</div>
+      <button id="drawCardButton">Karte ziehen</button>
     </div>
-    <div id="playerHand">Deine Karten:</div>
-    <button id="drawCardButton">Karte ziehen</button>
   </div>
 
   <script>
