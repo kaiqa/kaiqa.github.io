@@ -255,7 +255,7 @@
 
   <script>
     const suits = ["hearts", "diamonds", "clubs", "spades"];
-    const ranks = ["8", "9", "10", "jack", "queen", "king", "ace"];
+    const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
     const suitMap = { "hearts": 0, "diamonds": 1, "clubs": 2, "spades": 3 };
     const rankMap = { 
       "8": 0, "9": 1, "10": 2, "jack": 3, "queen": 4, "king": 5, "ace": 6 
@@ -292,8 +292,8 @@
 
     function shuffleDeck() {
       for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
+        const j = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * (i + 1)); // Use a cryptographically secure random number
+        [deck[i], deck[j]] = [deck[j], deck[i]]; // Swap elements
       }
     }
 
