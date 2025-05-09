@@ -85,7 +85,7 @@
 
      /* Computer's cards (50% smaller) */
   #computerHand .card {
-    width: 96px; /* 50% of the original width */
+    width: 130px; /* 50% of the original width */
     height: 188.5px; /* 50% of the original height */
     background-size: contain; /* Ensure the card back scales proportionally */
     background-position: center;
@@ -218,7 +218,7 @@
   <h1>Mau Mau</h1>
   <div id="gameContainer">
     <div id="gameArea">
-      <div id="computerHand">Computer Hand: (0 Karten)</div>
+      <div id="computerHand"></div>
       <div id="message"></div>
       <div id="topCardContainer">
         <div id="topCard" class="card"></div>
@@ -240,6 +240,8 @@
       <img src="images/cards/spades_ace.svg" alt="Pik" data-suit="spades" style="width: 100px; cursor: pointer;">
     </div>
   </div>
+
+  <audio id="victorySound" src="sounds/victory.mp3" preload="auto"></audio>
 
   <script>
     const cardFilePath = (suit, rank) => {
@@ -336,7 +338,8 @@
       });
 
       // Clear the computer's hand
-      computerHandDiv.innerHTML = `Computer Hand (${computerHand.length} Karten):`;
+      computerHandDiv.innerHTML = ``;
+
       computerHand.forEach(() => {
         const cardDiv = document.createElement("div");
         cardDiv.classList.add("card");
@@ -525,6 +528,12 @@
     function endGame(winner) {
       gameEnded = true;
       messageDiv.textContent = `${winner} hat gewonnen!`;
+
+      // Play the victory sound if the player wins
+      if (winner === "Spieler") {
+        const victorySound = document.getElementById("victorySound");
+        victorySound.play();
+      }
 
       // Show the restart button
       const restartButton = document.getElementById("restartButton");
