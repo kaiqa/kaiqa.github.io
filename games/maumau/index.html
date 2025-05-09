@@ -244,6 +244,7 @@
   <audio id="victorySound" src="sounds/victory.mp3" preload="auto"></audio>
   <audio id="drawSound" src="sounds/draw.mp3" preload="auto"></audio>
   <audio id="playSound" src="sounds/play.mp3" preload="auto"></audio>
+  <audio id="errorSound" src="sounds/error.mp3" preload="auto"></audio>
 
   <script>
     const cardFilePath = (suit, rank) => {
@@ -363,7 +364,12 @@
     function playCard(index) {
       if (gameEnded || currentTurn !== "player") return; // Ensure it's the player's turn
       const card = playerHand[index];
-      if (!isValidMove(card)) return alert("Ungültiger Zug!");
+      if (!isValidMove(card)) {
+        // Play the error sound
+        const errorSound = document.getElementById("errorSound");
+        errorSound.play();
+        return;
+      }
 
       // Prevent ending on Jack
       if (playerHand.length === 1 && card.rank === "jack") {
@@ -513,7 +519,8 @@
             }
 
             currentSuit = null;
-            messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
+            // messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
+           messageDiv.textContent = ``; 
             displayHands();
             if (computerHand.length === 0) {
               endGame("Computer");
