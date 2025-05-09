@@ -193,6 +193,25 @@
         font-size: 14px;
       }
     }
+
+    #suitSelectionDialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid #28a745;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      z-index: 1000;
+    }
+
+    #suitSelectionDialog img:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s ease;
+    }
   </style>
 </head>
 <body>
@@ -209,6 +228,16 @@
     </div>
   </div>
 
+  <div id="suitSelectionDialog" style="display: none;">
+    <h3>Wähle eine Farbe:</h3>
+    <div style="display: flex; justify-content: center; gap: 20px;">
+      <img src="images/cards/hearts_ace.svg" alt="Herz" data-suit="hearts" style="width: 100px; cursor: pointer;">
+      <img src="images/cards/diamonds_ace.svg" alt="Karo" data-suit="diamonds" style="width: 100px; cursor: pointer;">
+      <img src="images/cards/clubs_ace.svg" alt="Kreuz" data-suit="clubs" style="width: 100px; cursor: pointer;">
+      <img src="images/cards/spades_ace.svg" alt="Pik" data-suit="spades" style="width: 100px; cursor: pointer;">
+    </div>
+  </div>
+
   <script>
     const cardFilePath = (suit, rank) => {
       // Map suits and ranks to the corresponding file names
@@ -222,6 +251,13 @@
     const suitMap = { "hearts": 0, "diamonds": 1, "clubs": 2, "spades": 3 };
     const rankMap = { 
       "8": 0, "9": 1, "10": 2, "jack": 3, "queen": 4, "king": 5, "ace": 6 
+    };
+
+    const suitTranslations = {
+      hearts: "Herz",
+      diamonds: "Karo",
+      clubs: "Kreuz",
+      spades: "Pik"
     };
 
     const cardWidth = 410;
@@ -351,16 +387,20 @@
     }
 
     function chooseSuit() {
-      const suit = prompt("Welche Farbe wählst du? hearts diamonds clubs spades (Herz, Karo, Kreuz, Pik)");
-      if (suits.includes(suit)) {
-        currentSuit = suit;
-        messageDiv.textContent = `Du hast ${currentSuit} gewählt. Computer ist dran.`;
-        currentTurn = "computer"; // Switch to the computer's turn
-        computerTurn(); // Trigger the computer's turn
-      } else {
-        alert("Ungültige Farbe.");
-        chooseSuit(); // Prompt the player again if the input is invalid
-      }
+      const suitSelectionDialog = document.getElementById("suitSelectionDialog");
+      suitSelectionDialog.style.display = "block"; // Show the dialog
+
+      // Add click event listeners to the suit images
+      suitSelectionDialog.querySelectorAll("img").forEach(img => {
+        img.addEventListener("click", function () {
+          const suit = this.getAttribute("data-suit"); // Get the selected suit
+          currentSuit = suit;
+          messageDiv.textContent = `Du hast ${currentSuit} (${suitTranslations[currentSuit]}) gewählt. Computer ist dran.`;
+          suitSelectionDialog.style.display = "none"; // Hide the dialog
+          currentTurn = "computer"; // Switch to the computer's turn
+          computerTurn(); // Trigger the computer's turn
+        });
+      });
     }
 
     function nextTurn() {
@@ -403,14 +443,14 @@
 
           if (card.rank === "jack") {
             currentSuit = suits[Math.floor(Math.random() * suits.length)];
-            messageDiv.textContent = `Computer spielt Bube und wählt ${currentSuit}`;
+            messageDiv.textContent = `Computer spielt Jack und wählt ${currentSuit} (${suitTranslations[currentSuit]})`;
             displayHands();
             currentTurn = "player"; // Switch to the player's turn
             return;
           }
 
           currentSuit = null;
-          messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit}`;
+          messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
           displayHands();
           if (computerHand.length === 0) {
             endGame("Computer");
