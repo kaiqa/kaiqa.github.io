@@ -17,7 +17,7 @@
     }
 
     #gameContainer {
-      width: 90%; /* Base width for the game */
+      width: 100%; /* Base width for the game */
       margin: 0 auto;
       transform-origin: top center; /* Ensure scaling happens from the top center */
     }
@@ -37,8 +37,8 @@
     }
 
     .card {
-      width: 392px;
-      height: 577px;
+    width: 196px; /* 50% of the original width (392px) */
+    height: 288.5px; /* 50% of the original height (577px) */
       margin: 1px;
       border-radius: 1px;
       transition: transform 0.3s ease;
@@ -46,6 +46,7 @@
       display: inline-block;
       background-image: url('Full-Deck-Of-Ornate-Playing-Cards.svg');
       background-repeat: no-repeat;
+      
           }
 
     .card:hover {
@@ -74,13 +75,14 @@
       justify-content: center;
       flex-wrap: wrap;
       color: white;
-      font-size: 50px;
+      font-size: 10px;
       background: #28a745;
+       background-size: contain;
           }
 
     #drawCardButton {
       padding: 15px 30px;
-      font-size: 60px;
+      font-size: 30px;
       background: #007bff;
       color: white;
       border: none;
