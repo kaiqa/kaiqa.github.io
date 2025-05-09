@@ -10,7 +10,9 @@
       text-align: center;
       color: white;
       font-size: 18px;
-          }
+      margin: 0;
+      padding: 0;
+    }
 
     h1 {
       font-size: 36px;
@@ -23,7 +25,7 @@
     }
 
     #gameArea {
-      background: #fff;
+      background: #0c6b0c;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       color: black;
@@ -37,17 +39,16 @@
     }
 
     .card {
-    width: 196px; /* 50% of the original width (392px) */
-    height: 288.5px; /* 50% of the original height (577px) */
-      margin: 1px;
-      border-radius: 1px;
-      transition: transform 0.3s ease;
-      cursor: pointer;
-      display: inline-block;
-      background-image: url('Full-Deck-Of-Ornate-Playing-Cards.svg');
+      width: 120px; /* Adjust card size */
+      height: 180px;
+      margin: 5px;
+      border-radius: 10px;
       background-repeat: no-repeat;
-      
-          }
+      background-size: contain;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
 
     .card:hover {
       transform: scale(1.1);
@@ -60,14 +61,16 @@
     .invalid {
       opacity: 0.4;
     }
-    /* Specific styles for computer's cards */
-  #computerHand .card {
-    width: 80px; /* Smaller width for computer cards */
-    height: 120px; /* Smaller height for computer cards */
-    background-image: url('images/cards/backside.svg'); /* Ensure the back of the card is displayed */
-    background-size: contain;
-    background-position: center;
-  }
+
+    #topCard {
+  
+      border-radius: 10px;
+      background-image: url('Full-Deck-Of-Ornate-Playing-Cards.svg');
+      background-repeat: no-repeat;
+      
+      background-position: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
     #playerHand, #computerHand {
       font-weight: bold;
@@ -75,19 +78,28 @@
       justify-content: center;
       flex-wrap: wrap;
       color: white;
-      font-size: 10px;
+      font-size: 16px;
       background: #28a745;
-       background-size: contain;
-          }
+      /* padding: 10px; */
+      border-radius: 5px;
+    }
+
+     /* Computer's cards (50% smaller) */
+  #computerHand .card {
+    width: 96px; /* 50% of the original width */
+    height: 188.5px; /* 50% of the original height */
+    background-size: contain; /* Ensure the card back scales proportionally */
+    background-position: center;
+  }
 
     #drawCardButton {
-      padding: 15px 30px;
-      font-size: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
       background: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
-      margin: 1px;
+      margin: 10px;
       cursor: pointer;
     }
 
@@ -97,25 +109,89 @@
 
     #message {
       font-size: 24px;
-      color: #fff;
+      color: #ffffff;
       background: #28a745;
-      }
-
-    #topCard {
-      width: 392px;
-      height: 577px;
-      border-radius: 10px;
-      background-image: url('Full-Deck-Of-Ornate-Playing-Cards.svg');
-      background-repeat: no-repeat;
-      background-size: 5100px 2310px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 0px;
+      border-radius: 5px;
+      margin: 0px auto;
+      max-width: 100%;
     }
 
-    #message {
-      font-size: 52px;
-      color: #fff;
- 
-      background: #28a745;
+    /* Media Queries for Responsiveness */
+    @media (max-width: 1024px) {
+      #gameContainer {
+        transform: scale(0.9); /* Scale down to 80% for tablets */
+      }
+
+      .card, #topCard {
+        width: 156px; /* Adjust card size for tablets */
+        height: 228.5px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      #message {
+        font-size: 20px;
+      }
+
+      #drawCardButton {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #gameContainer {
+        transform: scale(0.6); /* Scale down to 60% for smaller tablets */
+      }
+
+      .card, #topCard {
+        width: 120px; /* Adjust card size for smaller tablets */
+        height: 180px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      #message {
+        font-size: 18px;
+      }
+
+      #drawCardButton {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #gameContainer {
+        transform: scale(0.4); /* Scale down to 40% for mobile phones */
+      }
+
+      .card, #topCard {
+        width: 198px; /* Adjust card size for mobile phones */
+        height: 244px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      #message {
+        font-size: 16px;
+      }
+
+      #drawCardButton {
+        font-size: 10px;
+        padding: 5px 10px;
+      }
+
+      #playerHand, #computerHand {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -134,12 +210,18 @@
   </div>
 
   <script>
-    const suits = ["Herz", "Karo", "Kreuz", "Pik"];
-    const ranks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Bube", "Dame", "König"];
-    const suitMap = { "Herz": 0, "Karo": 1, "Kreuz": 2, "Pik": 3 };
+    const cardFilePath = (suit, rank) => {
+      // Map suits and ranks to the corresponding file names
+      return `images/cards/${suit}_${rank}.svg`;
+    };
+  </script>
+
+  <script>
+    const suits = ["hearts", "diamonds", "clubs", "spades"];
+    const ranks = ["8", "9", "10", "jack", "queen", "king", "ace"];
+    const suitMap = { "hearts": 0, "diamonds": 1, "clubs": 2, "spades": 3 };
     const rankMap = { 
-      "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5, 
-      "7": 6, "8": 7, "9": 8, "10": 9, "Bube": 10, "Dame": 11, "König": 12 
+      "8": 0, "9": 1, "10": 2, "jack": 3, "queen": 4, "king": 5, "ace": 6 
     };
 
     const cardWidth = 410;
@@ -183,41 +265,35 @@
     }
 
     function isValidMove(card) {
-      if (topCard.rank === "Bube" && currentSuit) {
-        return card.suit === currentSuit || card.rank === "Bube";
+      if (topCard.rank === "jack" && currentSuit) {
+        return card.suit === currentSuit || card.rank === "jack";
       }
-      return card.rank === "Bube" || card.suit === topCard.suit || card.rank === topCard.rank;
+      return card.rank === "jack" || card.suit === topCard.suit || card.rank === topCard.rank;
     }
 
     function displayHands() {
-      playerHandDiv.innerHTML = `Deine Karten (${playerHand.length}):`;
+      // Clear the player's hand
+      playerHandDiv.innerHTML = "";
       playerHand.forEach((card, index) => {
         const cardDiv = document.createElement("div");
         cardDiv.classList.add("card");
-        cardDiv.title = `${card.rank} von ${card.suit}`;
-        cardDiv.style.backgroundPosition = getCardPosition(card);
-
-        if (isValidMove(card)) {
-          cardDiv.classList.add("valid");
-          cardDiv.addEventListener("click", () => playCard(index));
-        } else {
-          cardDiv.classList.add("invalid");
-        }
+        cardDiv.style.backgroundImage = `url('${cardFilePath(card.suit, card.rank)}')`; // Set the card image
+        cardDiv.addEventListener("click", () => playCard(index)); // Add click event
         playerHandDiv.appendChild(cardDiv);
       });
 
+      // Clear the computer's hand
       computerHandDiv.innerHTML = `Computer Hand (${computerHand.length} Karten):`;
-      for (let i = 0; i < computerHand.length; i++) {
+      computerHand.forEach(() => {
         const cardDiv = document.createElement("div");
         cardDiv.classList.add("card");
-        cardDiv.style.backgroundImage = "url('images/cards/backside.svg')";
+        cardDiv.style.backgroundImage = `url('images/cards/backside.svg')`; // Use the backside image
         computerHandDiv.appendChild(cardDiv);
-      }
+      });
 
+      // Update the top card
       if (topCard) {
-        const topCardPosition = getCardPosition(topCard);
-        topCardDiv.style.backgroundPosition = topCardPosition;
-        topCardDiv.title = `${topCard.rank} von ${topCard.suit}`;
+        topCardDiv.style.backgroundImage = `url('${cardFilePath(topCard.suit, topCard.rank)}')`;
       }
     }
 
@@ -227,7 +303,7 @@
       if (!isValidMove(card)) return alert("Ungültiger Zug!");
 
       // Prevent ending on Bube
-      if (playerHand.length === 1 && card.rank === "Bube") {
+      if (playerHand.length === 1 && card.rank === "jack") {
         alert("Du darfst das Spiel nicht mit einem Buben beenden!");
         return;
       }
@@ -258,7 +334,7 @@
         return; // Player retains their turn
       }
 
-      if (card.rank === "Bube") {
+      if (card.rank === "jack") {
         // Rule for "Bube": Wild card, player chooses the next suit
         chooseSuit();
         return;
@@ -275,7 +351,7 @@
     }
 
     function chooseSuit() {
-      const suit = prompt("Welche Farbe wählst du? (Herz, Karo, Kreuz, Pik)");
+      const suit = prompt("Welche Farbe wählst du? hearts diamonds clubs spades (Herz, Karo, Kreuz, Pik)");
       if (suits.includes(suit)) {
         currentSuit = suit;
         messageDiv.textContent = `Du hast ${currentSuit} gewählt. Computer ist dran.`;
@@ -325,7 +401,7 @@
             return;
           }
 
-          if (card.rank === "Bube") {
+          if (card.rank === "jack") {
             currentSuit = suits[Math.floor(Math.random() * suits.length)];
             messageDiv.textContent = `Computer spielt Bube und wählt ${currentSuit}`;
             displayHands();
