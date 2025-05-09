@@ -227,6 +227,9 @@
       <button id="drawCardButton">Karte ziehen</button>
     </div>
   </div>
+  <button id="restartButton" style="display: none; margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+    Spiel neu starten
+  </button>
 
   <div id="suitSelectionDialog" style="display: none;">
     <h3>Wähle eine Farbe:</h3>
@@ -264,6 +267,7 @@
     const cardHeight = 590;
 
     let deck = [], playerHand = [], computerHand = [], topCard, currentSuit = null, gameEnded = false;
+    let discardPile = [];
     let currentTurn = "player"; // Start with the player's turn
 
     const playerHandDiv = document.getElementById("playerHand");
@@ -289,7 +293,20 @@
     }
 
     function dealCard() {
-      return deck.length > 0 ? deck.pop() : null;
+      if (deck.length === 0) {
+        if (discardPile.length > 0) {
+          // Shuffle the discard pile back into the deck
+          deck = [...discardPile];
+          discardPile = [];
+          shuffleDeck();
+          messageDiv.textContent = "Der Stapel war leer. Der Ablagestapel wurde gemischt.";
+        } else {
+          // No cards left to shuffle
+          messageDiv.textContent = "Keine Karten mehr verfügbar!";
+          return null;
+        }
+      }
+      return deck.pop();
     }
 
     function getCardPosition(card) {
@@ -338,10 +355,15 @@
       const card = playerHand[index];
       if (!isValidMove(card)) return alert("Ungültiger Zug!");
 
-      // Prevent ending on Bube
+      // Prevent ending on Jack
       if (playerHand.length === 1 && card.rank === "jack") {
         alert("Du darfst das Spiel nicht mit einem Buben beenden!");
         return;
+      }
+
+      // Move the current top card to the discard pile
+      if (topCard) {
+        discardPile.push(topCard);
       }
 
       topCard = card;
@@ -371,7 +393,7 @@
       }
 
       if (card.rank === "jack") {
-        // Rule for "Bube": Wild card, player chooses the next suit
+        // Rule for "Jack": Wild card, player chooses the next suit
         chooseSuit();
         return;
       }
@@ -418,6 +440,9 @@
       for (let i = 0; i < computerHand.length; i++) {
         const card = computerHand[i];
         if (isValidMove(card)) {
+          if (topCard) {
+            discardPile.push(topCard); // Move the current top card to the discard pile
+          }
           topCard = card;
           computerHand.splice(i, 1);
 
@@ -442,8 +467,16 @@
           }
 
           if (card.rank === "jack") {
-            currentSuit = suits[Math.floor(Math.random() * suits.length)];
-            messageDiv.textContent = `Computer spielt Jack und wählt ${currentSuit} (${suitTranslations[currentSuit]})`;
+            // Rule for "jack": Computer chooses a suit it has in its hand
+            const availableSuits = computerHand.map(c => c.suit);
+            currentSuit = availableSuits.length > 0 ? availableSuits[Math.floor(Math.random() * availableSuits.length)] : null;
+
+            if (currentSuit) {
+              messageDiv.textContent = `Computer spielt Jack und wählt ${currentSuit} (${suitTranslations[currentSuit]})`;
+            } else {
+              messageDiv.textContent = "Computer spielt Jack, aber hat keine Karten der gewählten Farbe.";
+            }
+
             displayHands();
             currentTurn = "player"; // Switch to the player's turn
             return;
@@ -491,8 +524,14 @@
 
     function endGame(winner) {
       gameEnded = true;
-      drawCardButton.disabled = true;
-      messageDiv.textContent = `${winner} gewinnt das Spiel!`;
+      messageDiv.textContent = `${winner} hat gewonnen!`;
+
+      // Show the restart button
+      const restartButton = document.getElementById("restartButton");
+      restartButton.style.display = "block";
+
+      // Add click event listener to restart the game
+      restartButton.addEventListener("click", startGame);
     }
 
     function startGame() {
