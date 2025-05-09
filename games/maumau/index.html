@@ -242,6 +242,8 @@
   </div>
 
   <audio id="victorySound" src="sounds/victory.mp3" preload="auto"></audio>
+  <audio id="drawSound" src="sounds/draw.mp3" preload="auto"></audio>
+  <audio id="playSound" src="sounds/play.mp3" preload="auto"></audio>
 
   <script>
     const cardFilePath = (suit, rank) => {
@@ -308,6 +310,11 @@
           return null;
         }
       }
+
+      // Play the draw sound
+      const drawSound = document.getElementById("drawSound");
+      drawSound.play();
+
       return deck.pop();
     }
 
@@ -372,6 +379,13 @@
       topCard = card;
       playerHand.splice(index, 1);
 
+      // Update the top card visually
+      topCardDiv.style.backgroundImage = `url('${cardFilePath(topCard.suit, topCard.rank)}')`;
+
+      // Play the play sound
+      const playSound = document.getElementById("playSound");
+      playSound.play();
+
       if (card.rank === "7") {
         // Rule for "7": Computer draws 2 cards and skips its turn
         for (let i = 0; i < 2; i++) {
@@ -390,6 +404,10 @@
 
       if (card.rank === "8") {
         // Rule for "8": Skip the computer's turn
+        if (playerHand.length === 0) {
+          endGame("Spieler"); // Player wins if no cards are left
+          return;
+        }
         messageDiv.textContent = "Du hast eine 8 gespielt. Computer wird übersprungen!";
         displayHands();
         return; // Player retains their turn
@@ -440,72 +458,82 @@
     function computerTurn() {
       if (gameEnded || currentTurn !== "computer") return; // Ensure it's the computer's turn
 
-      for (let i = 0; i < computerHand.length; i++) {
-        const card = computerHand[i];
-        if (isValidMove(card)) {
-          if (topCard) {
-            discardPile.push(topCard); // Move the current top card to the discard pile
-          }
-          topCard = card;
-          computerHand.splice(i, 1);
-
-          if (card.rank === "7") {
-            // Rule for "7": Player draws 2 cards and the computer plays again
-            for (let j = 0; j < 2; j++) {
-              const newCard = dealCard();
-              if (newCard) playerHand.push(newCard);
+      setTimeout(() => {
+        for (let i = 0; i < computerHand.length; i++) {
+          const card = computerHand[i];
+          if (isValidMove(card)) {
+            if (topCard) {
+              discardPile.push(topCard); // Move the current top card to the discard pile
             }
-            messageDiv.textContent = "Computer spielt 7. Du ziehst 2 Karten. Computer ist nochmal dran.";
+            topCard = card;
+            computerHand.splice(i, 1);
+
+            // Play the play sound
+            const playSound = document.getElementById("playSound");
+            playSound.play();
+
+            if (card.rank === "7") {
+              // Rule for "7": Player draws 2 cards and the computer plays again
+              for (let j = 0; j < 2; j++) {
+                const newCard = dealCard();
+                if (newCard) playerHand.push(newCard);
+              }
+              messageDiv.textContent = "Computer spielt 7. Du ziehst 2 Karten. Computer ist nochmal dran.";
+              displayHands();
+              setTimeout(() => computerTurn(), 500); // Computer plays again
+              return;
+            }
+
+            if (card.rank === "8") {
+              // Rule for "8": Skip the player's turn
+              if (computerHand.length === 0) {
+                endGame("Computer"); // Computer wins if no cards are left
+                return;
+              }
+              messageDiv.textContent = "Computer spielt 8. Dein Zug wird übersprungen!";
+              displayHands();
+              setTimeout(() => computerTurn(), 500); // Computer plays again
+              return;
+            }
+
+            if (card.rank === "jack") {
+              // Rule for "jack": Computer chooses a suit it has in its hand
+              const availableSuits = computerHand.map(c => c.suit);
+              currentSuit = availableSuits.length > 0 ? availableSuits[Math.floor(Math.random() * availableSuits.length)] : null;
+
+              if (currentSuit) {
+                messageDiv.textContent = `Computer spielt Jack und wählt ${currentSuit} (${suitTranslations[currentSuit]})`;
+              } else {
+                messageDiv.textContent = "Computer spielt Jack, aber hat keine Karten der gewählten Farbe.";
+              }
+
+              displayHands();
+              currentTurn = "player"; // Switch to the player's turn
+              return;
+            }
+
+            currentSuit = null;
+            messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
             displayHands();
-            setTimeout(() => computerTurn(), 500); // Computer plays again
-            return;
-          }
-
-          if (card.rank === "8") {
-            // Rule for "8": Skip the player's turn, and the computer plays again
-            messageDiv.textContent = "Computer spielt 8. Dein Zug wird übersprungen!";
-            displayHands();
-            setTimeout(() => computerTurn(), 500); // Computer plays again
-            return;
-          }
-
-          if (card.rank === "jack") {
-            // Rule for "jack": Computer chooses a suit it has in its hand
-            const availableSuits = computerHand.map(c => c.suit);
-            currentSuit = availableSuits.length > 0 ? availableSuits[Math.floor(Math.random() * availableSuits.length)] : null;
-
-            if (currentSuit) {
-              messageDiv.textContent = `Computer spielt Jack und wählt ${currentSuit} (${suitTranslations[currentSuit]})`;
+            if (computerHand.length === 0) {
+              endGame("Computer");
             } else {
-              messageDiv.textContent = "Computer spielt Jack, aber hat keine Karten der gewählten Farbe.";
+              currentTurn = "player"; // Switch to the player's turn
             }
-
-            displayHands();
-            currentTurn = "player"; // Switch to the player's turn
             return;
           }
-
-          currentSuit = null;
-          messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
-          displayHands();
-          if (computerHand.length === 0) {
-            endGame("Computer");
-          } else {
-            currentTurn = "player"; // Switch to the player's turn
-          }
-          return;
         }
-      }
 
-      const newCard = dealCard();
-      if (newCard) {
-        computerHand.push(newCard);
-        messageDiv.textContent = "Computer zieht eine Karte.";
-      } else {
-        messageDiv.textContent = "Computer kann nicht ziehen.";
-      }
-      displayHands();
-      currentTurn = "player"; // Switch to the player's turn
+        const newCard = dealCard();
+        if (newCard) {
+          computerHand.push(newCard);
+          messageDiv.textContent = "Computer zieht eine Karte.";
+        } else {
+          messageDiv.textContent = "Computer kann nicht ziehen.";
+        }
+        displayHands();
+        currentTurn = "player"; // Switch to the player's turn
+      }, 2000); // Add a 3-second delay before the computer plays
     }
 
     function drawCard() {
