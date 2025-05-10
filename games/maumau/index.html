@@ -393,7 +393,8 @@
       playSound.play();
 
       if (card.rank === "7") {
-        // Rule for "7": Computer draws 2 cards and skips its turn
+        // Rule for "7": Counter with another seven
+        messageDiv.textContent = "Du hast eine 7 gespielt! Computer muss 2 Karten ziehen.";
         for (let i = 0; i < 2; i++) {
           const newCard = dealCard();
           if (newCard) {
@@ -403,7 +404,7 @@
             break;
           }
         }
-        messageDiv.textContent = "Computer zieht 2 Karten. Du bist nochmal dran.";
+        messageDiv.textContent = "Computer zieht 2 Karten. Du bist dran.";
         displayHands();
         return; // Player retains their turn
       }
@@ -479,14 +480,12 @@
             playSound.play();
 
             if (card.rank === "7") {
-              // Rule for "7": Player draws 2 cards and the computer plays again
-              for (let j = 0; j < 2; j++) {
-                const newCard = dealCard();
-                if (newCard) playerHand.push(newCard);
-              }
-              messageDiv.textContent = "Computer spielt 7. Du ziehst 2 Karten. Computer ist nochmal dran.";
+              // Rule for "7": Player must draw 2 cards automatically if they cannot counter
+              messageDiv.textContent = "Computer spielt 7. Du ziehst automatisch 2 Karten.";
+              drawTwoCardsForPlayer(playerHand); // Automatically add 2 cards to the player's hand
+              messageDiv.textContent = "Du hast 2 Karten gezogen. Computer ist nochmal dran.";
               displayHands();
-              setTimeout(() => computerTurn(), 500); // Computer plays again
+              setTimeout(() => computerTurn(), 1500); // Computer plays again
               return;
             }
 
@@ -519,8 +518,8 @@
             }
 
             currentSuit = null;
-            // messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
-           messageDiv.textContent = ``; 
+//             messageDiv.textContent = `Computer spielt ${card.rank} von ${card.suit} (${suitTranslations[card.suit]})`;
+messageDiv.textContent = ``; 
             displayHands();
             if (computerHand.length === 0) {
               endGame("Computer");
@@ -540,7 +539,7 @@
         }
         displayHands();
         currentTurn = "player"; // Switch to the player's turn
-      }, 2000); // Add a 3-second delay before the computer plays
+      }, 1500); // Add a delay before the computer plays
     }
 
     function drawCard() {
@@ -558,6 +557,35 @@
         currentTurn = "computer"; // Switch to the computer's turn
         computerTurn();
       }
+    }
+
+    function drawTwoCards() {
+      for (let i = 0; i < 2; i++) {
+        const newCard = dealCard();
+        if (newCard) {
+          playerHand.push(newCard);
+        } else {
+          messageDiv.textContent = "Der Stapel ist leer! Keine Karten mehr verfügbar.";
+          break;
+        }
+      }
+      displayHands();
+      messageDiv.textContent = "Du hast 2 Karten gezogen. Computer ist dran.";
+      currentTurn = "computer"; // Switch to the computer's turn
+      computerTurn(); // Resume the computer's turn
+    }
+
+    function drawTwoCardsForPlayer(player) {
+      for (let i = 0; i < 2; i++) {
+        const newCard = dealCard();
+        if (newCard) {
+          player.push(newCard);
+        } else {
+          messageDiv.textContent = "Der Stapel ist leer! Keine Karten mehr verfügbar.";
+          break;
+        }
+      }
+      displayHands();
     }
 
     function endGame(winner) {
@@ -591,7 +619,7 @@
       gameEnded = false;
       currentSuit = null;
       drawCardButton.disabled = false;
-      messageDiv.textContent = "Das Spiel beginnt! Du bist am Zug.";
+      messageDiv.textContent = "Du bist am Zug.";
       displayHands();
     }
 
