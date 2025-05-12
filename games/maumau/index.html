@@ -383,14 +383,6 @@
       }
 
       topCard = card;
-      playerHand.splice(index, 1);
-
-      // Update the top card visually
-      topCardDiv.style.backgroundImage = `url('${cardFilePath(topCard.suit, topCard.rank)}')`;
-
-      // Play the play sound
-      const playSound = document.getElementById("playSound");
-      playSound.play();
 
       if (card.rank === "7") {
         // Rule for "7": Counter with another seven
@@ -409,10 +401,24 @@
             drawCards(computerHand, 2); // Computer draws 2 cards
             messageDiv.textContent = "Computer zieht 2 Karten. Du bist dran.";
             displayHands();
+            currentTurn = "player"; // Switch back to the player's turn
           }
         }, 1500); // Add a delay for the computer's response
+
+        // Remove the player's "7" from their hand
+        playerHand.splice(index, 1);
+        displayHands(); // Update the UI to reflect the change
         return;
       }
+
+      playerHand.splice(index, 1);
+
+      // Update the top card visually
+      topCardDiv.style.backgroundImage = `url('${cardFilePath(topCard.suit, topCard.rank)}')`;
+
+      // Play the play sound
+      const playSound = document.getElementById("playSound");
+      playSound.play();
 
       if (card.rank === "8") {
         // Rule for "8": Skip the computer's turn
