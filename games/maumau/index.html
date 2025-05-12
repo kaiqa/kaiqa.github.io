@@ -395,18 +395,23 @@
       if (card.rank === "7") {
         // Rule for "7": Counter with another seven
         messageDiv.textContent = "Du hast eine 7 gespielt! Computer muss 2 Karten ziehen.";
-        for (let i = 0; i < 2; i++) {
-          const newCard = dealCard();
-          if (newCard) {
-            computerHand.push(newCard);
+        setTimeout(() => {
+          const hasSeven = computerHand.some(c => c.rank === "7");
+          if (hasSeven) {
+            // Computer counters with a 7
+            messageDiv.textContent = "Computer kontert mit einer 7! Du musst 4 Karten ziehen.";
+            drawCards(playerHand, 4); // Player draws 4 cards
+            displayHands();
+            currentTurn = "computer"; // Switch to the computer's turn
+            computerTurn();
           } else {
-            messageDiv.textContent = "Der Stapel ist leer! Computer kann keine Karte ziehen.";
-            break;
+            // Computer cannot counter
+            drawCards(computerHand, 2); // Computer draws 2 cards
+            messageDiv.textContent = "Computer zieht 2 Karten. Du bist dran.";
+            displayHands();
           }
-        }
-        messageDiv.textContent = "Computer zieht 2 Karten. Du bist dran.";
-        displayHands();
-        return; // Player retains their turn
+        }, 1500); // Add a delay for the computer's response
+        return;
       }
 
       if (card.rank === "8") {
@@ -480,12 +485,24 @@
             playSound.play();
 
             if (card.rank === "7") {
-              // Rule for "7": Player must draw 2 cards automatically if they cannot counter
-              messageDiv.textContent = "Computer spielt 7. Du ziehst automatisch 2 Karten.";
-              drawTwoCardsForPlayer(playerHand); // Automatically add 2 cards to the player's hand
-              messageDiv.textContent = "Du hast 2 Karten gezogen. Computer ist nochmal dran.";
-              displayHands();
-              setTimeout(() => computerTurn(), 1500); // Computer plays again
+              // Rule for "7": Player must draw 2 cards unless they counter with a 7
+              messageDiv.textContent = "Computer spielt 7. Du musst 2 Karten ziehen.";
+              setTimeout(() => {
+                const hasSeven = playerHand.some(c => c.rank === "7");
+                if (hasSeven) {
+                  // Player counters with a 7
+                  messageDiv.textContent = "Du konterst mit einer 7! Computer muss 4 Karten ziehen.";
+                  drawCards(computerHand, 4); // Computer draws 4 cards
+                  displayHands();
+                  currentTurn = "player"; // Switch to the player's turn
+                } else {
+                  // Player cannot counter
+                  drawCards(playerHand, 2); // Player draws 2 cards
+                  messageDiv.textContent = "Du hast 2 Karten gezogen. Computer ist nochmal dran.";
+                  displayHands();
+                  setTimeout(() => computerTurn(), 1500); // Computer plays again
+                }
+              }, 1500); // Add a delay for the player's response
               return;
             }
 
@@ -557,6 +574,19 @@ messageDiv.textContent = ``;
         currentTurn = "computer"; // Switch to the computer's turn
         computerTurn();
       }
+    }
+
+    function drawCards(player, count) {
+      for (let i = 0; i < count; i++) {
+        const newCard = dealCard();
+        if (newCard) {
+          player.push(newCard);
+        } else {
+          messageDiv.textContent = "Der Stapel ist leer! Keine Karten mehr verfügbar.";
+          break;
+        }
+      }
+      displayHands();
     }
 
     function drawTwoCards() {
